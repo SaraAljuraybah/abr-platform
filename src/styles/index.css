@@ -1,0 +1,229 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+/*
+ * ABR design tokens — Brand Identity Guidelines v1.0, Plan v2.0 §16.
+ * Raw brand values live in --abr-*; shadcn/ui semantic variables map onto them
+ * so every component inherits the brand. Primary actions use Secondary #7C3AED,
+ * never Pink (white on Pink is 3.53:1 and fails WCAG AA for button text).
+ *
+ * Dark mode is out of scope for SCRUM-11. Proposed dark values (§16) for later:
+ * background #0F0720 · surface #241645 · border #33235C · text #F5F0FF
+ * text-secondary #B8A9D9 · action #A855F7 · on-action #0F0720.
+ */
+:root {
+  /* Brand palette */
+  --abr-primary: #4b1c7a;
+  --abr-action: #7c3aed;
+  --abr-action-hover: #6d28d9;
+  --abr-action-pressed: #5b21b6;
+  --abr-accent: #a855f7;
+  --abr-pink: #ec4899; /* gradients, illustrations, large display text; under 5% of a layout */
+  --abr-pink-text: #be185d; /* functional pink for text (6.04:1 on white) */
+  --abr-light-pink: #fbcfe8;
+  --abr-dark: #0f0720;
+
+  /* Neutrals */
+  --abr-bg: #faf9fc;
+  --abr-card: #ffffff;
+  --abr-surface: #f3edff;
+  --abr-border: #e9d5ff;
+  --abr-text: #1e1147;
+  --abr-text-2: #6b5b95;
+
+  /* Status (outside the brand palette on purpose; always pair with icon or label) */
+  --abr-success: #15803d;
+  --abr-success-bg: #dcfce7;
+  --abr-warning: #b45309;
+  --abr-warning-bg: #fef3c7;
+  --abr-error: #dc2626;
+  --abr-error-bg: #fee2e2;
+  --abr-info: #2563eb;
+  --abr-info-bg: #dbeafe;
+
+  /* Gradients */
+  --abr-gradient-ribbon: linear-gradient(45deg, #ec4899 0%, #a855f7 52%, #7c3aed 100%);
+  --abr-gradient-deep: linear-gradient(125deg, #0f0720 0%, #4b1c7a 42%, #7c3aed 74%, #ec4899 108%);
+  --abr-gradient-soft: linear-gradient(135deg, #f3edff 0%, #fbcfe8 100%);
+
+  /* shadcn/ui semantic tokens */
+  --background: var(--abr-bg);
+  --foreground: var(--abr-text);
+  --card: var(--abr-card);
+  --card-foreground: var(--abr-text);
+  --popover: var(--abr-card);
+  --popover-foreground: var(--abr-text);
+  --primary: var(--abr-action);
+  --primary-foreground: #ffffff;
+  --secondary: var(--abr-surface);
+  --secondary-foreground: var(--abr-primary);
+  --muted: var(--abr-surface);
+  --muted-foreground: var(--abr-text-2);
+  --accent: var(--abr-surface);
+  --accent-foreground: var(--abr-primary);
+  --destructive: var(--abr-error);
+  --border: var(--abr-border);
+  --input: var(--abr-border);
+  --ring: var(--abr-accent);
+  --radius: 10px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand: var(--abr-primary);
+  --color-brand-accent: var(--abr-accent);
+  --color-action-hover: var(--abr-action-hover);
+  --color-action-pressed: var(--abr-action-pressed);
+  --color-pink: var(--abr-pink);
+  --color-pink-text: var(--abr-pink-text);
+  --color-light-pink: var(--abr-light-pink);
+  --color-dark: var(--abr-dark);
+  --color-success: var(--abr-success);
+  --color-success-bg: var(--abr-success-bg);
+  --color-warning: var(--abr-warning);
+  --color-warning-bg: var(--abr-warning-bg);
+  --color-error: var(--abr-error);
+  --color-error-bg: var(--abr-error-bg);
+  --color-info: var(--abr-info);
+  --color-info-bg: var(--abr-info-bg);
+
+  --font-sans: 'Inter Variable', 'Inter', 'SF Pro Text', 'Segoe UI', Roboto, Arial, sans-serif;
+  --font-arabic: 'Tajawal', 'IBM Plex Sans Arabic', 'Noto Sans Arabic', Tahoma, sans-serif;
+
+  /* Radius scale 6 / 10 / 16 / 24 / full */
+  --radius-xs: 6px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Purple-tinted elevation */
+  --shadow-sm: 0 1px 2px rgb(75 28 122 / 0.06);
+  --shadow-md: 0 4px 12px rgb(75 28 122 / 0.1);
+  --shadow-lg: 0 12px 32px rgb(75 28 122 / 0.14);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv11', 'ss01'; /* single-storey a */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-size: 1rem; /* Body 16/24 */
+    line-height: 1.5;
+  }
+
+  h1 {
+    font-size: 1.875rem; /* 30/38 mobile, 40/48 desktop */
+    line-height: 1.2667;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+
+  @media (width >= 48rem) {
+    h1 {
+      font-size: 2.5rem;
+      line-height: 1.2;
+    }
+  }
+
+  h2 {
+    font-size: 1.625rem; /* 26/34 mobile, 32/40 desktop */
+    line-height: 1.3077;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  @media (width >= 48rem) {
+    h2 {
+      font-size: 2rem;
+      line-height: 1.25;
+    }
+  }
+
+  /* Visible focus: 2px Accent ring with a 2px gap. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/*
+ * Arabic typography (unlayered so it wins over utilities): Tajawal, one step
+ * larger with looser leading; never letter-spacing, italics or all-caps.
+ * Tajawal has no 600 weight — map "semibold" to 500 in UI, 700 in headings.
+ */
+:lang(ar) {
+  font-family: var(--font-arabic);
+  font-feature-settings: normal;
+}
+
+:lang(ar) body,
+body:lang(ar) {
+  font-size: 1.0625rem; /* Body 17/30 */
+  line-height: 1.75;
+}
+
+:lang(ar) :is(h1, h2, h3, h4, h5, h6) {
+  line-height: 1.4;
+}
+
+:lang(ar) h1 {
+  font-size: 2.5rem; /* 40/56 */
+}
+
+:lang(ar) h2 {
+  font-size: 2rem; /* 32/46 */
+}
+
+:lang(ar),
+:lang(ar) * {
+  letter-spacing: normal;
+  font-style: normal;
+  text-transform: none;
+}
+
+:lang(ar) .font-semibold {
+  font-weight: 500;
+}
+
+:lang(ar) :is(h1, h2, h3, h4, h5, h6).font-semibold {
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
