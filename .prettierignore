@@ -6,3 +6,4 @@ supabase/.branches
 supabase/.temp
 src/types/database.ts
 README.md
+public/brand/*.svg
