@@ -147,3 +147,10 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# ABR
+.vite
+supabase/.branches
+supabase/.temp
+# Confidential source documents kept locally only. Never commit.
+_context/
