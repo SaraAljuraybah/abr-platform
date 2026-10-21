@@ -21,5 +21,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "include": ["vite.config.ts", "src/lib/env-schema.ts", "eslint-rules/**/*.js", "tests/**/*.ts"]
+  "include": [
+    "vite.config.ts",
+    "src/lib/env-schema.ts",
+    "eslint-rules/**/*.js",
+    "scripts/**/*.mjs",
+    "tests/**/*.ts"
+  ]
 }
