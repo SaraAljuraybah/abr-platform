@@ -35,7 +35,7 @@ describe('RTL lint rule', () => {
       rules: Record<string, unknown>;
     };
     expect(config.rules[RULE]).toEqual([2]);
-  });
+  }, 60_000); // loads the full type-aware config
 
   it.each([
     'ml-4',
@@ -43,7 +43,11 @@ describe('RTL lint rule', () => {
     'pl-3',
     'pr-1',
     '-ml-2',
+    'ml-auto',
+    'ml-[12px]',
+    'pr-(--gutter)',
     'left-0',
+    'left-1/2',
     'right-4',
     'md:ml-4',
     'hover:pr-2',
@@ -74,7 +78,9 @@ describe('RTL lint rule', () => {
   });
 
   it('ignores prose that merely contains direction words', async () => {
-    const messages = await lint(`export const label = 'Turn right at the left door';\n`);
+    const messages = await lint(
+      `export const label = 'Turn right at the left door; text runs left-to-right.';\n`,
+    );
     expect(messages).toEqual([]);
   });
 });

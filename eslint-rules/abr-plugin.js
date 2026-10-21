@@ -3,13 +3,19 @@
  * RTL guard (CLAUDE.md rule 5, ADR-0008): physical-direction Tailwind classes
  * break the Arabic layout. Use the logical equivalents instead.
  */
+// A Tailwind value: 4, 0.5, px, auto, 1/2, [12px], (--var). Hyphenated words such as
+// "left-to-right" are prose, not classes. Empty is allowed for `ml-${x}` template parts.
+const VALUE = String.raw`(?:[\w.%/]+|\[[^\]]*\]|\([^)]*\))?$`;
+/** @param {string} prefix */
+const spacing = (prefix) => new RegExp(`^-?${prefix}-${VALUE}`);
+
 const PHYSICAL_CLASS_HINTS = [
-  [/^-?m[lr]-/, 'ms-* / me-*'],
-  [/^-?p[lr]-/, 'ps-* / pe-*'],
-  [/^-?(left|right)-/, 'start-* / end-*'],
-  [/^-?inset-[lr]-/, 'start-* / end-*'],
-  [/^-?scroll-m[lr]-/, 'scroll-ms-* / scroll-me-*'],
-  [/^-?scroll-p[lr]-/, 'scroll-ps-* / scroll-pe-*'],
+  [spacing('m[lr]'), 'ms-* / me-*'],
+  [spacing('p[lr]'), 'ps-* / pe-*'],
+  [spacing('(?:left|right)'), 'start-* / end-*'],
+  [spacing('inset-[lr]'), 'start-* / end-*'],
+  [spacing('scroll-m[lr]'), 'scroll-ms-* / scroll-me-*'],
+  [spacing('scroll-p[lr]'), 'scroll-ps-* / scroll-pe-*'],
   [/^rounded-[lr](-|$)/, 'rounded-s* / rounded-e*'],
   [/^rounded-[tb][lr](-|$)/, 'rounded-ss* / rounded-se* / rounded-es* / rounded-ee*'],
   [/^border-[lr](-|$)/, 'border-s* / border-e*'],

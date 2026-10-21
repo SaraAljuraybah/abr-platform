@@ -4,6 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ABR</title>
+    <script>
+      // Set language and direction before first paint to avoid a flash of the wrong layout.
+      // Must stay in sync with LANGUAGE_STORAGE_KEY in src/lib/i18n.ts.
+      (function () {
+        try {
+          if (localStorage.getItem('abr.lang') === 'ar') {
+            document.documentElement.lang = 'ar';
+            document.documentElement.dir = 'rtl';
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
