@@ -19,6 +19,22 @@ export default defineConfig(({ mode }) => {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
+    build: {
+      rollupOptions: {
+        output: {
+          // Stable vendor chunks: better caching, and no single chunk over the 500 kB warning.
+          manualChunks(id) {
+            if (!id.includes('node_modules')) return undefined;
+            if (/[\\/]@supabase[\\/]/.test(id)) return 'vendor-supabase';
+            if (/[\\/](react|react-dom|react-router|scheduler)[\\/]/.test(id))
+              return 'vendor-react';
+            if (/[\\/](i18next|react-i18next)[\\/]/.test(id)) return 'vendor-i18n';
+            if (/[\\/]zod[\\/]/.test(id)) return 'vendor-zod';
+            return 'vendor';
+          },
+        },
+      },
+    },
     server: {
       host: '127.0.0.1',
       port: 5173,
