@@ -12,7 +12,7 @@ export function Logo({ className }: { className?: string }) {
       alt="ABR"
       width={470}
       height={200}
-      className={cn('h-11 w-auto', className)}
+      className={cn('h-11 w-auto max-w-none shrink-0', className)}
     />
   );
 }

@@ -16,14 +16,16 @@ export function AppLayout() {
         {t('app.skipToContent')}
       </a>
 
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6">
-          <Link to="/" className="rounded-sm" aria-label={t('app.homeLink')}>
+      {/* bg-background matches the raster logo's own background (#FAF9FC) exactly. */}
+      <header className="border-b border-border bg-background">
+        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 sm:px-6">
+          <Link to="/" className="shrink-0 rounded-sm" aria-label={t('app.homeLink')}>
             <Logo />
           </Link>
           <nav aria-label={t('nav.primary')} className="flex items-center gap-1 sm:gap-2">
             <LanguageSwitch />
-            <Button asChild variant="ghost" size="sm">
+            {/* Below sm the home page's own sign-in action covers this; keeps the logo at full size. */}
+            <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
               <Link to="/sign-in">{t('nav.signIn')}</Link>
             </Button>
             <Button asChild variant="outline" size="sm">
