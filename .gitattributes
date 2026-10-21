@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff2 binary
+# Brand masters are committed byte-for-byte; never normalise or reformat them.
+public/brand/** -text

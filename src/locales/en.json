@@ -1,0 +1,42 @@
+{
+  "app": {
+    "name": "ABR",
+    "skipToContent": "Skip to main content",
+    "loading": "Loading…",
+    "homeLink": "ABR home"
+  },
+  "nav": {
+    "primary": "Main navigation",
+    "signIn": "Sign in",
+    "signUp": "Sign up"
+  },
+  "language": {
+    "switchLabel": "Change language to Arabic",
+    "switchTo": "العربية"
+  },
+  "home": {
+    "eyebrow": "Graduation projects discovery and connection platform",
+    "title": "Graduation projects deserve a life after graduation.",
+    "body": "ABR connects verified students, organizations and mentors. Every project is reviewed, and contact details are shared only when both sides agree.",
+    "ctaSignUp": "Create an account",
+    "ctaSignIn": "Sign in",
+    "buildNotice": "Internal build. Only the platform foundation is available."
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Page not found",
+    "body": "The page you are looking for does not exist or has moved.",
+    "backHome": "Back to home"
+  },
+  "placeholder": {
+    "body": "This page arrives in a later story.",
+    "backHome": "Back to home",
+    "pages": {
+      "signIn": "Sign in",
+      "signUp": "Sign up",
+      "onboarding": "Onboarding",
+      "app": "Dashboard",
+      "admin": "Admin"
+    }
+  }
+}

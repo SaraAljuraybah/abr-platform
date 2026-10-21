@@ -1,0 +1,3 @@
+-- ABR local/development seed data.
+-- Synthetic data only. NEVER real personal data (Plan v2.0 §17).
+-- Intentionally empty until the schema exists (SCRUM-12 onwards).

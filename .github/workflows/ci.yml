@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Web (typecheck, lint, format, test, build, secret scan)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Placeholders only. The build validates their shape; no real project is contacted.
+      VITE_SUPABASE_URL: http://127.0.0.1:54321
+      VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run test
+      - run: npm run build
+      - run: npm run check:secrets
+
+  database:
+    name: Database (lint, pgTAP, type drift)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.113.0
+
+      - name: Start local database (applies all migrations from zero)
+        run: supabase db start
+
+      - name: Lint schema
+        run: supabase db lint --level error
+
+      - name: pgTAP tests
+        run: supabase test db
+
+      - name: Type drift check
+        run: |
+          supabase gen types typescript --local > src/types/database.ts
+          git diff --exit-code -- src/types/database.ts || {
+            echo "::error file=src/types/database.ts::Generated types are out of date. Run 'npm run db:types' and commit the result (the CI-generated version wins; see CLAUDE.md)."
+            exit 1
+          }
