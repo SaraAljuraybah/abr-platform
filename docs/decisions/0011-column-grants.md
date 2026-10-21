@@ -19,6 +19,7 @@ privileges depends on the platform version and on who owns the object:
 - Functions are executable by `PUBLIC` (and therefore `anon`) unless revoked.
 
 Defaults that vary between environments cannot be relied on in either direction.
+Verify default privileges on the hosted development project when it is linked (SCRUM-12); hosted and older projects may still grant ALL.
 
 In PostgreSQL, **a column-level `REVOKE` has no effect while a table-level grant exists.** A pattern
 such as `revoke update (status, published_at, owner_id) on projects from authenticated` therefore
