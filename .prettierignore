@@ -1,0 +1,8 @@
+dist
+coverage
+node_modules
+package-lock.json
+supabase/.branches
+supabase/.temp
+src/types/database.ts
+README.md
