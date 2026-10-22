@@ -41,9 +41,13 @@ function storeLanguage(language: Language): void {
   }
 }
 
+/** Sets <html lang/dir>, the document title and the meta description for the language. */
 export function applyDocumentLanguage(language: Language): void {
+  const { meta } = resources[language].translation;
   document.documentElement.lang = language;
   document.documentElement.dir = directionOf(language);
+  document.title = meta.title;
+  document.querySelector('meta[name="description"]')?.setAttribute('content', meta.description);
 }
 
 export function currentLanguage(): Language {

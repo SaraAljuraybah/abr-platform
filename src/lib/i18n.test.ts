@@ -34,6 +34,23 @@ describe('i18n', () => {
     expect(window.localStorage.getItem(KEY)).toBe('ar');
   });
 
+  it('updates the document title and meta description with the language', async () => {
+    const meta = document.createElement('meta');
+    meta.name = 'description';
+    document.head.append(meta);
+    try {
+      const { changeLanguage } = await loadI18n();
+      expect(document.title).toBe('ABR · Graduation projects, verified and connected');
+      expect(meta.content).toMatch(/^ABR connects verified students/);
+
+      await changeLanguage('ar');
+      expect(document.title).toBe('ABR · مشاريع تخرج موثّقة ومتصلة');
+      expect(meta.content).toMatch(/^تربط ABR الطلاب الموثّقين/);
+    } finally {
+      meta.remove();
+    }
+  });
+
   it('switching back to English restores left-to-right', async () => {
     const { changeLanguage } = await loadI18n();
     await changeLanguage('ar');
