@@ -18,7 +18,7 @@ export const buttonVariants = cva(
         inverse:
           'bg-white text-brand hover:bg-muted focus-visible:outline-white active:bg-light-pink',
         outlineInverse:
-          'border border-white bg-transparent text-white hover:bg-white/15 focus-visible:outline-white active:bg-white/25',
+          'border border-white bg-transparent text-white hover:bg-white/10 focus-visible:outline-white active:bg-white/15',
       },
       size: {
         default: 'h-10 px-4 py-2 has-[>svg]:px-3',
