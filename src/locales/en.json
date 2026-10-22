@@ -5,22 +5,142 @@
     "loading": "Loading…",
     "homeLink": "ABR home"
   },
+  "meta": {
+    "title": "ABR · Graduation projects, verified and connected",
+    "description": "ABR connects verified students with the organizations and mentors who can take their work further. Every project is reviewed, and contact details are shared only when both sides agree."
+  },
   "nav": {
     "primary": "Main navigation",
+    "footer": "Footer navigation",
+    "menu": "Menu",
     "signIn": "Sign in",
-    "createAccount": "Create an account"
+    "createAccount": "Create an account",
+    "goToDashboard": "Go to dashboard",
+    "sections": {
+      "howItWorks": "How it works",
+      "whoItsFor": "Who it's for",
+      "trust": "Trust & privacy",
+      "faq": "FAQ"
+    }
   },
   "language": {
     "switchLabel": "Change language to Arabic",
     "switchTo": "العربية"
   },
-  "home": {
-    "eyebrow": "Graduation projects discovery and connection platform",
-    "title": "Graduation projects deserve a life after graduation.",
-    "body": "ABR connects verified students, organizations and mentors. Every project is reviewed, and contact details are shared only when both sides agree.",
-    "ctaSignUp": "Create an account",
-    "ctaSignIn": "Sign in",
-    "buildNotice": "Internal build. Only the platform foundation is available."
+  "landing": {
+    "buildNotice": "Internal build. Only the platform foundation is available.",
+    "copyright": "© 2026 ABR",
+    "hero": {
+      "eyebrow": "Graduation projects, verified and connected",
+      "title": "Graduation projects deserve a life after graduation.",
+      "subtitle": "ABR connects verified students with the organizations and mentors who can take their work further. Every project is reviewed, and contact details are shared only when both sides agree.",
+      "card": {
+        "title": "Arabic Speech-to-Text for Clinics",
+        "field": "Health tech",
+        "reviewed": "Reviewed",
+        "request": "Request to connect",
+        "lockNote": "Contact shared after acceptance"
+      }
+    },
+    "how": {
+      "title": "How it works",
+      "steps": {
+        "discover": {
+          "title": "Discover",
+          "body": "Organizations browse reviewed projects from verified students."
+        },
+        "request": {
+          "title": "Request",
+          "body": "A verified organization sends a structured request. No contact details are shared."
+        },
+        "decide": {
+          "title": "Decide",
+          "body": "The student accepts or declines. Declining reveals nothing."
+        },
+        "connect": {
+          "title": "Connect",
+          "body": "Accepting creates an approved connection."
+        },
+        "contact": {
+          "title": "Contact",
+          "body": "Each side sees the contact details the other agreed to share."
+        }
+      }
+    },
+    "who": {
+      "title": "Built for everyone around a graduation project",
+      "cta": "Create an account",
+      "students": {
+        "title": "Students",
+        "points": {
+          "publish": "Publish your project on a reviewed, professional page",
+          "requests": "Receive requests from verified organizations",
+          "control": "You decide who gets your contact details"
+        }
+      },
+      "organizations": {
+        "title": "Organizations",
+        "points": {
+          "browse": "Browse projects reviewed by the ABR team",
+          "verified": "Every student has a verified university email",
+          "requests": "Send structured requests; contact unlocks on acceptance"
+        }
+      },
+      "mentors": {
+        "title": "Mentors",
+        "note": "Mentor workflows open after the pilot.",
+        "points": {
+          "profile": "A verified professional profile",
+          "requests": "Requests tied to specific projects",
+          "contact": "Contact shared only for accepted mentorships"
+        }
+      }
+    },
+    "trust": {
+      "title": "Trust is built in, not added later",
+      "items": {
+        "students": {
+          "title": "Verified students",
+          "body": "Students join with an email from a participating university."
+        },
+        "projects": {
+          "title": "Reviewed projects",
+          "body": "The ABR team reviews every project before it is published."
+        },
+        "organizations": {
+          "title": "Verified organizations",
+          "body": "Organizations are verified before they can send requests."
+        },
+        "privacy": {
+          "title": "Private by default",
+          "body": "Contact details unlock only after a request is accepted, and every access is logged."
+        }
+      }
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": {
+        "join": {
+          "question": "Who can join?",
+          "answer": "Students with an email from a participating university, organizations after verification, and mentors."
+        },
+        "university": {
+          "question": "My university isn't listed. What can I do?",
+          "answer": "You can request it during sign-up, and we'll review it."
+        },
+        "contact": {
+          "question": "When are my contact details shared?",
+          "answer": "Only after you accept a request, and only the details you chose to share."
+        },
+        "messaging": {
+          "question": "Can I message people on ABR?",
+          "answer": "Not in this version. Once a connection is approved, you continue by email or phone."
+        }
+      }
+    },
+    "cta": {
+      "title": "Give your project the audience it deserves."
+    }
   },
   "notFound": {
     "code": "404",
