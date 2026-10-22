@@ -31,14 +31,17 @@
   --abr-text: #1e1147;
   --abr-text-2: #6b5b95;
 
-  /* Status (outside the brand palette on purpose; always pair with icon or label) */
+  /* Status (outside the brand palette on purpose; always pair with icon or label).
+     Error and info are one shade darker than the guidelines' #DC2626 / #2563EB, which measure
+     3.95:1 and 4.24:1 on their tints (the guidelines print 4.8 and 5.2) and fail WCAG AA.
+     Now 5.30:1 and 5.49:1. Pending brand sign-off (D-14). */
   --abr-success: #15803d;
   --abr-success-bg: #dcfce7;
   --abr-warning: #b45309;
   --abr-warning-bg: #fef3c7;
-  --abr-error: #dc2626;
+  --abr-error: #b91c1c;
   --abr-error-bg: #fee2e2;
-  --abr-info: #2563eb;
+  --abr-info: #1d4ed8;
   --abr-info-bg: #dbeafe;
 
   /* Gradients */
