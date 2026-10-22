@@ -8,7 +8,7 @@
   "nav": {
     "primary": "التنقل الرئيسي",
     "signIn": "تسجيل الدخول",
-    "signUp": "إنشاء حساب"
+    "createAccount": "إنشاء حساب"
   },
   "language": {
     "switchLabel": "تغيير اللغة إلى الإنجليزية",

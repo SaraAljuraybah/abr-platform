@@ -8,7 +8,7 @@
   "nav": {
     "primary": "Main navigation",
     "signIn": "Sign in",
-    "signUp": "Sign up"
+    "createAccount": "Create an account"
   },
   "language": {
     "switchLabel": "Change language to Arabic",
@@ -33,7 +33,7 @@
     "backHome": "Back to home",
     "pages": {
       "signIn": "Sign in",
-      "signUp": "Sign up",
+      "signUp": "Create an account",
       "onboarding": "Onboarding",
       "app": "Dashboard",
       "admin": "Admin"

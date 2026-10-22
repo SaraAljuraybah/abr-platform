@@ -29,7 +29,7 @@ export function AppLayout() {
               <Link to="/sign-in">{t('nav.signIn')}</Link>
             </Button>
             <Button asChild variant="outline" size="sm">
-              <Link to="/sign-up">{t('nav.signUp')}</Link>
+              <Link to="/sign-up">{t('nav.createAccount')}</Link>
             </Button>
           </nav>
         </div>
