@@ -34,6 +34,7 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   menu); compact header on other routes. Site footer with logo, links, language switch, © 2026 ABR.
 - Per-language document title and meta description; static Open Graph tags; `robots.txt`.
 - axe-core accessibility tests in both languages.
+- `vercel.json` with an SPA rewrite to `/index.html`; static files are served first (SCRUM-31).
 
 ### Changed
 
@@ -47,7 +48,7 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Branch protection on `main` (set manually in GitHub).
 - Stylelint rule for physical CSS properties in stylesheets.
 - i18next lint plugin to catch literal UI strings.
-- `vercel.json` (SPA rewrites) and Vercel preview deployments.
+- Vercel preview deployments.
 - Playwright end-to-end tests (from Week 2).
 - Dark mode (tokens proposed in Plan §16).
 - Header logo switches to `abr-logo.svg` once the vector is supplied.
