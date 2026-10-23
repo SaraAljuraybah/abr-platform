@@ -1,6 +1,7 @@
 import { ArrowRight, Building2, Check, Clock, GraduationCap, UserRound } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
+import { useAuth } from '@/features/auth/auth-context';
 
 const AUDIENCES = [
   {
@@ -34,6 +35,7 @@ const AUDIENCES = [
 
 export function WhoItsFor() {
   const { t } = useTranslation();
+  const { session } = useAuth();
 
   return (
     <section
@@ -75,17 +77,20 @@ export function WhoItsFor() {
                   {t('landing.who.mentors.note')}
                 </p>
               )}
-              <Link
-                to="/sign-up"
-                className="mt-6 inline-flex items-center gap-1.5 self-start rounded-sm font-semibold text-primary hover:underline"
-              >
-                {t('landing.who.cta')}
-                <ArrowRight
-                  aria-hidden="true"
-                  strokeWidth={1.75}
-                  className="size-4 rtl:-scale-x-100"
-                />
-              </Link>
+              {/* Signed-in visitors already have an account: no sign-up link (UX only). */}
+              {!session && (
+                <Link
+                  to="/sign-up"
+                  className="mt-6 inline-flex items-center gap-1.5 self-start rounded-sm font-semibold text-primary hover:underline"
+                >
+                  {t('landing.who.cta')}
+                  <ArrowRight
+                    aria-hidden="true"
+                    strokeWidth={1.75}
+                    className="size-4 rtl:-scale-x-100"
+                  />
+                </Link>
+              )}
             </li>
           ))}
         </ul>

@@ -143,6 +143,20 @@ describe.each(['en', 'ar'] as const)('landing page (%s)', (language) => {
     }
   });
 
+  it('audience cards link to sign-up only when signed out', async () => {
+    await renderLanding(language);
+    const cards = screen.getByRole('region', { name: copy.regions[2] });
+    const links = within(cards).getAllByRole('link', { name: copy.create });
+    expect(links).toHaveLength(3);
+    for (const link of links) expect(link).toHaveAttribute('href', '/sign-up');
+  });
+
+  it('audience cards show no sign-up link when signed in', async () => {
+    await renderLanding(language, signedIn);
+    const cards = screen.getByRole('region', { name: copy.regions[2] });
+    expect(within(cards).queryAllByRole('link')).toHaveLength(0);
+  });
+
   it('links the section anchors to existing sections', async () => {
     await renderLanding(language);
     const footerNav = within(screen.getByRole('contentinfo')).getByRole('navigation');
