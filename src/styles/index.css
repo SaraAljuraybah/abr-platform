@@ -31,19 +31,30 @@
   --abr-text: #1e1147;
   --abr-text-2: #6b5b95;
 
-  /* Status (outside the brand palette on purpose; always pair with icon or label) */
+  /* Status (outside the brand palette on purpose; always pair with icon or label).
+     Error and info are one shade darker than the guidelines' #DC2626 / #2563EB, which measure
+     3.95:1 and 4.24:1 on their tints (the guidelines print 4.8 and 5.2) and fail WCAG AA.
+     Now 5.30:1 and 5.49:1. Pending brand sign-off (D-14). */
   --abr-success: #15803d;
   --abr-success-bg: #dcfce7;
   --abr-warning: #b45309;
   --abr-warning-bg: #fef3c7;
-  --abr-error: #dc2626;
+  --abr-error: #b91c1c;
   --abr-error-bg: #fee2e2;
-  --abr-info: #2563eb;
+  --abr-info: #1d4ed8;
   --abr-info-bg: #dbeafe;
 
   /* Gradients */
   --abr-gradient-ribbon: linear-gradient(45deg, #ec4899 0%, #a855f7 52%, #7c3aed 100%);
   --abr-gradient-deep: linear-gradient(125deg, #0f0720 0%, #4b1c7a 42%, #7c3aed 74%, #ec4899 108%);
+  /* Same gradient mirrored for RTL, so the dark end stays behind start-aligned text. */
+  --abr-gradient-deep-rtl: linear-gradient(
+    235deg,
+    #0f0720 0%,
+    #4b1c7a 42%,
+    #7c3aed 74%,
+    #ec4899 108%
+  );
   --abr-gradient-soft: linear-gradient(135deg, #f3edff 0%, #fbcfe8 100%);
 
   /* shadcn/ui semantic tokens */
@@ -167,10 +178,27 @@
     }
   }
 
+  /* In-page anchors scroll smoothly only when the user has not asked for reduced motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
   /* Visible focus: 2px Accent ring with a 2px gap. */
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
+  }
+}
+
+/* The Deep gradient: one per view (Brand Guidelines p. 11). White text only. */
+@utility bg-hero-gradient {
+  background-color: var(--abr-dark);
+  background-image: var(--abr-gradient-deep);
+
+  &:where([dir='rtl'], [dir='rtl'] *) {
+    background-image: var(--abr-gradient-deep-rtl);
   }
 }
 

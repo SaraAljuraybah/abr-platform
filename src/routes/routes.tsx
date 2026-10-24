@@ -1,6 +1,6 @@
 import type { RouteObject } from 'react-router';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { HomePage } from '@/pages/HomePage';
+import { LandingPage } from '@/features/landing';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
 import { RequireAuth } from './guards/RequireAuth';
@@ -18,7 +18,7 @@ export const routes: RouteObject[] = [
   {
     element: <AppLayout />,
     children: [
-      { index: true, element: <HomePage /> },
+      { index: true, element: <LandingPage /> },
       { path: 'sign-in', element: <PlaceholderPage page="signIn" /> },
       { path: 'sign-up', element: <PlaceholderPage page="signUp" /> },
       {

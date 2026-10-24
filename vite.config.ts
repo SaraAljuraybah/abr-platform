@@ -46,6 +46,10 @@ export default defineConfig(({ mode }) => {
       include: ['src/**/*.test.{ts,tsx}', 'tests/**/*.test.ts'],
       restoreMocks: true,
       unstubEnvs: true,
+      // Full-page render tests (landing) are heavy in jsdom. Half the cores and a 15 s budget keep
+      // runs reliable on busy developer machines; one jsdom worker per core exhausted memory.
+      maxWorkers: '50%',
+      testTimeout: 15_000,
       env: {
         VITE_SUPABASE_URL: 'http://127.0.0.1:54321',
         VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_test_placeholder',

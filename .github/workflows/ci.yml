@@ -59,8 +59,27 @@ jobs:
 
       - name: Type drift check
         run: |
-          supabase gen types typescript --local > src/types/database.ts
-          git diff --exit-code -- src/types/database.ts || {
-            echo "::error file=src/types/database.ts::Generated types are out of date. Run 'npm run db:types' and commit the result (the CI-generated version wins; see CLAUDE.md)."
+          # Generate into a temp file: on failure the CLI writes its error JSON to stdout,
+          # which must not be mistaken for drift. Retry, since generation fails intermittently.
+          out="$RUNNER_TEMP/database.ts"
+          for attempt in 1 2 3; do
+            if supabase gen types typescript --local > "$out" 2> "$RUNNER_TEMP/gen.err"; then
+              break
+            fi
+            echo "Type generation failed (attempt $attempt):"
+            cat "$out" "$RUNNER_TEMP/gen.err"
+            if [ "$attempt" = 3 ]; then
+              echo "::error file=src/types/database.ts::'supabase gen types' failed three times. This is a generation error, not type drift; see the log above."
+              exit 1
+            fi
+            sleep 10
+          done
+          cp "$out" src/types/database.ts
+          if ! git diff --quiet -- src/types/database.ts; then
+            echo "Generated types differ from the committed file:"
+            git --no-pager diff --stat -- src/types/database.ts
+            git --no-pager diff -- src/types/database.ts
+            echo "::error file=src/types/database.ts::Generated types are out of date. Copy the CI-generated version from the diff above (or run 'npm run db:types') and commit it (the CI-generated version wins; see CLAUDE.md)."
             exit 1
-          }
+          fi
+          echo "src/types/database.ts matches the generated types."

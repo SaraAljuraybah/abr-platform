@@ -1,0 +1,4 @@
+# Allow all for now. Vercel marks preview deployments noindex on its own.
+# Review robots and indexing at public launch.
+User-agent: *
+Allow: /

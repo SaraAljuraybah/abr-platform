@@ -27,15 +27,33 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   Node secret scanner, `npm run ci`.
 - GitHub Actions CI (web and database jobs, including type drift), Dependabot, PR template.
 - Docs: CLAUDE.md, Definition of Done, permissions matrix template, ADR index, ADR-0011.
+- Landing page at `/` (SCRUM-31), English and Arabic: hero with an example project card, how it
+  works, who it's for, trust & privacy, FAQ, final call to action. Signed-in visitors see
+  "Go to dashboard" instead of the sign-in and create-account actions.
+- Site header: sticky; section links on `/` (inline from `lg`, otherwise in an accessible mobile
+  menu); compact header on other routes. Site footer with logo, links, language switch, © 2026 ABR.
+- Per-language document title and meta description; static Open Graph tags; `robots.txt`.
+- axe-core accessibility tests in both languages.
+- `vercel.json` with an SPA rewrite to `/index.html`; static files are served first (SCRUM-31).
+
+### Changed
+
+- The account action is called "Create an account" everywhere (was "Sign up") (SCRUM-31).
+- Error and info status colours are one shade darker (#B91C1C, #1D4ED8) to meet WCAG AA; the
+  guidelines' values measure 3.95:1 and 4.24:1. Pending brand sign-off (D-14) (SCRUM-31).
+- The Supabase client and env validation load on demand, off the critical path (SCRUM-31).
 
 ### Planned
 
 - Branch protection on `main` (set manually in GitHub).
 - Stylelint rule for physical CSS properties in stylesheets.
 - i18next lint plugin to catch literal UI strings.
-- `vercel.json` (SPA rewrites) and Vercel preview deployments.
+- Vercel preview deployments.
 - Playwright end-to-end tests (from Week 2).
 - Dark mode (tokens proposed in Plan §16).
 - Header logo switches to `abr-logo.svg` once the vector is supplied.
 - SHA-pinned GitHub Actions (pre-pilot hardening).
 - ESLint 10 upgrade (ESLint 9 is now end-of-life upstream).
+- Review robots/indexing at public launch.
+- Mobile Lighthouse Performance ≥ 90 (currently about 71 on the production build): prerender the
+  public pages or reduce initial style and script work.
