@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation } from 'react-router';
 import { AuthActions } from '@/components/AuthActions';
 import { LanguageSwitch } from '@/components/LanguageSwitch';
 import { cn } from '@/lib/utils';
+import { BuildNoticeBar } from './BuildNoticeBar';
 import { Logo } from './Logo';
 import { MobileMenu } from './MobileMenu';
 import { SectionLinks } from './SectionLinks';
@@ -24,6 +25,8 @@ export function AppLayout() {
       >
         {t('app.skipToContent')}
       </a>
+
+      <BuildNoticeBar />
 
       <header className="sticky top-0 z-40 border-b border-border bg-background">
         <div className="relative mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 sm:px-6">

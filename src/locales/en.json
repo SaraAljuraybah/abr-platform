@@ -3,7 +3,8 @@
     "name": "ABR",
     "skipToContent": "Skip to main content",
     "loading": "Loading…",
-    "homeLink": "ABR home"
+    "homeLink": "ABR home",
+    "buildStatus": "Build status"
   },
   "meta": {
     "title": "ABR · Graduation projects, verified and connected",

@@ -3,7 +3,8 @@
     "name": "ABR",
     "skipToContent": "انتقل إلى المحتوى الرئيسي",
     "loading": "جارٍ التحميل…",
-    "homeLink": "الصفحة الرئيسية لـ ABR"
+    "homeLink": "الصفحة الرئيسية لـ ABR",
+    "buildStatus": "حالة النسخة"
   },
   "meta": {
     "title": "ABR · مشاريع تخرج موثّقة ومتصلة",

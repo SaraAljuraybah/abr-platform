@@ -56,6 +56,18 @@ describe('AppLayout', () => {
     expect(within(header).getByRole('link', { name: 'Create an account' })).toBeInTheDocument();
   });
 
+  it.each(['/', '/sign-in'])(
+    'shows the build notice in a labelled bar above the header on %s',
+    async (path) => {
+      renderAt(path);
+      const header = await screen.findByRole('banner');
+      const bar = screen.getByRole('complementary', { name: 'Build status' });
+      expect(bar).toHaveTextContent('Internal build. Only the platform foundation is available.');
+      expect(bar.compareDocumentPosition(header) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(within(screen.getByRole('main')).queryByText(/Internal build/)).toBeNull();
+    },
+  );
+
   it('switches to Arabic (RTL) and back to English (LTR)', async () => {
     const user = userEvent.setup();
     renderAt('/');
