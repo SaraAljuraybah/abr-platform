@@ -1,5 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { SectionHeader } from './SectionHeader';
 
 const QUESTIONS = ['join', 'university', 'contact', 'messaging'] as const;
 
@@ -8,11 +9,9 @@ export function Faq() {
   const { t } = useTranslation();
 
   return (
-    <section id="faq" aria-labelledby="faq-title" className="scroll-mt-20 py-16 lg:py-24">
+    <section id="faq" aria-labelledby="faq-title" className="scroll-mt-20 py-10 lg:py-16">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-        <h2 id="faq-title" className="text-brand">
-          {t('landing.faq.title')}
-        </h2>
+        <SectionHeader section="faq" titleId="faq-title" />
         <div className="mt-8 max-w-3xl divide-y divide-border border-y border-border">
           {QUESTIONS.map((key) => (
             <details key={key} className="group">

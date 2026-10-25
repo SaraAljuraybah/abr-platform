@@ -35,6 +35,15 @@ const COPY = {
     create: 'Create an account',
     signIn: 'Sign in',
     dashboard: 'Go to dashboard',
+    headers: [
+      ['The process', 'Five steps, and your contact details stay private until you say yes.'],
+      ["Who it's for", 'One platform, three roles, each with its own verified path.'],
+      [
+        'Trust & privacy',
+        'Every safeguard is enforced by the platform itself, not left to chance.',
+      ],
+      ['FAQ', 'The essentials, in short.'],
+    ],
   },
   ar: {
     h1: 'مشاريع التخرج تستحق حياة بعد التخرج.',
@@ -49,6 +58,12 @@ const COPY = {
     create: 'إنشاء حساب',
     signIn: 'تسجيل الدخول',
     dashboard: 'الانتقال إلى لوحة التحكم',
+    headers: [
+      ['آلية العمل', 'خمس خطوات، وتبقى بيانات تواصلك خاصة حتى توافق.'],
+      ['لمن المنصة', 'منصة واحدة وثلاثة أدوار، لكل منها مسار موثّق.'],
+      ['الثقة والخصوصية', 'كل ضمانة تفرضها المنصة نفسها، ولا تُترك للصدفة.'],
+      ['الأسئلة الشائعة', 'أهم ما تحتاج معرفته باختصار.'],
+    ],
   },
 } as const;
 
@@ -74,6 +89,15 @@ describe.each(['en', 'ar'] as const)('landing page (%s)', (language) => {
     expect(screen.getByRole('banner')).toBeInTheDocument();
     expect(screen.getByRole('contentinfo')).toBeInTheDocument();
     expect(screen.getAllByRole('listitem').length).toBeGreaterThan(5);
+  });
+
+  it('gives each section after the hero an eyebrow and a one-line intro', async () => {
+    await renderLanding(language);
+    copy.headers.forEach(([eyebrow, intro], index) => {
+      const region = screen.getByRole('region', { name: copy.regions[index + 1] });
+      expect(within(region).getByText(eyebrow, { selector: 'p' })).toBeInTheDocument();
+      expect(within(region).getByText(intro)).toBeInTheDocument();
+    });
   });
 
   it('has five steps, three audience cards, four trust items and four FAQ entries', async () => {

@@ -74,7 +74,9 @@
           "title": "Contact",
           "body": "Each side sees the contact details the other agreed to share."
         }
-      }
+      },
+      "eyebrow": "The process",
+      "intro": "Five steps, and your contact details stay private until you say yes."
     },
     "who": {
       "title": "Built for everyone around a graduation project",
@@ -103,7 +105,9 @@
           "requests": "Requests tied to specific projects",
           "contact": "Contact shared only for accepted mentorships"
         }
-      }
+      },
+      "eyebrow": "Who it's for",
+      "intro": "One platform, three roles, each with its own verified path."
     },
     "trust": {
       "title": "Trust is built in, not added later",
@@ -124,7 +128,9 @@
           "title": "Private by default",
           "body": "Contact details unlock only after a request is accepted, and every access is logged."
         }
-      }
+      },
+      "eyebrow": "Trust & privacy",
+      "intro": "Every safeguard is enforced by the platform itself, not left to chance."
     },
     "faq": {
       "title": "Frequently asked questions",
@@ -145,7 +151,9 @@
           "question": "Can I message people on ABR?",
           "answer": "Not in this version. Once a connection is approved, you continue by email or phone."
         }
-      }
+      },
+      "eyebrow": "FAQ",
+      "intro": "The essentials, in short."
     },
     "cta": {
       "title": "Give your project the audience it deserves."

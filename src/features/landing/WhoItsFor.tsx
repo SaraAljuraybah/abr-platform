@@ -1,5 +1,6 @@
 import { ArrowRight, Building2, Check, Clock, GraduationCap, UserRound } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { SectionHeader } from './SectionHeader';
 import { Link } from 'react-router';
 import { useAuth } from '@/features/auth/auth-context';
 
@@ -38,16 +39,10 @@ export function WhoItsFor() {
   const { session } = useAuth();
 
   return (
-    <section
-      id="who-its-for"
-      aria-labelledby="who-title"
-      className="scroll-mt-20 border-t border-border py-16 lg:py-24"
-    >
+    <section id="who-its-for" aria-labelledby="who-title" className="scroll-mt-20 py-10 lg:py-16">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-        <h2 id="who-title" className="max-w-3xl text-brand">
-          {t('landing.who.title')}
-        </h2>
-        <ul className="mt-10 grid gap-6 md:grid-cols-3">
+        <SectionHeader section="who" titleId="who-title" />
+        <ul className="mt-8 grid gap-6 md:grid-cols-3">
           {AUDIENCES.map(({ key, icon: Icon, points }) => (
             <li key={key} className="flex flex-col rounded-lg border border-border bg-card p-6">
               <span

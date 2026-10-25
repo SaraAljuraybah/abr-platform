@@ -1,5 +1,6 @@
 import { BadgeCheck, ClipboardCheck, Lock, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { SectionHeader } from './SectionHeader';
 
 const ITEMS = [
   { key: 'students', icon: BadgeCheck },
@@ -16,13 +17,11 @@ export function TrustPrivacy() {
     <section
       id="trust"
       aria-labelledby="trust-title"
-      className="scroll-mt-20 bg-muted py-16 lg:py-24"
+      className="scroll-mt-20 bg-muted py-10 lg:py-16"
     >
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-        <h2 id="trust-title" className="max-w-3xl text-brand">
-          {t('landing.trust.title')}
-        </h2>
-        <ul className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <SectionHeader section="trust" titleId="trust-title" />
+        <ul className="mt-8 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {ITEMS.map(({ key, icon: Icon }) => (
             <li key={key}>
               <span
