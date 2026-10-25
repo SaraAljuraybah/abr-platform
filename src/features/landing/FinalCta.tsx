@@ -14,7 +14,7 @@ export function FinalCta() {
       <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:py-16">
         <div className="max-w-2xl">
           <h2 id="cta-title">{t('landing.cta.title')}</h2>
-          <p className="mt-3 text-lg text-white/90">{t('landing.cta.subline')}</p>
+          <p className="mt-3 text-lg text-white">{t('landing.cta.subline')}</p>
         </div>
         <AuthActions placement="hero" className="shrink-0" />
       </div>

@@ -13,12 +13,13 @@ export const buttonVariants = cva(
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'text-brand hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
-        // On the hero gradient only (white reverse, Brand Guidelines p. 8). White focus ring:
-        // the accent ring would not reach 3:1 against the dark purple.
+        // On the deep gradients only (white reverse, Brand Guidelines p. 8). White focus ring:
+        // the accent ring would not reach 3:1 against the dark purple. Hover/pressed darken, so
+        // white text never drops below its default contrast on the lighter end of the gradient.
         inverse:
           'bg-white text-brand hover:bg-muted focus-visible:outline-white active:bg-light-pink',
         outlineInverse:
-          'border border-white bg-transparent text-white hover:bg-white/10 focus-visible:outline-white active:bg-white/15',
+          'border border-white bg-transparent text-white hover:bg-black/15 focus-visible:outline-white active:bg-black/25',
       },
       size: {
         default: 'h-10 px-4 py-2 has-[>svg]:px-3',
