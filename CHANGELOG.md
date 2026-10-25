@@ -42,6 +42,9 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Error and info status colours are one shade darker (#B91C1C, #1D4ED8) to meet WCAG AA; the
   guidelines' values measure 3.95:1 and 4.24:1. Pending brand sign-off (D-14) (SCRUM-31).
 - The Supabase client and env validation load on demand, off the critical path (SCRUM-31).
+- Dependabot (npm) no longer opens semver-major updates; majors are a separate maintenance story
+  after Sprint 1. `@types/node` majors stay ignored permanently to match the Node 22 runtime.
+  Weekly grouped minor/patch updates and GitHub Actions updates are unchanged (SCRUM-11).
 
 ### Planned
 

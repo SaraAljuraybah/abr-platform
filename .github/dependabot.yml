@@ -16,3 +16,10 @@ updates:
     groups:
       npm-minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # Permanent: @types/node must match the Node 22 runtime.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # Temporary: majors are a separate maintenance story after Sprint 1. Remove this rule then.
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
