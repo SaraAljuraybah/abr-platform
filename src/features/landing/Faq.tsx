@@ -14,7 +14,7 @@ export function Faq() {
 
   return (
     <section id="faq" aria-labelledby="faq-title" className="scroll-mt-20 py-10 lg:py-16">
-      <div className="mx-auto grid max-w-[1200px] gap-8 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12">
+      <div className="container-page grid gap-10 lg:grid-cols-12 lg:gap-12">
         <div data-faq-intro="" className="lg:sticky lg:top-24 lg:col-span-5 lg:self-start">
           <SectionHeader section="faq" titleId="faq-title" />
         </div>

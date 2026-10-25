@@ -19,9 +19,9 @@ export function TrustPrivacy() {
       aria-labelledby="trust-title"
       className="scroll-mt-20 bg-muted py-10 lg:py-16"
     >
-      <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-        <SectionHeader section="trust" titleId="trust-title" />
-        <ul className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+      <div className="container-page">
+        <SectionHeader section="trust" titleId="trust-title" align="center" />
+        <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
           {ITEMS.map(({ key, icon: Icon }) => (
             <li key={key} className="rounded-lg bg-card p-6 shadow-sm">
               <span

@@ -44,9 +44,9 @@ export function WhoItsFor() {
 
   return (
     <section id="who-its-for" aria-labelledby="who-title" className="scroll-mt-20 py-10 lg:py-16">
-      <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
+      <div className="container-page">
         <SectionHeader section="who" titleId="who-title" />
-        <ul className="mt-8 grid gap-6 md:grid-cols-3">
+        <ul className="mt-10 grid gap-6 md:grid-cols-3">
           {AUDIENCES.map(({ key, role, icon: Icon, points }) => (
             // The card is not a link; only its action is. The lift is motion-safe only.
             <li

@@ -10,7 +10,7 @@ export function BuildNoticeBar() {
 
   return (
     <aside aria-label={t('app.buildStatus')} className="bg-info-bg text-info">
-      <p className="mx-auto flex min-h-8 max-w-[1200px] items-center justify-center gap-2 px-4 py-1.5 text-center text-xs font-medium sm:px-6">
+      <p className="container-page flex min-h-8 items-center justify-center gap-2 py-1.5 text-center text-xs font-medium">
         <Info aria-hidden="true" className="size-3.5 shrink-0" strokeWidth={2} />
         {t('landing.buildNotice')}
       </p>

@@ -36,9 +36,9 @@ export function HowItWorks() {
       aria-labelledby="how-title"
       className="scroll-mt-20 bg-card py-10 lg:py-16"
     >
-      <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-        <SectionHeader section="how" titleId="how-title" />
-        <ol className="relative mt-8 grid gap-8 before:absolute before:start-5 before:top-5 before:bottom-5 before:w-0.5 before:-translate-x-1/2 before:bg-border lg:grid-cols-5 lg:gap-6 lg:before:start-5 lg:before:end-[calc((100%-6rem)/5-1.25rem)] lg:before:bottom-auto lg:before:h-0.5 lg:before:w-auto lg:before:translate-x-0 lg:before:-translate-y-1/2 rtl:before:translate-x-1/2 rtl:lg:before:translate-x-0">
+      <div className="container-page">
+        <SectionHeader section="how" titleId="how-title" align="center" />
+        <ol className="relative mt-10 grid gap-8 before:absolute before:start-5 before:top-5 before:bottom-5 before:w-0.5 before:-translate-x-1/2 before:bg-border lg:grid-cols-5 lg:gap-6 lg:before:start-5 lg:before:end-[calc((100%-6rem)/5-1.25rem)] lg:before:bottom-auto lg:before:h-0.5 lg:before:w-auto lg:before:translate-x-0 lg:before:-translate-y-1/2 rtl:before:translate-x-1/2 rtl:lg:before:translate-x-0">
           {STEPS.map(({ key, icon: Icon, consent }, index) => (
             <li key={key} className="relative flex gap-4 lg:flex-col lg:gap-4">
               <span

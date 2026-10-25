@@ -10,8 +10,11 @@ export function FinalCta() {
   const { t } = useTranslation();
 
   return (
-    <section aria-labelledby="cta-title" className="bg-hero-gradient text-white">
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:py-16">
+    <section
+      aria-labelledby="cta-title"
+      className="inset-panel mb-4 bg-hero-gradient text-white sm:mb-6 lg:mb-8"
+    >
+      <div className="container-page flex flex-col gap-8 py-12 lg:flex-row lg:items-center lg:justify-between lg:py-16">
         <div className="max-w-2xl">
           <h2 id="cta-title">{t('landing.cta.title')}</h2>
           <p className="mt-3 text-lg text-white">{t('landing.cta.subline')}</p>
