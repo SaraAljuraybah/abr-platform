@@ -37,6 +37,7 @@ const COPY = {
     dashboard: 'Go to dashboard',
     badges: { private: 'Contact private', shared: 'Contact shared' },
     join: ['Join as a student', 'Join as an organization', 'Join as a mentor'],
+    subline: 'Your contact details stay private until you accept a request.',
     headers: [
       ['The process', 'Five steps, and your contact details stay private until you say yes.'],
       ["Who it's for", 'One platform, three roles, each with its own verified path.'],
@@ -62,6 +63,7 @@ const COPY = {
     dashboard: 'الانتقال إلى لوحة التحكم',
     badges: { private: 'التواصل خاص', shared: 'تمت مشاركة التواصل' },
     join: ['انضم كطالب', 'انضم كجهة', 'انضم كمرشد'],
+    subline: 'تبقى بيانات تواصلك خاصة حتى تقبل طلبًا.',
     headers: [
       ['آلية العمل', 'خمس خطوات، وتبقى بيانات تواصلك خاصة حتى توافق.'],
       ['لمن المنصة', 'منصة واحدة وثلاثة أدوار، لكل منها مسار موثّق.'],
@@ -181,6 +183,15 @@ describe.each(['en', 'ar'] as const)('landing page (%s)', (language) => {
       expect(within(area).queryByRole('link', { name: copy.signIn })).toBeNull();
       expect(within(area).queryByRole('link', { name: copy.create })).toBeNull();
     }
+  });
+
+  it('ends with a deep-gradient band: heading, subline and white-reverse actions', async () => {
+    await renderLanding(language);
+    const band = screen.getByRole('region', { name: copy.regions[5] });
+    expect(band).toHaveClass('bg-hero-gradient');
+    expect(within(band).getByText(copy.subline)).toBeInTheDocument();
+    expect(within(band).getByRole('link', { name: copy.create })).toHaveClass('bg-white');
+    expect(within(band).getByRole('link', { name: copy.signIn })).toHaveClass('border-white');
   });
 
   it('lays the FAQ out as a header column followed by the accordion column', async () => {
