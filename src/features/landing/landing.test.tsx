@@ -183,6 +183,21 @@ describe.each(['en', 'ar'] as const)('landing page (%s)', (language) => {
     }
   });
 
+  it('lays the FAQ out as a header column followed by the accordion column', async () => {
+    await renderLanding(language);
+    const faq = screen.getByRole('region', { name: copy.regions[4] });
+    const intro = faq.querySelector('[data-faq-intro]');
+    const list = faq.querySelector('[data-faq-list]');
+    if (!(intro instanceof HTMLElement) || !(list instanceof HTMLElement)) {
+      throw new Error('FAQ columns not found');
+    }
+    expect(within(intro).getByRole('heading', { level: 2 })).toHaveTextContent(copy.regions[4]);
+    expect(within(intro).getByText(copy.headers[3][1])).toBeInTheDocument();
+    expect(list.querySelectorAll(':scope > details')).toHaveLength(4);
+    expect(intro.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(intro.className).toMatch(/lg:sticky/);
+  });
+
   it('audience cards offer role-specific join links when signed out', async () => {
     await renderLanding(language);
     const cards = screen.getByRole('region', { name: copy.regions[2] });
