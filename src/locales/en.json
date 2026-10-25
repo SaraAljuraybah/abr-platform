@@ -84,14 +84,14 @@
     },
     "who": {
       "title": "Built for everyone around a graduation project",
-      "cta": "Create an account",
       "students": {
         "title": "Students",
         "points": {
           "publish": "Publish your project on a reviewed, professional page",
           "requests": "Receive requests from verified organizations",
           "control": "You decide who gets your contact details"
-        }
+        },
+        "cta": "Join as a student"
       },
       "organizations": {
         "title": "Organizations",
@@ -99,7 +99,8 @@
           "browse": "Browse projects reviewed by the ABR team",
           "verified": "Every student has a verified university email",
           "requests": "Send structured requests; contact unlocks on acceptance"
-        }
+        },
+        "cta": "Join as an organization"
       },
       "mentors": {
         "title": "Mentors",
@@ -108,7 +109,8 @@
           "profile": "A verified professional profile",
           "requests": "Requests tied to specific projects",
           "contact": "Contact shared only for accepted mentorships"
-        }
+        },
+        "cta": "Join as a mentor"
       },
       "eyebrow": "Who it's for",
       "intro": "One platform, three roles, each with its own verified path."

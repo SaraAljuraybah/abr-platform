@@ -36,6 +36,7 @@ const COPY = {
     signIn: 'Sign in',
     dashboard: 'Go to dashboard',
     badges: { private: 'Contact private', shared: 'Contact shared' },
+    join: ['Join as a student', 'Join as an organization', 'Join as a mentor'],
     headers: [
       ['The process', 'Five steps, and your contact details stay private until you say yes.'],
       ["Who it's for", 'One platform, three roles, each with its own verified path.'],
@@ -60,6 +61,7 @@ const COPY = {
     signIn: 'تسجيل الدخول',
     dashboard: 'الانتقال إلى لوحة التحكم',
     badges: { private: 'التواصل خاص', shared: 'تمت مشاركة التواصل' },
+    join: ['انضم كطالب', 'انضم كجهة', 'انضم كمرشد'],
     headers: [
       ['آلية العمل', 'خمس خطوات، وتبقى بيانات تواصلك خاصة حتى توافق.'],
       ['لمن المنصة', 'منصة واحدة وثلاثة أدوار، لكل منها مسار موثّق.'],
@@ -181,12 +183,18 @@ describe.each(['en', 'ar'] as const)('landing page (%s)', (language) => {
     }
   });
 
-  it('audience cards link to sign-up only when signed out', async () => {
+  it('audience cards offer role-specific join links when signed out', async () => {
     await renderLanding(language);
     const cards = screen.getByRole('region', { name: copy.regions[2] });
-    const links = within(cards).getAllByRole('link', { name: copy.create });
-    expect(links).toHaveLength(3);
-    for (const link of links) expect(link).toHaveAttribute('href', '/sign-up');
+    const roles = ['student', 'organization', 'mentor'];
+    copy.join.forEach((name, index) => {
+      expect(within(cards).getByRole('link', { name })).toHaveAttribute(
+        'href',
+        `/sign-up?role=${roles[index] ?? ''}`,
+      );
+    });
+    expect(within(cards).getAllByRole('link')).toHaveLength(3);
+    expect(within(cards).queryByRole('link', { name: copy.create })).toBeNull();
   });
 
   it('audience cards show no sign-up link when signed in', async () => {
