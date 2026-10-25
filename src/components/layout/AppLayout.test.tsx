@@ -27,7 +27,7 @@ describe('AppLayout', () => {
     const header = await screen.findByRole('banner');
     expect(within(header).getByRole('img', { name: 'ABR' })).toHaveAttribute(
       'src',
-      '/brand/abr-logo.png',
+      '/brand/abr-logo.svg',
     );
     expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute(
       'href',

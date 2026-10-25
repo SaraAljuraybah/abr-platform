@@ -25,7 +25,6 @@ export function AppLayout() {
         {t('app.skipToContent')}
       </a>
 
-      {/* Solid bg-background: it also equals the raster logo's own background (#FAF9FC). */}
       <header className="sticky top-0 z-40 border-b border-border bg-background">
         <div className="relative mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 sm:px-6">
           <Link to="/" className="shrink-0 rounded-sm" aria-label={t('app.homeLink')}>

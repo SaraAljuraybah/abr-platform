@@ -34,6 +34,7 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   menu); compact header on other routes. Site footer with logo, links, language switch, © 2026 ABR.
 - Per-language document title and meta description; static Open Graph tags; `robots.txt`.
 - axe-core accessibility tests in both languages.
+- Vector logo `public/brand/abr-logo.svg` in the header and footer (a redraw pending approval, D-13).
 - `vercel.json` with an SPA rewrite to `/index.html`; static files are served first (SCRUM-31).
 
 ### Changed
@@ -51,7 +52,6 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Vercel preview deployments.
 - Playwright end-to-end tests (from Week 2).
 - Dark mode (tokens proposed in Plan §16).
-- Header logo switches to `abr-logo.svg` once the vector is supplied.
 - SHA-pinned GitHub Actions (pre-pilot hardening).
 - ESLint 10 upgrade (ESLint 9 is now end-of-life upstream).
 - Review robots/indexing at public launch.
