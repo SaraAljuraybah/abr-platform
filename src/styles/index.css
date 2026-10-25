@@ -55,6 +55,18 @@
     #7c3aed 74%,
     #ec4899 108%
   );
+  /*
+   * Hero-only variant (pending brand sign-off, D-14): the approved Deep stops with the pink pushed
+   * from 108% to 130%, so only a hint of pink reaches the corner and the eye stays on the content.
+   */
+  --abr-gradient-hero: linear-gradient(125deg, #0f0720 0%, #4b1c7a 42%, #7c3aed 74%, #ec4899 130%);
+  --abr-gradient-hero-rtl: linear-gradient(
+    235deg,
+    #0f0720 0%,
+    #4b1c7a 42%,
+    #7c3aed 74%,
+    #ec4899 130%
+  );
   --abr-gradient-soft: linear-gradient(135deg, #f3edff 0%, #fbcfe8 100%);
 
   /* shadcn/ui semantic tokens */
@@ -192,13 +204,16 @@
   }
 }
 
-/* The Deep gradient: one per view (Brand Guidelines p. 11). White text only. */
+/*
+ * Hero gradient (Deep with softened pink), mirrored in RTL. White text only. Never two gradient
+ * surfaces on screen together (Brand Guidelines p. 11).
+ */
 @utility bg-hero-gradient {
   background-color: var(--abr-dark);
-  background-image: var(--abr-gradient-deep);
+  background-image: var(--abr-gradient-hero);
 
   &:where([dir='rtl'], [dir='rtl'] *) {
-    background-image: var(--abr-gradient-deep-rtl);
+    background-image: var(--abr-gradient-hero-rtl);
   }
 }
 

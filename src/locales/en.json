@@ -40,7 +40,15 @@
         "field": "Health tech",
         "reviewed": "Reviewed",
         "request": "Request to connect",
-        "lockNote": "Contact shared after acceptance"
+        "lockNote": "Contact shared after acceptance",
+        "summary": "Transcribes doctor–patient conversations in Saudi dialects into structured notes.",
+        "team": "Team of 3 · 2026",
+        "initials": {
+          "first": "N",
+          "second": "F",
+          "third": "A"
+        },
+        "toast": "Request accepted — contact unlocked"
       }
     },
     "how": {
