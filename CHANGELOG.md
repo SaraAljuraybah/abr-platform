@@ -37,12 +37,31 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Vector logo `public/brand/abr-logo.svg` in the header and footer (a redraw pending approval, D-13).
 - `vercel.json` with an SPA rewrite to `/index.html`; static files are served first (SCRUM-31).
 
+- Landing polish (SCRUM-31): build notice moved to a slim bar above the header on every route; tighter
+  hero with a richer example card (summary, team row, avatars, a second card behind, an "accepted"
+  toast); eyebrow and one-line intro on every section with a lighter rhythm and alternating
+  backgrounds; step icons and "Contact private" / "Contact shared" badges; role-specific join links
+  (`/sign-up?role=student|organization|mentor`); trust items as cards; two-column FAQ with a sticky
+  intro; deep-gradient final call to action; footer descriptor.
+
 ### Changed
 
 - The account action is called "Create an account" everywhere (was "Sign up") (SCRUM-31).
 - Error and info status colours are one shade darker (#B91C1C, #1D4ED8) to meet WCAG AA; the
   guidelines' values measure 3.95:1 and 4.24:1. Pending brand sign-off (D-14) (SCRUM-31).
 - The Supabase client and env validation load on demand, off the critical path (SCRUM-31).
+
+### Pending brand sign-off
+
+- Hero and final-band gradient: the approved Deep stops with the pink pushed from 108% to 130%, so
+  only a hint of pink reaches the corner (D-14).
+- Error and info status colours one shade darker for WCAG AA (see Changed) (D-14).
+- Second gradient surface (final call to action): a deliberate exception to "one gradient per view".
+  The guideline forbids two gradients competing on one screen; on this page the hero and the band
+  are never on screen together. Measured on the production build (gap = band top − hero bottom):
+  1280 px wide: page 2941 px, gap 1992 px (EN) / 2047 px (AR); 768 px: gap 2554 / 2569 px;
+  360 px: gap 4032 / 4023 px. Both are visible at once only in a viewport taller than the gap
+  (about 2000 px at desktop width).
 
 ### Planned
 
@@ -55,5 +74,7 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - SHA-pinned GitHub Actions (pre-pilot hardening).
 - ESLint 10 upgrade (ESLint 9 is now end-of-life upstream).
 - Review robots/indexing at public launch.
+- Scroll to the hash after the first render when the page is opened directly at `/#section` (native
+  anchors already work for in-page links).
 - Mobile Lighthouse Performance ≥ 90 (currently about 71 on the production build): prerender the
   public pages or reduce initial style and script work.
