@@ -44,6 +44,9 @@ describe('AppLayout', () => {
       within(footer).getByRole('button', { name: /Change language to Arabic/ }),
     ).toBeInTheDocument();
     expect(within(footer).getByText('© 2026 ABR')).toBeInTheDocument();
+    expect(
+      within(footer).getByText('Verified discovery and connection for graduation projects.'),
+    ).toBeInTheDocument();
   });
 
   it('shows section links on "/" only; other routes get the compact header and footer', async () => {
