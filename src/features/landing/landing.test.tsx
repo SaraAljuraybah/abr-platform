@@ -35,6 +35,7 @@ const COPY = {
     create: 'Create an account',
     signIn: 'Sign in',
     dashboard: 'Go to dashboard',
+    badges: { private: 'Contact private', shared: 'Contact shared' },
     headers: [
       ['The process', 'Five steps, and your contact details stay private until you say yes.'],
       ["Who it's for", 'One platform, three roles, each with its own verified path.'],
@@ -58,6 +59,7 @@ const COPY = {
     create: 'إنشاء حساب',
     signIn: 'تسجيل الدخول',
     dashboard: 'الانتقال إلى لوحة التحكم',
+    badges: { private: 'التواصل خاص', shared: 'تمت مشاركة التواصل' },
     headers: [
       ['آلية العمل', 'خمس خطوات، وتبقى بيانات تواصلك خاصة حتى توافق.'],
       ['لمن المنصة', 'منصة واحدة وثلاثة أدوار، لكل منها مسار موثّق.'],
@@ -89,6 +91,18 @@ describe.each(['en', 'ar'] as const)('landing page (%s)', (language) => {
     expect(screen.getByRole('banner')).toBeInTheDocument();
     expect(screen.getByRole('contentinfo')).toBeInTheDocument();
     expect(screen.getAllByRole('listitem').length).toBeGreaterThan(5);
+  });
+
+  it('marks the consent moment: contact private in steps 1-2, shared at step 5', async () => {
+    await renderLanding(language);
+    const how = screen.getByRole('region', { name: copy.regions[1] });
+    const [first, second, , , fifth] = within(how).getAllByRole('listitem');
+    if (!first || !second || !fifth) throw new Error('expected five steps');
+    expect(within(first).getByText(copy.badges.private)).toBeInTheDocument();
+    expect(within(second).getByText(copy.badges.private)).toBeInTheDocument();
+    expect(within(fifth).getByText(copy.badges.shared)).toBeInTheDocument();
+    expect(within(how).getAllByText(copy.badges.private)).toHaveLength(2);
+    expect(within(how).getAllByText(copy.badges.shared)).toHaveLength(1);
   });
 
   it('gives each section after the hero an eyebrow and a one-line intro', async () => {
