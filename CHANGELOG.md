@@ -30,7 +30,7 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Landing page at `/` (SCRUM-31), English and Arabic: hero with an example project card, how it
   works, who it's for, trust & privacy, FAQ, final call to action. Signed-in visitors see
   "Go to dashboard" instead of the sign-in and create-account actions.
-- Site header: sticky; section links on `/` (inline from `lg`, otherwise in an accessible mobile
+- Site header: sticky; section links on `/` (inline from `xl`, otherwise in an accessible mobile
   menu); compact header on other routes. Site footer with logo, links, language switch, © 2026 ABR.
 - Per-language document title and meta description; static Open Graph tags; `robots.txt`.
 - axe-core accessibility tests in both languages.
@@ -38,11 +38,24 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - `vercel.json` with an SPA rewrite to `/index.html`; static files are served first (SCRUM-31).
 
 - Landing polish (SCRUM-31): build notice moved to a slim bar above the header on every route; tighter
-  hero with a richer example card (summary, team row, avatars, a second card behind, an "accepted"
-  toast); eyebrow and one-line intro on every section with a lighter rhythm and alternating
-  backgrounds; step icons and "Contact private" / "Contact shared" badges; role-specific join links
-  (`/sign-up?role=student|organization|mentor`); trust items as cards; two-column FAQ with a sticky
-  intro; deep-gradient final call to action; footer descriptor.
+  hero with a richer example card (summary, team row, avatars, an "accepted" toast over the card's
+  bottom edge at the end side); eyebrow and one-line intro on every section with a lighter rhythm and
+  alternating backgrounds; step icons and "Contact private" / "Contact shared" badges; role-specific
+  join links (`/sign-up?role=student|organization|mentor`); trust items as cards; two-column FAQ with
+  a sticky intro; deep-gradient final call to action; footer descriptor.
+- Landing layout (SCRUM-31):
+  - Three-part header from 1280 px (`xl`): logo at the start, section links truly centred
+    (`grid-cols-[1fr_auto_1fr]`, the nav as a subgrid), actions at the end; menu below `xl`. From
+    `xl` the header row is 1280 px wide, wider than the content, because the widest action group
+    (Arabic, signed out: 313 px) needs 1136 px for true centring and the 1120 px content leaves
+    1040 px. Measured centring offset: 0 px in EN/AR, signed out and in, at 1280 and 1920 px.
+  - Hero and final band as inset panels (16 / 24 / 32 px from the viewport, 28 px corners).
+  - Shared page container: 1120 px max, 24 px gutters (40 px from `lg`); 40 px below section headers.
+  - Centred section headers for How it works and Trust; Who it's for and FAQ stay start-aligned.
+  - Quieter eyebrows: 14 px, uppercase with +0.08em tracking in English; normal case, no tracking in
+    Arabic.
+  - Hero title about 10% smaller (27 / 36 px; Arabic 36 px); English h1–h3 at −0.02em tracking,
+    Arabic at 0.
 
 ### Changed
 
@@ -53,15 +66,17 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 
 ### Pending brand sign-off
 
-- Hero and final-band gradient: the approved Deep stops with the pink pushed from 108% to 130%, so
-  only a hint of pink reaches the corner (D-14).
+- Hero and final-band gradient: the approved Deep stops with the pink pushed from 108% to 160%, so
+  the panels read purple with only a faint warm hint in the far corner (D-14). Worst-case text
+  contrast on both panels, sampled from the rendered background at 360 / 768 / 1280 px in EN and AR:
+  5.26:1 (hero subtitle); every other text run is higher.
 - Error and info status colours one shade darker for WCAG AA (see Changed) (D-14).
 - Second gradient surface (final call to action): a deliberate exception to "one gradient per view".
   The guideline forbids two gradients competing on one screen; on this page the hero and the band
   are never on screen together. Measured on the production build (gap = band top − hero bottom):
-  1280 px wide: page 2941 px, gap 1992 px (EN) / 2047 px (AR); 768 px: gap 2554 / 2569 px;
-  360 px: gap 4032 / 4023 px. Both are visible at once only in a viewport taller than the gap
-  (about 2000 px at desktop width).
+  1280 px wide: page 3093 / 3084 px, gap 2060 px (EN) / 2091 px (AR); 768 px: gap 2586 / 2601 px;
+  360 px: gap 4088 / 4159 px. Both are visible at once only in a viewport taller than the gap
+  (about 2060 px at desktop width).
 
 ### Planned
 
