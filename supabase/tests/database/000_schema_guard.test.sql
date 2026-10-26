@@ -9,11 +9,16 @@
 --   (d) anon cannot INSERT/UPDATE/DELETE/TRUNCATE any public relation
 --   (e) authenticated cannot INSERT/DELETE/TRUNCATE any public relation
 --       (column-level UPDATE grants remain allowed)
---   (f) no SECURITY DEFINER function in public/private is executable by anon or PUBLIC
+--   (f) no SECURITY DEFINER function in public/private is executable by anon or PUBLIC,
+--       except the allowlist below
+--   (g) anon can execute no function in public at all (definer or not), except the allowlist
+--
+-- Anon allowlist (SCRUM-12): public.check_student_email(uuid,text), the sign-up email pre-check.
+-- Adding to it is a security decision: record it in docs/permissions.md and the PR.
 
 begin;
 
-select plan(6);
+select plan(7);
 
 -- (a) ------------------------------------------------------------------------
 select is_empty(
@@ -127,9 +132,35 @@ select is_empty(
           and d.objid = p.oid
           and d.deptype = 'e'
       )
+      -- Allowlisted functions may be granted to anon explicitly, never to PUBLIC.
+      and not (
+        g.grantee = 'anon'
+        and p.oid::pg_catalog.regprocedure::text in ('check_student_email(uuid,text)')
+      )
     order by 1
   $$,
-  '(f) no SECURITY DEFINER function in public/private is executable by anon or PUBLIC'
+  '(f) no SECURITY DEFINER function in public/private is executable by anon or PUBLIC (allowlist excepted)'
+);
+
+-- (g) ------------------------------------------------------------------------
+-- Covers non-definer functions too: anon should reach nothing in public but the allowlist.
+select is_empty(
+  $$
+    select format('%s is executable by anon', p.oid::pg_catalog.regprocedure)
+    from pg_catalog.pg_proc p
+    join pg_catalog.pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public'
+      and pg_catalog.has_function_privilege('anon', p.oid, 'EXECUTE')
+      and not exists (
+        select 1 from pg_catalog.pg_depend d
+        where d.classid = 'pg_catalog.pg_proc'::pg_catalog.regclass
+          and d.objid = p.oid
+          and d.deptype = 'e'
+      )
+      and p.oid::pg_catalog.regprocedure::text not in ('check_student_email(uuid,text)')
+    order by 1
+  $$,
+  '(g) anon can execute no function in public except the allowlist'
 );
 
 select * from finish();
