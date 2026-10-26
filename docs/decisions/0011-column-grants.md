@@ -50,3 +50,45 @@ CI. It fails if anon can write to any public relation, if authenticated can `INS
 - Every migration is explicit about privileges, so behaviour is identical on local, development and
   production regardless of each project's default privileges.
 - Adding an editable column requires a matching `grant update (<column>)` in the same migration.
+
+## Note (SCRUM-12, 2026-10-26): default privileges
+
+**Local stack, observed** (Supabase CLI 2.113.0, Postgres 17.6.1.158, `pg_default_acl` for schema
+`public`):
+
+| Objects created by | Tables (`r`)                                              | Functions (`f`)                                    |
+| ------------------ | --------------------------------------------------------- | -------------------------------------------------- |
+| `postgres`         | `anon`, `authenticated`, `service_role`: `Dxtm` only      | `postgres` only (no `PUBLIC` default)              |
+| `supabase_admin`   | `anon`, `authenticated`, `service_role`: ALL (`arwdDxtm`) | `anon`, `authenticated`, `service_role`: `EXECUTE` |
+
+Consequences seen while building SCRUM-12: `service_role` (the secret key) cannot even `SELECT` a
+table created in a migration unless it is granted explicitly (`profiles` now grants it `SELECT`).
+The migrations still revoke function `EXECUTE` from `PUBLIC` explicitly, so they do not depend on
+the local function default either.
+
+**Hosted development project: not yet verified.** It is not linked (no project ref in
+`supabase/.temp`), and linking needs the CTO's credentials. When it is linked, run these in the SQL
+editor and record the output here:
+
+```sql
+-- Default privileges per creating role in schema public.
+select pg_catalog.pg_get_userbyid(d.defaclrole) as creator,
+       d.defaclobjtype::text as object_type,
+       pg_catalog.array_to_string(d.defaclacl, ' ') as privileges
+from pg_catalog.pg_default_acl d
+join pg_catalog.pg_namespace n on n.oid = d.defaclnamespace
+where n.nspname = 'public'
+order by 1, 2;
+
+-- What the client roles actually hold on the migrated tables.
+select grantee, table_name,
+       string_agg(privilege_type, ',' order by privilege_type) as privileges
+from information_schema.role_table_grants
+where table_schema = 'public' and grantee in ('anon', 'authenticated', 'service_role')
+group by grantee, table_name
+order by table_name, grantee;
+```
+
+The mutation check in SCRUM-12 simulated the hosted worst case (`grant all` to `authenticated`,
+then a column-only `revoke`): the privilege tests and the schema guard fail, and only the guard
+trigger still stops role and status changes. Both layers are needed.
