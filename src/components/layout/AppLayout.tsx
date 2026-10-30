@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useLocation } from 'react-router';
 import { AuthActions } from '@/components/AuthActions';
+import { BuildNotice } from '@/components/BuildNotice';
 import { LanguageSwitch } from '@/components/LanguageSwitch';
 import { cn } from '@/lib/utils';
 import { Logo } from './Logo';
@@ -49,6 +50,12 @@ export function AppLayout() {
       </header>
 
       <main id="main" tabIndex={-1} className="flex-1 outline-none">
+        {/* The landing page places the notice under its hero. */}
+        {!isLanding && (
+          <div className="mx-auto max-w-[1200px] px-4 pt-6 sm:px-6">
+            <BuildNotice />
+          </div>
+        )}
         <Outlet />
       </main>
 
