@@ -35,6 +35,14 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Per-language document title and meta description; static Open Graph tags; `robots.txt`.
 - axe-core accessibility tests in both languages.
 - `vercel.json` with an SPA rewrite to `/index.html`; static files are served first (SCRUM-31).
+- Sign in at `/sign-in` (SCRUM-13), English and Arabic: email and password with Supabase Auth;
+  one generic message for a wrong email or password; unconfirmed email with "Resend link";
+  rate-limit and network messages; returns to a safe in-app `next` path, otherwise `/app`.
+  Already signed-in visitors are redirected. `/forgot-password` placeholder.
+- First shared UI-kit pieces, grown page by page (SCRUM-33): `TextField`, `PasswordField`,
+  `Callout`, `Button` loading state, `AuthLayout`, `BuildNotice` (now on every route).
+- One localized Zod error map (`src/lib/zod-i18n.ts`): schemas return i18n keys, fields translate
+  them, so messages follow a language switch.
 
 ### Changed
 
