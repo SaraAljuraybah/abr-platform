@@ -1,12 +1,11 @@
 import type { Session } from '@supabase/supabase-js';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, describe, expect, it } from 'vitest';
-import { AuthContext, type AuthState } from '@/features/auth/auth-context';
+import { type AuthState } from '@/features/auth/auth-context';
 import { changeLanguage, type Language } from '@/lib/i18n';
-import { routes } from '@/routes/routes';
 import { axeViolations } from '@/test/axe';
+import { renderRoute } from '@/test/render-route';
 
 const session = { user: { id: '00000000-0000-0000-0000-000000000001' } } as unknown as Session;
 const signedOut: AuthState = { status: 'ready', session: null, role: null, onboarded: false };
@@ -17,12 +16,7 @@ const AXE_TIMEOUT = 60_000;
 
 async function renderAt(path: string, language: Language, auth: AuthState = signedOut) {
   await changeLanguage(language);
-  const router = createMemoryRouter(routes, { initialEntries: [path] });
-  render(
-    <AuthContext value={auth}>
-      <RouterProvider router={router} />
-    </AuthContext>,
-  );
+  renderRoute(path, auth);
   await screen.findByRole('heading', { level: 1 });
 }
 
@@ -65,9 +59,9 @@ describe.each(['en', 'ar'] as const)('accessibility (axe, %s)', (language) => {
   );
 
   it(
-    'compact header page (sign-in placeholder): no violations',
+    'compact header page (404): no violations',
     async () => {
-      await renderAt('/sign-in', language);
+      await renderAt('/does-not-exist', language);
       expect(await axeViolations()).toEqual([]);
     },
     AXE_TIMEOUT,

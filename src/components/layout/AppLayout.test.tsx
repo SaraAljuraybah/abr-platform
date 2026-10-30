@@ -1,20 +1,11 @@
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, describe, expect, it } from 'vitest';
-import { AuthContext, type AuthState } from '@/features/auth/auth-context';
 import { changeLanguage } from '@/lib/i18n';
-import { routes } from '@/routes/routes';
-
-const signedOut: AuthState = { status: 'ready', session: null, role: null, onboarded: false };
+import { renderRoute } from '@/test/render-route';
 
 function renderAt(path: string) {
-  const router = createMemoryRouter(routes, { initialEntries: [path] });
-  render(
-    <AuthContext value={signedOut}>
-      <RouterProvider router={router} />
-    </AuthContext>,
-  );
+  renderRoute(path);
 }
 
 describe('AppLayout', () => {
@@ -47,7 +38,7 @@ describe('AppLayout', () => {
   });
 
   it('shows section links on "/" only; other routes get the compact header and footer', async () => {
-    renderAt('/sign-in');
+    renderAt('/does-not-exist');
     const header = await screen.findByRole('banner');
     expect(within(header).queryByRole('link', { name: 'How it works' })).not.toBeInTheDocument();
     expect(

@@ -1,9 +1,8 @@
 import type { Session } from '@supabase/supabase-js';
-import { render, screen } from '@testing-library/react';
-import { createMemoryRouter, RouterProvider } from 'react-router';
+import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { AuthContext, type AuthState } from '@/features/auth/auth-context';
-import { routes } from '@/routes/routes';
+import { type AuthState } from '@/features/auth/auth-context';
+import { renderRoute } from '@/test/render-route';
 
 const session = { user: { id: '00000000-0000-0000-0000-000000000001' } } as unknown as Session;
 
@@ -14,13 +13,7 @@ const onboardedStudent: AuthState = { status: 'ready', session, role: 'student',
 const onboardedAdmin: AuthState = { status: 'ready', session, role: 'admin', onboarded: true };
 
 function renderAt(path: string, auth: AuthState) {
-  const router = createMemoryRouter(routes, { initialEntries: [path] });
-  render(
-    <AuthContext value={auth}>
-      <RouterProvider router={router} />
-    </AuthContext>,
-  );
-  return router;
+  return renderRoute(path, auth).router;
 }
 
 function heading() {
