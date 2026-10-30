@@ -156,7 +156,42 @@
       "signUp": "Create an account",
       "onboarding": "Onboarding",
       "app": "Dashboard",
-      "admin": "Admin"
+      "admin": "Admin",
+      "forgotPassword": "Reset your password"
     }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Sign in",
+      "subtitle": "Welcome back to ABR.",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot your password?",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "newToAbr": "New to ABR?",
+      "createAccount": "Create an account"
+    },
+    "errors": {
+      "invalidCredentials": "Email or password is incorrect.",
+      "emailNotConfirmed": "Confirm your email to continue. We sent a link to {{email}}.",
+      "rateLimited": "Too many attempts. Please wait a minute and try again.",
+      "network": "We couldn't reach the server. Check your connection and try again.",
+      "unexpected": "Something went wrong. Please try again."
+    },
+    "resend": {
+      "action": "Resend link",
+      "sending": "Sending…",
+      "sent": "A new link is on its way."
+    }
+  },
+  "validation": {
+    "required": "This field is required.",
+    "email": "Enter a valid email address.",
+    "invalid": "Check this value."
+  },
+  "passwordField": {
+    "show": "Show password",
+    "hide": "Hide password"
   }
 }
