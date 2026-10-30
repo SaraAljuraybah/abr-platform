@@ -3,19 +3,16 @@ import { CircleAlert, Info } from 'lucide-react';
 import { type ComponentProps } from 'react';
 import { cn } from '@/lib/utils';
 
-const calloutVariants = cva(
-  'flex items-start gap-3 rounded-md border px-4 py-3 text-sm outline-none',
-  {
-    variants: {
-      variant: {
-        // AA status pairs from SCRUM-31 (5.30:1 and 5.49:1 on their tints).
-        info: 'border-info/30 bg-info-bg text-info',
-        error: 'border-error/30 bg-error-bg text-error',
-      },
+const calloutVariants = cva('flex items-start gap-3 rounded-md border px-4 py-3 text-sm', {
+  variants: {
+    variant: {
+      // AA status pairs from SCRUM-31 (5.30:1 and 5.49:1 on their tints).
+      info: 'border-info/30 bg-info-bg text-info',
+      error: 'border-error/30 bg-error-bg text-error',
     },
-    defaultVariants: { variant: 'info' },
   },
-);
+  defaultVariants: { variant: 'info' },
+});
 
 const icons = { info: Info, error: CircleAlert } as const;
 
