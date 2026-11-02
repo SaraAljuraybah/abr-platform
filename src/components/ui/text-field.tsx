@@ -7,6 +7,8 @@ export type TextFieldProps = Omit<ComponentProps<'input'>, 'id'> & {
   hint?: ReactNode;
   /** Already-translated message. Sets aria-invalid and joins aria-describedby. */
   error?: ReactNode;
+  /** Below the input (e.g. a password checklist or a related link); joins aria-describedby. */
+  details?: ReactNode;
   /** Content inside the input's end edge (e.g. the password toggle). Reserve room with inputClassName. */
   endAdornment?: ReactNode;
   inputClassName?: string;
@@ -16,6 +18,7 @@ export function TextField({
   label,
   hint,
   error,
+  details,
   endAdornment,
   className,
   inputClassName,
@@ -24,7 +27,10 @@ export function TextField({
   const id = useId();
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
-  const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ');
+  const detailsId = `${id}-details`;
+  const describedBy = [hint ? hintId : null, error ? errorId : null, details ? detailsId : null]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
@@ -60,6 +66,7 @@ export function TextField({
           {error}
         </p>
       )}
+      {details && <div id={detailsId}>{details}</div>}
     </div>
   );
 }
