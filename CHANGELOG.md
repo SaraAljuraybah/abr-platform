@@ -43,6 +43,19 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   `Callout`, `Button` loading state, `AuthLayout`, `BuildNotice` (now on every route).
 - One localized Zod error map (`src/lib/zod-i18n.ts`): schemas return i18n keys, fields translate
   them, so messages follow a language switch.
+- Create an account at `/sign-up` (SCRUM-13), English and Arabic: role cards (Student,
+  Organization, Mentor; pre-selected from `?role=`, anything else falls back to Student), numbered
+  fields per role with a `01—04` / `01—03` progress label, character counters on the name fields,
+  a live password checklist matching the Supabase password policy, and the consent line with the
+  privacy notice. Students pick an active university and are pre-checked with
+  `check_student_email()` on blur and on submit; no sign-up request is sent for a mismatched
+  email. Sign-up metadata matches the trigger exactly per role. Success, an existing email and a
+  filled spam-trap field all land on `/check-email` (email in router state only). Rate-limit,
+  network, weak-password and the trigger's generic refusal have their own messages. Landing
+  audience cards link with `?role=`. Placeholders: `/request-access`, `/check-email`,
+  `/auth/confirmed`.
+- UI kit (SCRUM-33): `RadioCardGroup`/`RadioCard` (Radix), `SelectField`, `NumberedLabel`,
+  `FieldProgress`, `CharacterCount`; `TextField` gains a `details` slot below the input.
 - Identity schema (SCRUM-12), seven migrations:
   - shared enums (Plan §14), schema `private`, `updated_at` trigger, append-only `audit_events`
     (update, delete and truncate refused even for the owner) written only by `private.log_event()`;
@@ -76,8 +89,12 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   When the sign-up trigger refuses, Supabase Auth returns only a generic "Database error saving new
   user" (HTTP 500), so the `ABR_*` reason never reaches the client.
 - A sign-up Edge Function that returns specific errors is a possible later improvement.
-- Sign-up metadata: `role` (`student` | `organization` | `mentor`), `university_id` (students) and
-  optional `full_name`.
+- Sign-up metadata: `role` (`student` | `organization` | `mentor`), `university_id` (students),
+  `organization_name` (organizations, SCRUM-13) and optional `full_name`.
+- `[auth.sms] enable_confirmations` must stay `true` (SCRUM-13): with SMS or email autoconfirm on,
+  Supabase Auth answers a sign-up for an existing confirmed email with `422 user_already_exists`
+  instead of the obfuscated success, which enumerates accounts. The hosted project needs the same
+  setting.
 
 ### Changed
 
@@ -85,6 +102,9 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Error and info status colours are one shade darker (#B91C1C, #1D4ED8) to meet WCAG AA; the
   guidelines' values measure 3.95:1 and 4.24:1. Pending brand sign-off (D-14) (SCRUM-31).
 - The Supabase client and env validation load on demand, off the critical path (SCRUM-31).
+- `[auth.sms] enable_confirmations = true` (was `false`; SMS sign-up stays disabled) (SCRUM-13).
+- Tests wait up to 5 s for lazy routes (`asyncUtilTimeout`); jsdom gets a `ResizeObserver` stub
+  for Radix (SCRUM-13).
 
 ### Planned
 
