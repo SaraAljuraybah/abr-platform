@@ -157,7 +157,10 @@
       "onboarding": "Onboarding",
       "app": "Dashboard",
       "admin": "Admin",
-      "forgotPassword": "Reset your password"
+      "forgotPassword": "Reset your password",
+      "requestAccess": "Request access",
+      "checkEmail": "Check your email",
+      "authConfirmed": "Email confirmed"
     }
   },
   "auth": {
@@ -177,18 +180,77 @@
       "emailNotConfirmed": "Confirm your email to continue. We sent a link to {{email}}.",
       "rateLimited": "Too many attempts. Please wait a minute and try again.",
       "network": "We couldn't reach the server. Check your connection and try again.",
-      "unexpected": "Something went wrong. Please try again."
+      "unexpected": "Something went wrong. Please try again.",
+      "weakPassword": "Choose a stronger password that meets every requirement under the password field.",
+      "signUpFailed": "We couldn't create your account. Check your details and try again."
     },
     "resend": {
       "action": "Resend link",
       "sending": "Sending…",
       "sent": "A new link is on its way."
+    },
+    "signUp": {
+      "title": "Create your account",
+      "intro": "Every project starts with an idea. This is the first step.",
+      "roleLabel": "I'm joining as",
+      "roles": {
+        "student": {
+          "title": "Student",
+          "description": "Publish your graduation project"
+        },
+        "organization": {
+          "title": "Organization",
+          "description": "Discover verified projects"
+        },
+        "mentor": {
+          "title": "Mentor",
+          "description": "Guide student teams"
+        }
+      },
+      "progress": "Number of fields: {{total}}",
+      "fullName": "Full name",
+      "yourFullName": "Your full name",
+      "organizationName": "Organization name",
+      "university": "University",
+      "universityPlaceholder": "Select your university",
+      "universitiesLoading": "Loading universities…",
+      "universitiesError": "We couldn't load the universities.",
+      "universitiesEmpty": "No universities are available yet.",
+      "retry": "Try again",
+      "cantFindUniversity": "Can't find your university?",
+      "universityEmail": "University email",
+      "universityEmailHint": "Use your university email. It's how we verify you're a student.",
+      "universityEmailTrouble": "Having trouble with your university email? Request an exception.",
+      "emailMismatch": "This email doesn't belong to {{university}}. Use your university email.",
+      "workEmail": "Work email",
+      "workEmailHint": "We review every organization before it can send requests.",
+      "email": "Email",
+      "password": "Password",
+      "passwordRulesTitle": "Password requirements",
+      "passwordRules": {
+        "length": "At least 10 characters",
+        "case": "An uppercase and a lowercase letter",
+        "digit": "A number"
+      },
+      "ruleMet": "Done:",
+      "ruleNotMet": "Not yet:",
+      "passwordNotMet": "Your password doesn't meet all the requirements yet.",
+      "mentorNotice": "Mentor workflows open after the pilot. You can register now, and we'll review your profile.",
+      "website": "Website",
+      "submit": "Create account",
+      "submitting": "Creating your account…",
+      "consent": "By creating an account, you agree to the use of your data to review your account and contact you about ABR, as described in the <privacyLink>privacy notice</privacyLink>.",
+      "opensInNewTab": "(opens in a new tab)",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in"
     }
   },
   "validation": {
     "required": "This field is required.",
     "email": "Enter a valid email address.",
-    "invalid": "Check this value."
+    "invalid": "Check this value.",
+    "tooShort": "This is too short.",
+    "tooLong": "This is too long."
   },
   "passwordField": {
     "show": "Show password",

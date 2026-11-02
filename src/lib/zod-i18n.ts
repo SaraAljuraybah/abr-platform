@@ -7,6 +7,8 @@ const VALIDATION_KEYS: readonly ValidationKey[] = [
   'validation.required',
   'validation.email',
   'validation.invalid',
+  'validation.tooShort',
+  'validation.tooLong',
 ];
 
 export function isValidationKey(value: unknown): value is ValidationKey {
@@ -24,6 +26,8 @@ export const errorMap: z.core.$ZodErrorMap = (issue) => {
   if (issue.code === 'too_small' && issue.origin === 'string' && issue.minimum === 1) {
     return 'validation.required';
   }
+  if (issue.code === 'too_small' && issue.origin === 'string') return 'validation.tooShort';
+  if (issue.code === 'too_big' && issue.origin === 'string') return 'validation.tooLong';
   if (issue.code === 'invalid_format' && issue.format === 'email') return 'validation.email';
   return 'validation.invalid';
 };
