@@ -27,10 +27,23 @@ export const routes: RouteObject[] = [
         // Lazy: keeps the Supabase client and zod off the landing page's critical path.
         lazy: async () => ({ Component: (await import('@/features/auth/SignInPage')).SignInPage }),
       },
-      { path: 'sign-up', element: <PlaceholderPage page="signUp" className={inCard} /> },
+      {
+        path: 'sign-up',
+        lazy: async () => ({ Component: (await import('@/features/auth/SignUpPage')).SignUpPage }),
+      },
       {
         path: 'forgot-password',
         element: <PlaceholderPage page="forgotPassword" className={inCard} />,
+      },
+      // Placeholders until SCRUM-14 (request access) and page 3 (check email, confirmed).
+      {
+        path: 'request-access',
+        element: <PlaceholderPage page="requestAccess" className={inCard} />,
+      },
+      { path: 'check-email', element: <PlaceholderPage page="checkEmail" className={inCard} /> },
+      {
+        path: 'auth/confirmed',
+        element: <PlaceholderPage page="authConfirmed" className={inCard} />,
       },
     ],
   },
