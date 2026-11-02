@@ -6,6 +6,7 @@ import { useAuth } from '@/features/auth/auth-context';
 const AUDIENCES = [
   {
     key: 'students',
+    role: 'student',
     icon: GraduationCap,
     points: [
       'landing.who.students.points.publish',
@@ -15,6 +16,7 @@ const AUDIENCES = [
   },
   {
     key: 'organizations',
+    role: 'organization',
     icon: Building2,
     points: [
       'landing.who.organizations.points.browse',
@@ -24,6 +26,7 @@ const AUDIENCES = [
   },
   {
     key: 'mentors',
+    role: 'mentor',
     icon: UserRound,
     points: [
       'landing.who.mentors.points.profile',
@@ -48,7 +51,7 @@ export function WhoItsFor() {
           {t('landing.who.title')}
         </h2>
         <ul className="mt-10 grid gap-6 md:grid-cols-3">
-          {AUDIENCES.map(({ key, icon: Icon, points }) => (
+          {AUDIENCES.map(({ key, role, icon: Icon, points }) => (
             <li key={key} className="flex flex-col rounded-lg border border-border bg-card p-6">
               <span
                 aria-hidden="true"
@@ -80,7 +83,7 @@ export function WhoItsFor() {
               {/* Signed-in visitors already have an account: no sign-up link (UX only). */}
               {!session && (
                 <Link
-                  to="/sign-up"
+                  to={`/sign-up?role=${role}`}
                   className="mt-6 inline-flex items-center gap-1.5 self-start rounded-sm font-semibold text-primary hover:underline"
                 >
                   {t('landing.who.cta')}

@@ -143,12 +143,15 @@ describe.each(['en', 'ar'] as const)('landing page (%s)', (language) => {
     }
   });
 
-  it('audience cards link to sign-up only when signed out', async () => {
+  it('audience cards link to sign-up with their role, only when signed out', async () => {
     await renderLanding(language);
     const cards = screen.getByRole('region', { name: copy.regions[2] });
     const links = within(cards).getAllByRole('link', { name: copy.create });
-    expect(links).toHaveLength(3);
-    for (const link of links) expect(link).toHaveAttribute('href', '/sign-up');
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
+      '/sign-up?role=student',
+      '/sign-up?role=organization',
+      '/sign-up?role=mentor',
+    ]);
   });
 
   it('audience cards show no sign-up link when signed in', async () => {
