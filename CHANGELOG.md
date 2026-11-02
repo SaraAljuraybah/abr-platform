@@ -52,7 +52,10 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   - sign-up trigger: admin only from `app_metadata.abr_role`; students need an allowlisted domain
     of their university; organizations and mentors start pending. It is deferred to COMMIT
     because Supabase Auth sets `app_metadata` and confirms the email after inserting the user.
-- pgTAP: sign-up (37), permissions (44) and verification (30) suites; the schema guard gains an
+  - an eighth migration (SCRUM-13) saves a trimmed `organization_name` from sign-up metadata for
+    organizations only; empty means NULL, and a name outside the column CHECK (2-150) refuses
+    the sign-up instead of being truncated.
+- pgTAP: sign-up (37), organization name (12), permissions (44) and verification (30) suites; the schema guard gains an
   anon allowlist (`check_student_email`) and a check that anon can execute nothing else in `public`.
 - `scripts/provision-admin.mjs`: creates an admin with the secret key (from the environment only),
   verifies the profile and prints one single-use recovery link.
