@@ -34,16 +34,406 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      audit_events: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: number
+          metadata: Json
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: never
+          metadata?: Json
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: never
+          metadata?: Json
+        }
+        Relationships: []
+      }
+      mentor_profiles: {
+        Row: {
+          company: string | null
+          created_at: string
+          expertise: string[]
+          job_title: string | null
+          professional_summary: string | null
+          updated_at: string
+          user_id: string
+          years_of_experience: number | null
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          expertise?: string[]
+          job_title?: string | null
+          professional_summary?: string | null
+          updated_at?: string
+          user_id: string
+          years_of_experience?: number | null
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          expertise?: string[]
+          job_title?: string | null
+          professional_summary?: string | null
+          updated_at?: string
+          user_id?: string
+          years_of_experience?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_profiles: {
+        Row: {
+          created_at: string
+          description: string | null
+          logo_path: string | null
+          organization_name: string | null
+          support_types: string[]
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          logo_path?: string | null
+          organization_name?: string | null
+          support_types?: string[]
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          logo_path?: string | null
+          organization_name?: string | null
+          support_types?: string[]
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_path: string | null
+          bio: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          onboarding_completed: boolean
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          verification_status: Database["public"]["Enums"]["verification_status"]
+        }
+        Insert: {
+          avatar_path?: string | null
+          bio?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          onboarding_completed?: boolean
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          verification_status: Database["public"]["Enums"]["verification_status"]
+        }
+        Update: {
+          avatar_path?: string | null
+          bio?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          onboarding_completed?: boolean
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          verification_status?: Database["public"]["Enums"]["verification_status"]
+        }
+        Relationships: []
+      }
+      student_profiles: {
+        Row: {
+          academic_level: string | null
+          created_at: string
+          github_url: string | null
+          interests: string[]
+          major: string | null
+          skills: string[]
+          university_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          academic_level?: string | null
+          created_at?: string
+          github_url?: string | null
+          interests?: string[]
+          major?: string | null
+          skills?: string[]
+          university_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          academic_level?: string | null
+          created_at?: string
+          github_url?: string | null
+          interests?: string[]
+          major?: string | null
+          skills?: string[]
+          university_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_profiles_university_id_fkey"
+            columns: ["university_id"]
+            isOneToOne: false
+            referencedRelation: "universities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      universities: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name_ar: string
+          name_en: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name_ar: string
+          name_en: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name_ar?: string
+          name_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      university_email_domains: {
+        Row: {
+          active: boolean
+          created_at: string
+          domain: string
+          id: string
+          university_id: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          domain: string
+          id?: string
+          university_id: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          domain?: string
+          id?: string
+          university_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "university_email_domains_university_id_fkey"
+            columns: ["university_id"]
+            isOneToOne: false
+            referencedRelation: "universities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      university_requests: {
+        Row: {
+          created_at: string
+          email_domain: string
+          id: string
+          requested_name: string
+          requester_email: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email_domain: string
+          id?: string
+          requested_name: string
+          requester_email: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email_domain?: string
+          id?: string
+          requested_name?: string
+          requester_email?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      verification_reviews: {
+        Row: {
+          created_at: string
+          decision: Database["public"]["Enums"]["review_decision"]
+          id: string
+          reason: string | null
+          reviewer_id: string
+          subject_id: string
+          subject_role: Database["public"]["Enums"]["user_role"]
+          submitted_snapshot: Json
+        }
+        Insert: {
+          created_at?: string
+          decision: Database["public"]["Enums"]["review_decision"]
+          id?: string
+          reason?: string | null
+          reviewer_id: string
+          subject_id: string
+          subject_role: Database["public"]["Enums"]["user_role"]
+          submitted_snapshot?: Json
+        }
+        Update: {
+          created_at?: string
+          decision?: Database["public"]["Enums"]["review_decision"]
+          id?: string
+          reason?: string | null
+          reviewer_id?: string
+          subject_id?: string
+          subject_role?: Database["public"]["Enums"]["user_role"]
+          submitted_snapshot?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_student_email: {
+        Args: { p_email: string; p_university_id: string }
+        Returns: boolean
+      }
+      current_app_role: {
+        Args: never
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
+      get_my_contact: {
+        Args: never
+        Returns: {
+          contact_email: string
+          contact_email_verified_at: string
+          linkedin_url: string
+          pending_contact_email: string
+          phone: string
+          share_linkedin: boolean
+          share_phone: boolean
+        }[]
+      }
+      is_admin: { Args: never; Returns: boolean }
+      is_verified: { Args: never; Returns: boolean }
+      resubmit_verification: { Args: never; Returns: undefined }
+      review_verification: {
+        Args: {
+          p_decision: Database["public"]["Enums"]["review_decision"]
+          p_reason?: string
+          p_subject_id: string
+        }
+        Returns: string
+      }
+      update_my_contact: {
+        Args: {
+          p_linkedin_url: string
+          p_phone: string
+          p_share_linkedin: boolean
+          p_share_phone: boolean
+        }
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      project_status:
+        | "draft"
+        | "pending_review"
+        | "changes_requested"
+        | "published"
+        | "rejected"
+        | "unpublished"
+      request_status:
+        | "pending"
+        | "accepted"
+        | "declined"
+        | "withdrawn"
+        | "cancelled"
+        | "expired"
+      request_type:
+        | "team_invitation"
+        | "join_request"
+        | "position_application"
+        | "org_project_request"
+        | "mentor_invitation"
+        | "mentorship_request"
+      review_decision: "approved" | "changes_requested" | "rejected"
+      user_role: "student" | "organization" | "mentor" | "admin"
+      verification_status:
+        | "unverified"
+        | "pending"
+        | "verified"
+        | "rejected"
+        | "suspended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -173,7 +563,41 @@ export const Constants = {
     Enums: {},
   },
   public: {
-    Enums: {},
+    Enums: {
+      project_status: [
+        "draft",
+        "pending_review",
+        "changes_requested",
+        "published",
+        "rejected",
+        "unpublished",
+      ],
+      request_status: [
+        "pending",
+        "accepted",
+        "declined",
+        "withdrawn",
+        "cancelled",
+        "expired",
+      ],
+      request_type: [
+        "team_invitation",
+        "join_request",
+        "position_application",
+        "org_project_request",
+        "mentor_invitation",
+        "mentorship_request",
+      ],
+      review_decision: ["approved", "changes_requested", "rejected"],
+      user_role: ["student", "organization", "mentor", "admin"],
+      verification_status: [
+        "unverified",
+        "pending",
+        "verified",
+        "rejected",
+        "suspended",
+      ],
+    },
   },
 } as const
 
