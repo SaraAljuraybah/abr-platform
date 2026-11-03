@@ -30,10 +30,11 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Landing page at `/` (SCRUM-31), English and Arabic: hero with an example project card, how it
   works, who it's for, trust & privacy, FAQ, final call to action. Signed-in visitors see
   "Go to dashboard" instead of the sign-in and create-account actions.
-- Site header: sticky; section links on `/` (inline from `lg`, otherwise in an accessible mobile
+- Site header: sticky; section links on `/` (inline from `xl`, otherwise in an accessible mobile
   menu); compact header on other routes. Site footer with logo, links, language switch, © 2026 ABR.
 - Per-language document title and meta description; static Open Graph tags; `robots.txt`.
 - axe-core accessibility tests in both languages.
+- Vector logo `public/brand/abr-logo.svg` in the header and footer (a redraw pending approval, D-13).
 - `vercel.json` with an SPA rewrite to `/index.html`; static files are served first (SCRUM-31).
 - Sign in at `/sign-in` (SCRUM-13), English and Arabic: email and password with Supabase Auth;
   one generic message for a wrong email or password; unconfirmed email with "Resend link";
@@ -98,6 +99,26 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   instead of the obfuscated success, which enumerates accounts. The hosted project needs the same
   setting.
 
+- Landing polish (SCRUM-31): tighter
+  hero with a richer example card (summary, team row, avatars, an "accepted" toast over the card's
+  bottom edge at the end side); eyebrow and one-line intro on every section with a lighter rhythm and
+  alternating backgrounds; step icons and "Contact private" / "Contact shared" badges; role-specific
+  join links (`/sign-up?role=student|organization|mentor`); trust items as cards; two-column FAQ with
+  a sticky intro; deep-gradient final call to action; footer descriptor.
+- Landing layout (SCRUM-31):
+  - Three-part header from 1280 px (`xl`): logo at the start, section links truly centred
+    (`grid-cols-[1fr_auto_1fr]`, the nav as a subgrid), actions at the end; menu below `xl`. From
+    `xl` the header row is 1280 px wide, wider than the content, because the widest action group
+    (Arabic, signed out: 313 px) needs 1136 px for true centring and the 1120 px content leaves
+    1040 px. Measured centring offset: 0 px in EN/AR, signed out and in, at 1280 and 1920 px.
+  - Hero and final band as inset panels (16 / 24 / 32 px from the viewport, 28 px corners).
+  - Shared page container: 1120 px max, 24 px gutters (40 px from `lg`); 40 px below section headers.
+  - Centred section headers for How it works and Trust; Who it's for and FAQ stay start-aligned.
+  - Quieter eyebrows: 14 px, uppercase with +0.08em tracking in English; normal case, no tracking in
+    Arabic.
+  - Hero title about 10% smaller (27 / 36 px; Arabic 36 px); English h1–h3 at −0.02em tracking,
+    Arabic at 0.
+
 ### Changed
 
 - The account action is called "Create an account" everywhere (was "Sign up") (SCRUM-31).
@@ -130,6 +151,20 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   confirmed email; the second answer must be HTTP 200 with no identities (SCRUM-13).
 - Verify default privileges on the hosted development project once it is linked (ADR-0011 note).
 
+### Pending brand sign-off
+
+- Hero and final-band gradient: the approved Deep stops with the pink pushed from 108% to 160%, so
+  the panels read purple with only a faint warm hint in the far corner (D-14). Worst-case text
+  contrast on both panels, sampled from the rendered background at 360 / 768 / 1280 px in EN and AR:
+  5.26:1 (hero subtitle); every other text run is higher.
+- Error and info status colours one shade darker for WCAG AA (see Changed) (D-14).
+- Second gradient surface (final call to action): a deliberate exception to "one gradient per view".
+  The guideline forbids two gradients competing on one screen; on this page the hero and the band
+  are never on screen together. Measured on the production build (gap = band top − hero bottom):
+  1280 px wide: page 3093 / 3084 px, gap 2060 px (EN) / 2091 px (AR); 768 px: gap 2586 / 2601 px;
+  360 px: gap 4088 / 4159 px. Both are visible at once only in a viewport taller than the gap
+  (about 2060 px at desktop width).
+
 ### Planned
 
 - Branch protection on `main` (set manually in GitHub).
@@ -138,10 +173,11 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Vercel preview deployments.
 - Playwright end-to-end tests (from Week 2).
 - Dark mode (tokens proposed in Plan §16).
-- Header logo switches to `abr-logo.svg` once the vector is supplied.
 - SHA-pinned GitHub Actions (pre-pilot hardening).
 - ESLint 10 upgrade (ESLint 9 is now end-of-life upstream).
 - Review robots/indexing at public launch.
+- Scroll to the hash after the first render when the page is opened directly at `/#section` (native
+  anchors already work for in-page links).
 - Mobile Lighthouse Performance ≥ 90 (currently about 71 on the production build): prerender the
   public pages or reduce initial style and script work.
 - PDPL erasure process for append-only history (admin procedure). `audit_events` and

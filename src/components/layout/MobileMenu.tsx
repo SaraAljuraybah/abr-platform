@@ -76,7 +76,7 @@ export function MobileMenu({ className, children }: { className?: string; childr
         ref={panelRef}
         id={panelId}
         hidden={!open}
-        className="absolute inset-x-0 top-full border-b border-border bg-background px-4 py-4 shadow-md sm:px-6"
+        className="absolute inset-x-0 top-full border-b border-border bg-background px-6 py-4 shadow-md"
       >
         {children}
       </div>

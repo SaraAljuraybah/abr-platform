@@ -1,19 +1,25 @@
 import { useTranslation } from 'react-i18next';
 import { AuthActions } from '@/components/AuthActions';
 
-/** Flat Surface band (#F3EDFF via bg-muted), not a second gradient. Primary stays #7C3AED. */
+/**
+ * Deep-gradient band, the same treatment as the hero (mirrored in RTL), with the hero's
+ * white-reverse buttons. Deliberate exception to "one gradient per view": the hero and this band
+ * are never on screen together (see CHANGELOG for the page-height measurement).
+ */
 export function FinalCta() {
   const { t } = useTranslation();
 
   return (
-    <section aria-labelledby="cta-title" className="pb-16 lg:pb-24">
-      <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-        <div className="flex flex-col gap-6 rounded-xl bg-muted px-6 py-10 sm:px-10 lg:flex-row lg:items-center lg:justify-between">
-          <h2 id="cta-title" className="max-w-2xl text-brand">
-            {t('landing.cta.title')}
-          </h2>
-          <AuthActions placement="band" className="shrink-0" />
+    <section
+      aria-labelledby="cta-title"
+      className="inset-panel mb-4 bg-hero-gradient text-white sm:mb-6 lg:mb-8"
+    >
+      <div className="container-page flex flex-col gap-8 py-12 lg:flex-row lg:items-center lg:justify-between lg:py-16">
+        <div className="max-w-2xl">
+          <h2 id="cta-title">{t('landing.cta.title')}</h2>
+          <p className="mt-3 text-lg text-white">{t('landing.cta.subline')}</p>
         </div>
+        <AuthActions placement="hero" className="shrink-0" />
       </div>
     </section>
   );

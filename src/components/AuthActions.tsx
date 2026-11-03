@@ -4,13 +4,13 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/features/auth/auth-context';
 import { cn } from '@/lib/utils';
 
-type Placement = 'header' | 'menu' | 'hero' | 'band';
+/** `hero` = on a deep gradient (hero, final band): white-reverse buttons. */
+type Placement = 'header' | 'menu' | 'hero';
 
 const layout: Record<Placement, string> = {
   header: 'flex items-center gap-1 sm:gap-2',
   menu: 'flex flex-col gap-2',
   hero: 'flex flex-col gap-3 sm:flex-row',
-  band: 'flex flex-col gap-3 sm:flex-row',
 };
 
 /**
@@ -29,7 +29,7 @@ export function AuthActions({
   const { session } = useAuth();
 
   const onDark = placement === 'hero';
-  const size = placement === 'hero' || placement === 'band' ? 'lg' : 'sm';
+  const size = onDark ? 'lg' : 'sm';
   const block = placement === 'menu' ? 'w-full' : undefined;
   const primary = onDark ? 'inverse' : 'default';
 
@@ -45,12 +45,12 @@ export function AuthActions({
 
   return (
     <div className={cn(layout[placement], className)}>
-      {placement === 'hero' || placement === 'band' ? (
+      {onDark ? (
         <>
           <Button asChild variant={primary} size={size}>
             <Link to="/sign-up">{t('nav.createAccount')}</Link>
           </Button>
-          <Button asChild variant={onDark ? 'outlineInverse' : 'outline'} size={size}>
+          <Button asChild variant="outlineInverse" size={size}>
             <Link to="/sign-in">{t('nav.signIn')}</Link>
           </Button>
         </>

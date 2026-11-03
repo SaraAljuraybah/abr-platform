@@ -9,10 +9,13 @@ export function SiteFooter({ showSections }: { showSections: boolean }) {
 
   return (
     <footer className="border-t border-border">
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 py-10 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
-        <Link to="/" className="shrink-0 self-start rounded-sm" aria-label={t('app.homeLink')}>
-          <Logo />
-        </Link>
+      <div className="container-page flex flex-col gap-6 py-10 lg:flex-row lg:items-center lg:justify-between">
+        <div className="shrink-0">
+          <Link to="/" className="inline-block rounded-sm" aria-label={t('app.homeLink')}>
+            <Logo />
+          </Link>
+          <p className="mt-2 max-w-xs text-sm text-muted-foreground">{t('app.descriptor')}</p>
+        </div>
         {showSections && (
           <nav aria-label={t('nav.footer')}>
             <SectionLinks className="-mx-3 flex flex-wrap gap-x-2 gap-y-1" />

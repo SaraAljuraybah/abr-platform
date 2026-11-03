@@ -18,7 +18,7 @@ describe('AppLayout', () => {
     const header = await screen.findByRole('banner');
     expect(within(header).getByRole('img', { name: 'ABR' })).toHaveAttribute(
       'src',
-      '/brand/abr-logo.png',
+      '/brand/abr-logo.svg',
     );
     expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute(
       'href',
@@ -35,6 +35,9 @@ describe('AppLayout', () => {
       within(footer).getByRole('button', { name: /Change language to Arabic/ }),
     ).toBeInTheDocument();
     expect(within(footer).getByText('© 2026 ABR')).toBeInTheDocument();
+    expect(
+      within(footer).getByText('Verified discovery and connection for graduation projects.'),
+    ).toBeInTheDocument();
   });
 
   it('shows section links on "/" only; other routes get the compact header and footer', async () => {
@@ -45,6 +48,13 @@ describe('AppLayout', () => {
       within(screen.getByRole('contentinfo')).queryByRole('navigation'),
     ).not.toBeInTheDocument();
     expect(within(header).getByRole('link', { name: 'Create an account' })).toBeInTheDocument();
+  });
+
+  it.each(['/', '/sign-in'])('shows no internal-build notice on %s', async (path) => {
+    renderAt(path);
+    await screen.findByRole('main');
+    expect(screen.queryByText(/Internal build/)).toBeNull();
+    expect(screen.queryByRole('complementary', { name: 'Build status' })).toBeNull();
   });
 
   it('switches to Arabic (RTL) and back to English (LTR)', async () => {
