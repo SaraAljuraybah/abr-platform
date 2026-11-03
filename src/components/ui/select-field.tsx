@@ -7,6 +7,8 @@ type SelectFieldProps = Omit<ComponentProps<'select'>, 'id'> & {
   hint?: ReactNode;
   /** Already-translated message. Sets aria-invalid and joins aria-describedby. */
   error?: ReactNode;
+  /** Shown below the select (helper link, etc.); joins aria-describedby. */
+  details?: ReactNode;
 };
 
 /** Native select with TextField's label, hint and error layout. */
@@ -14,6 +16,7 @@ export function SelectField({
   label,
   hint,
   error,
+  details,
   className,
   children,
   ...props
@@ -21,7 +24,10 @@ export function SelectField({
   const id = useId();
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
-  const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ');
+  const detailsId = `${id}-details`;
+  const describedBy = [hint ? hintId : null, error ? errorId : null, details ? detailsId : null]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
@@ -57,6 +63,11 @@ export function SelectField({
         <div id={errorId} className="flex items-start gap-1.5 text-sm text-error">
           <CircleAlert aria-hidden="true" strokeWidth={1.75} className="mt-0.5 size-4 shrink-0" />
           <div className="min-w-0 flex-1">{error}</div>
+        </div>
+      )}
+      {details && (
+        <div id={detailsId} className="text-sm text-muted-foreground">
+          {details}
         </div>
       )}
     </div>

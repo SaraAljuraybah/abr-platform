@@ -206,7 +206,6 @@
           "description": "Guide student teams"
         }
       },
-      "progress": "Number of fields: {{total}}",
       "fullName": "Full name",
       "yourFullName": "Your full name",
       "organizationName": "Organization name",

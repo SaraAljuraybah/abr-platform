@@ -206,7 +206,6 @@
           "description": "أرشد فرق الطلاب"
         }
       },
-      "progress": "عدد الحقول: {{total}}",
       "fullName": "الاسم الكامل",
       "yourFullName": "اسمك الكامل",
       "organizationName": "اسم الجهة",

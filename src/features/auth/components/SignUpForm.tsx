@@ -6,7 +6,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { Callout } from '@/components/ui/callout';
-import { CharacterCount, FieldProgress, NumberedLabel } from '@/components/ui/field-number';
+import { CharacterCount, NumberedLabel } from '@/components/ui/field-number';
 import { PasswordField } from '@/components/ui/password-field';
 import { RadioCard, RadioCardGroup } from '@/components/ui/radio-card';
 import { SelectField } from '@/components/ui/select-field';
@@ -227,7 +227,7 @@ export function SignUpForm() {
           <div key={key} className="flex flex-col gap-2">
             <SelectField
               label={<NumberedLabel n={n}>{t('auth.signUp.university')}</NumberedLabel>}
-              hint={
+              details={
                 <p>
                   {universities.data?.length === 0 && <>{t('auth.signUp.universitiesEmpty')} </>}
                   <Link to="/request-access" className={linkClass}>
@@ -326,7 +326,7 @@ export function SignUpForm() {
 
   return (
     <>
-      <h1 className="text-brand">{t('auth.signUp.title')}</h1>
+      <h1 className="auth-title text-brand">{t('auth.signUp.title')}</h1>
       <p className="mt-2 text-muted-foreground">{t('auth.signUp.intro')}</p>
 
       <form
@@ -375,11 +375,7 @@ export function SignUpForm() {
           </Callout>
         )}
 
-        <FieldProgress
-          total={fields.length}
-          srLabel={t('auth.signUp.progress', { total: fields.length })}
-          className="-mb-2 border-t border-border pt-5"
-        />
+        <div aria-hidden="true" className="-mb-2 border-t border-border" />
 
         {fields.map((key, index) => renderField(key, index + 1))}
 

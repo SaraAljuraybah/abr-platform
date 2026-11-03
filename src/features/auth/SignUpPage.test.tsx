@@ -147,7 +147,7 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
     await changeLanguage(language);
   });
 
-  it('student (default): title, intro, roles, numbered fields, 01—04 and links', async () => {
+  it('student (default): title, intro, roles, numbered fields and links', async () => {
     await renderSignUp();
     expect(screen.getByRole('heading', { level: 1, name: s.title })).toBeInTheDocument();
     expect(screen.getByText(s.intro)).toBeInTheDocument();
@@ -165,14 +165,17 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
       `03${s.universityEmail}`,
       `04${s.password}`,
     ]);
-    expect(screen.getByText('01—04')).toHaveAttribute('dir', 'ltr');
-    expect(screen.getByText(s.progress.replace('{{total}}', '4'))).toHaveClass('sr-only');
+    // No "01—04" progress label; the per-field badges stay.
+    expect(screen.queryByText(/^\d{2}—\d{2}$/)).toBeNull();
 
     expect(screen.getByText(s.universityEmailHint)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: s.cantFindUniversity })).toHaveAttribute(
-      'href',
-      '/request-access',
-    );
+    const cantFind = screen.getByRole('link', { name: s.cantFindUniversity });
+    expect(cantFind).toHaveAttribute('href', '/request-access');
+    // Helper link below the select, not between its label and the field.
+    const university = screen.getByRole('combobox', { name: new RegExp(s.university) });
+    expect(
+      university.compareDocumentPosition(cantFind) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
     expect(screen.getByRole('link', { name: s.universityEmailTrouble })).toHaveAttribute(
       'href',
       '/request-access',
@@ -191,7 +194,7 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
     expect(privacy).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
-  it('organization (?role=organization): fields, work-email hint and 01—04', async () => {
+  it('organization (?role=organization): fields and work-email hint', async () => {
     await renderSignUp('/sign-up?role=organization');
     expect(
       screen.getByRole('radio', { name: new RegExp(s.roles.organization.title) }),
@@ -202,16 +205,14 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
       `03${s.workEmail}`,
       `04${s.password}`,
     ]);
-    expect(screen.getByText('01—04')).toBeInTheDocument();
     expect(screen.getByText(s.workEmailHint)).toBeInTheDocument();
     expect(screen.queryByRole('combobox')).toBeNull();
   });
 
-  it('mentor (?role=mentor): three fields, 01—03 and the pilot notice', async () => {
+  it('mentor (?role=mentor): three fields and the pilot notice', async () => {
     await renderSignUp('/sign-up?role=mentor');
     expect(screen.getByRole('radio', { name: new RegExp(s.roles.mentor.title) })).toBeChecked();
     expect(fieldLabels()).toEqual([`01${s.fullName}`, `02${s.email}`, `03${s.password}`]);
-    expect(screen.getByText('01—03')).toBeInTheDocument();
     expect(screen.getByText(s.mentorNotice).closest('[role="status"]')).not.toBeNull();
   });
 
@@ -239,7 +240,7 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
     });
     await user.keyboard(`{/${next}}`);
     expect(field(s.yourFullName)).toHaveValue('Sara Test');
-    expect(screen.getByText('01—04')).toBeInTheDocument();
+    expect(fieldLabels()).toHaveLength(4);
   });
 
   it('lists active universities sorted in the current language', async () => {

@@ -1,5 +1,4 @@
 import { type ReactNode } from 'react';
-import { cn } from '@/lib/utils';
 
 /** Two Latin digits in both languages; dir="ltr" keeps them in order inside RTL text. */
 const twoDigits = (n: number) => String(n).padStart(2, '0');
@@ -20,26 +19,6 @@ export function NumberedLabel({ n, children }: { n: number; children: ReactNode 
       </span>
       {children}
     </span>
-  );
-}
-
-/** "01—04": decorative; pass the spoken equivalent as srLabel. */
-export function FieldProgress({
-  total,
-  srLabel,
-  className,
-}: {
-  total: number;
-  srLabel: string;
-  className?: string;
-}) {
-  return (
-    <p className={cn('text-sm font-semibold text-muted-foreground', className)}>
-      <span aria-hidden="true" dir="ltr" className="tabular-nums">
-        {twoDigits(1)}—{twoDigits(total)}
-      </span>
-      <span className="sr-only">{srLabel}</span>
-    </p>
   );
 }
 
