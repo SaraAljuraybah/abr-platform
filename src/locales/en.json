@@ -283,10 +283,7 @@
       "intro": "Be among the first to use ABR when we launch. It takes about a minute.",
       "roleLabel": "I'd like to join as",
       "panel": {
-        "statement": "Be part of ABR from day one.",
-        "minute": "Takes about a minute",
-        "noAccount": "No account needed",
-        "emailOnly": "Your email is used only for ABR"
+        "statement": "Be part of ABR from day one."
       },
       "fullName": "Full name",
       "email": "Email",

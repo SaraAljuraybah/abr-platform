@@ -1,17 +1,9 @@
-import {
-  BadgeCheck,
-  ClipboardCheck,
-  Clock3,
-  Lock,
-  type LucideIcon,
-  MailCheck,
-  UserRoundCheck,
-} from 'lucide-react';
+import { BadgeCheck, ClipboardCheck, Lock, type LucideIcon } from 'lucide-react';
 
 interface BrandPanelContent {
   /** Large statement (a paragraph, never a heading). */
   statement: string;
-  /** Exactly three short points with icons. */
+  /** Up to three short points with icons; none renders no list. */
   points: readonly { key: string; icon: LucideIcon }[];
 }
 
@@ -27,11 +19,7 @@ export const BRAND_PANELS = {
   },
   interest: {
     statement: 'forms.interest.panel.statement',
-    points: [
-      { key: 'forms.interest.panel.minute', icon: Clock3 },
-      { key: 'forms.interest.panel.noAccount', icon: UserRoundCheck },
-      { key: 'forms.interest.panel.emailOnly', icon: MailCheck },
-    ],
+    points: [],
   },
 } as const satisfies Record<string, BrandPanelContent>;
 

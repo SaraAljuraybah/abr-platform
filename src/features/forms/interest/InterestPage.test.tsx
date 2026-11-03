@@ -165,11 +165,7 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
 
     const panel = screen.getByRole('complementary');
     expect(within(panel).getByText(f.panel.statement).tagName).toBe('P');
-    expect(
-      within(panel)
-        .getAllByRole('listitem')
-        .map((item) => item.textContent),
-    ).toEqual([f.panel.minute, f.panel.noAccount, f.panel.emailOnly]);
+    expect(within(panel).queryByRole('list')).toBeNull();
     // No phone, student ID or national ID field.
     expect(screen.queryByRole('textbox', { name: /phone|هاتف|جوال|ID|هوية/i })).toBeNull();
   });

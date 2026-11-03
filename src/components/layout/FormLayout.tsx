@@ -91,19 +91,21 @@ function BrandPanel({ name }: { name: BrandPanelName }) {
             {t(statement)}
           </p>
 
-          <ul className="mt-10 flex flex-col gap-4">
-            {points.map(({ key, icon: Icon }) => (
-              <li key={key} className="flex items-center gap-3 text-lg font-semibold">
-                <span
-                  aria-hidden="true"
-                  className="flex size-10 shrink-0 items-center justify-center rounded-md bg-white/10"
-                >
-                  <Icon className="size-5" strokeWidth={1.75} />
-                </span>
-                {t(key)}
-              </li>
-            ))}
-          </ul>
+          {points.length > 0 && (
+            <ul className="mt-10 flex flex-col gap-4">
+              {points.map(({ key, icon: Icon }) => (
+                <li key={key} className="flex items-center gap-3 text-lg font-semibold">
+                  <span
+                    aria-hidden="true"
+                    className="flex size-10 shrink-0 items-center justify-center rounded-md bg-white/10"
+                  >
+                    <Icon className="size-5" strokeWidth={1.75} />
+                  </span>
+                  {t(key)}
+                </li>
+              ))}
+            </ul>
+          )}
 
           {/* Watermark: the logo's A, white and faint, off the bottom-end corner. Its position
               mirrors in RTL; the shape is never flipped. */}
