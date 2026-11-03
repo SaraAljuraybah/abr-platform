@@ -44,8 +44,8 @@ describe('i18n', () => {
       expect(meta.content).toMatch(/^ABR connects verified students/);
 
       await changeLanguage('ar');
-      expect(document.title).toBe('ABR · مشاريع تخرج موثّقة ومتصلة');
-      expect(meta.content).toMatch(/^تربط ABR الطلاب الموثّقين/);
+      expect(document.title).toBe('عَبْر · مشاريع تخرج موثّقة ومتصلة');
+      expect(meta.content).toMatch(/^تربط عَبْر الطلاب الموثّقين/);
     } finally {
       meta.remove();
     }

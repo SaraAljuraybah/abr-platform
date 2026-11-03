@@ -165,6 +165,9 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 
 ### Changed
 
+- Arabic copy names the platform «عَبْر» instead of "ABR" in all 11 strings (app name, home link,
+  page title and description, copyright, hero subtitle, audience and trust cards, FAQ, sign-in).
+  English keeps "ABR"; the logo is unchanged (SCRUM-36).
 - The account action is called "Create an account" everywhere (was "Sign up") (SCRUM-31).
 - Error and info status colours are one shade darker (#B91C1C, #1D4ED8) to meet WCAG AA; the
   guidelines' values measure 3.95:1 and 4.24:1. Pending brand sign-off (D-14) (SCRUM-31).
