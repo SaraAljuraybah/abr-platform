@@ -141,6 +141,9 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   on one line (SCRUM-13).
 - `public/brand/abr-logo-reverse.svg`: the logo with a white "BR" and a brighter "A" for dark
   backgrounds (SCRUM-13).
+- Dependabot (npm) no longer opens semver-major updates; majors are a separate maintenance story
+  after Sprint 1. `@types/node` majors stay ignored permanently to match the Node 22 runtime.
+  Weekly grouped minor/patch updates and GitHub Actions updates are unchanged (SCRUM-11).
 
 ### Removed
 
