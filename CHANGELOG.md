@@ -208,13 +208,17 @@ placeholder universities seeded (no users).
   confirmations on, so no autoconfirm). Behaviour check: sign up twice with a confirmed email; the
   second answer must be HTTP 200 with no identities. Needs a real, confirmed account, so it is left
   to the CTO.
-- Open: `submit-interest` client address (SCRUM-34). Testable once the secrets are set: send 6
-  requests, each with a different spoofed `cf-connecting-ip` and `x-forwarded-for`; the 6th must
-  still get 429. If the header can be spoofed on hosted, switch
-  `supabase/functions/_shared/client-ip.ts` to the right-most `x-forwarded-for` entry only.
-- Open: `submit-interest` secrets (SCRUM-34), set by the CTO: `INTEREST_IP_HASH_SECRET` (32+ random
-  bytes, different from local) and `ALLOWED_ORIGINS` (production and `dev` preview URLs). Until
-  then the function answers 500 (verified).
+- Verified 2026-11-03: `submit-interest` client address on abr-dev (SCRUM-34). A request that sends
+  its own `cf-connecting-ip` is refused by Cloudflare at the edge (HTTP 403, "error code: 1000")
+  and never reaches the function, so that header cannot be spoofed. Six requests with a different
+  spoofed `x-forwarded-for` and `x-real-ip` each: 400, 400, 400, 400, 400, then 429;
+  `private.rate_limits` held one key (64-hex HMAC) with five attempts. No change to
+  `client-ip.ts` needed.
+- Verified 2026-11-03: `submit-interest` secrets set by the CTO (SCRUM-34); the function refuses to
+  run with a missing, blank or under-32-character `INTEREST_IP_HASH_SECRET` (generic 500, logged
+  as `misconfigured: IP hash secret`). A valid submission from the production origin returned 200
+  and saved one row. All test rows (`interest_signups`, `private.rate_limits`) were deleted
+  afterwards; both tables are empty.
 - Production project: repeat all of the above when it exists.
 
 ### Pending CEO decisions
