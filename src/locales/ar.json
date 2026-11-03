@@ -228,7 +228,7 @@
       "password": "كلمة المرور",
       "passwordRulesTitle": "متطلبات كلمة المرور",
       "passwordRules": {
-        "length": "١٠ أحرف على الأقل",
+        "length": "10 أحرف على الأقل",
         "case": "حرف كبير وحرف صغير",
         "digit": "رقم"
       },
