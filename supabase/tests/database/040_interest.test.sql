@@ -4,7 +4,7 @@
 
 begin;
 
-select plan(87);
+select plan(88);
 
 set constraints all immediate;
 
@@ -272,6 +272,7 @@ select throws_ok(
 from (values
   (pg_temp.mentor('{"role": "admin"}'), 'unknown role'),
   (pg_temp.student('{"university_code": "mit"}'), 'unknown university code'),
+  (pg_temp.student('{"university_code": "naif"}'), 'Naif is no longer in the list'),
   (pg_temp.student('{"field_of_study": "cs_it"}'), 'old field of study'),
   (pg_temp.student('{"graduation_year": "1999"}'), 'graduation year before 2000'),
   (pg_temp.student('{"graduation_year": "2028_or_later"}'), 'old graduation year'),

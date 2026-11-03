@@ -156,6 +156,7 @@ describe('submit-interest: validation', () => {
     ],
     ['field text without other', { ...student, field_of_study_other: 'Robotics' }],
     ['unknown university', { ...student, university_code: 'mit' }],
+    ['Naif (removed from the list)', { ...student, university_code: 'naif' }],
     [
       'a university uuid (old shape)',
       { ...student, university_code: 'aaaaaaaa-0000-4000-8000-0000000000a1' },

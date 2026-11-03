@@ -120,6 +120,9 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   accepted; the current one is `2026-11-v2` (`INTEREST_CONSENT_VERSION` in
   `supabase/functions/_shared/interest-options.ts`), earlier rows are `2026-11-v1`. The function
   accepts only the current version; a resubmission refreshes `consent_at` and `consent_version`.
+- Interest form university list (SCRUM-34): Naif Arab University for Security Sciences is removed
+  (migration `20261103203037_interest_remove_naif`; any earlier answer becomes "Other" with the
+  university's name).
 - Phase 1 launch mode: build-time flag `VITE_AUTH_ENABLED` (`true` by default; `false` for
   production at tryabr.com, `true` for the dev preview). With `false`, `/sign-in`, `/sign-up` and
   `/forms/request-access` show a "Coming soon" page in the form layout (with links to the interest

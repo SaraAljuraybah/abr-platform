@@ -7,7 +7,7 @@
  */
 /** University codes for this form, by group (not public.universities, which is for sign-up). */
 export const INTEREST_UNIVERSITY_GROUPS = {
-  public: ['king_saud', 'imam', 'pnu', 'ksau_hs', 'seu', 'naif'],
+  public: ['king_saud', 'imam', 'pnu', 'ksau_hs', 'seu'],
   private: ['psu', 'alfaisal', 'yamamah', 'dau', 'reu', 'maarefa', 'aou'],
 } as const;
 
