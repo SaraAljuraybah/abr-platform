@@ -1,4 +1,8 @@
-import { INTEREST_OPTIONS, INTEREST_UNIVERSITY_GROUPS } from '@shared/interest-options';
+import {
+  INTEREST_CONSENT_VERSION,
+  INTEREST_OPTIONS,
+  INTEREST_UNIVERSITY_GROUPS,
+} from '@shared/interest-options';
 import { validateInterest } from '@shared/interest-validate';
 import { FunctionsFetchError, FunctionsHttpError } from '@supabase/supabase-js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -350,6 +354,17 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
     expect(supabase.functions.invoke).not.toHaveBeenCalled();
   });
 
+  it('consent: the current text with the privacy link', async () => {
+    await renderForm();
+    // Everything before the privacy link, as the label shows it.
+    const text = f.consent.split('<privacyLink>')[0] ?? '';
+    expect(consentBox().labels?.[0]?.textContent).toContain(text);
+    expect(within(consentBox().labels?.[0] as HTMLElement).getByRole('link')).toBeInTheDocument();
+    expect(text).toMatch(
+      language === 'en' ? /unsubscribe at any time/ : /إلغاء الاشتراك في أي وقت/,
+    );
+  });
+
   it('consent is required even when everything else is filled', async () => {
     const user = setupUser();
     await renderForm('/forms/interest?role=mentor');
@@ -391,6 +406,7 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
         website: '',
         heard_from: 'linkedin',
         heard_from_other: null,
+        consent_version: INTEREST_CONSENT_VERSION,
       });
       expect(payload).not.toHaveProperty('region');
       // The shared validator (same as the function) accepts exactly what the form sends.

@@ -1,4 +1,5 @@
 import {
+  INTEREST_CONSENT_VERSION,
   INTEREST_EMAIL_PATTERN,
   INTEREST_LIMITS,
   INTEREST_OPTIONS,
@@ -28,6 +29,8 @@ export interface InterestSubmission {
   heard_from: InterestOption<'heard_from'>;
   heard_from_other: string | null;
   consent_contact: true;
+  // Always INTEREST_CONSENT_VERSION once validated.
+  consent_version: string;
   locale: InterestOption<'locale'>;
 }
 
@@ -51,6 +54,7 @@ const COMMON_KEYS = [
   'heard_from',
   'heard_from_other',
   'consent_contact',
+  'consent_version',
   'locale',
 ];
 /** The spam trap travels in the same body; the handler reads it before validation. */
@@ -102,6 +106,8 @@ export function validateInterest(input: unknown): InterestSubmission | null {
       if (!allowed.has(key)) throw new Invalid(key);
     }
     if (input.consent_contact !== true) throw new Invalid('consent_contact');
+    // The text the person agreed to must be the one the form shows now.
+    if (input.consent_version !== INTEREST_CONSENT_VERSION) throw new Invalid('consent_version');
 
     const email = text('email', input.email, 3, INTEREST_LIMITS.email.max);
     if (!INTEREST_EMAIL_PATTERN.test(email)) throw new Invalid('email');
@@ -136,6 +142,7 @@ export function validateInterest(input: unknown): InterestSubmission | null {
         INTEREST_LIMITS.heardFromOther,
       ),
       consent_contact: true,
+      consent_version: INTEREST_CONSENT_VERSION,
       locale: option('locale', input.locale),
     };
 

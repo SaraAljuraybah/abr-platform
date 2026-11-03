@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from 'vitest';
 import { clientIp, hmacHex } from '../_shared/client-ip.ts';
+import { INTEREST_CONSENT_VERSION } from '../_shared/interest-options.ts';
 import { validateInterest } from '../_shared/interest-validate.ts';
 import {
   createConfiguredHandler,
@@ -22,6 +23,7 @@ const student = {
   project_stage: 'idea',
   heard_from: 'linkedin',
   consent_contact: true,
+  consent_version: INTEREST_CONSENT_VERSION,
   locale: 'ar',
   website: '',
 };
@@ -35,6 +37,7 @@ const organization = {
   org_size: '51_500',
   heard_from: 'event',
   consent_contact: true,
+  consent_version: INTEREST_CONSENT_VERSION,
   locale: 'en',
 };
 const mentor = {
@@ -46,6 +49,7 @@ const mentor = {
   heard_from: 'friend',
   heard_from_other: '',
   consent_contact: true,
+  consent_version: INTEREST_CONSENT_VERSION,
   locale: 'en',
 };
 
@@ -97,6 +101,11 @@ describe('submit-interest: validation', () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true });
     expect(deps.submit).toHaveBeenCalledTimes(1);
+  });
+
+  it('stores the version of the consent text the form shows', () => {
+    expect(INTEREST_CONSENT_VERSION).toBe('2026-11-v2');
+    expect(validateInterest(mentor)?.consent_version).toBe('2026-11-v2');
   });
 
   it('trims text and fills other roles’ fields with null', () => {
@@ -162,6 +171,9 @@ describe('submit-interest: validation', () => {
     ['repeated looking_for item', { ...organization, looking_for: ['hire_talent', 'hire_talent'] }],
     ['consent not given', { ...mentor, consent_contact: false }],
     ['consent as a string', { ...mentor, consent_contact: 'true' }],
+    ['no consent version', { ...mentor, consent_version: undefined }],
+    ['the first consent text (2026-11-v1)', { ...mentor, consent_version: '2026-11-v1' }],
+    ['an unknown consent version', { ...mentor, consent_version: '2099-01-v9' }],
     ['no university', { ...student, university_code: '' }],
     ['another role’s field', { ...mentor, sector: 'technology' }],
     ['an unknown key', { ...mentor, phone: '0500000000' }],

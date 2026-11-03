@@ -1,4 +1,9 @@
-import { INTEREST_LIMITS, INTEREST_OPTIONS, OTHER } from '@shared/interest-options';
+import {
+  INTEREST_CONSENT_VERSION,
+  INTEREST_LIMITS,
+  INTEREST_OPTIONS,
+  OTHER,
+} from '@shared/interest-options';
 import type { InterestSubmission } from '@shared/interest-validate';
 import { z } from '@/lib/zod-i18n';
 import type { FormRole } from '../roles';
@@ -137,6 +142,8 @@ export function toSubmission(
     heard_from: values.heardFrom,
     heard_from_other: otherText(values.heardFrom, values.heardFromOther),
     consent_contact: true as const,
+    // The version of the consent text shown in this bundle (forms.interest.consent).
+    consent_version: INTEREST_CONSENT_VERSION,
     locale,
     website: '',
     university_code: null,
@@ -197,6 +204,7 @@ export function payloadFor(submission: InterestSubmission & { website: string })
     'heard_from',
     'heard_from_other',
     'consent_contact',
+    'consent_version',
     'locale',
   ] as const;
   const payload: Record<string, unknown> = { website: submission.website };

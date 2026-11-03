@@ -68,6 +68,7 @@ export type Database = {
         Row: {
           consent_at: string
           consent_contact: boolean
+          consent_version: string
           created_at: string
           email: string
           experience: string | null
@@ -94,6 +95,7 @@ export type Database = {
         Insert: {
           consent_at?: string
           consent_contact: boolean
+          consent_version: string
           created_at?: string
           email: string
           experience?: string | null
@@ -120,6 +122,7 @@ export type Database = {
         Update: {
           consent_at?: string
           consent_contact?: boolean
+          consent_version?: string
           created_at?: string
           email?: string
           experience?: string | null

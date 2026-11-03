@@ -114,6 +114,12 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Request access (SCRUM-14) moves to `/forms/request-access` on the forms system; the sign-up
   "Can't find your university?" and "Request an exception" links point there (placeholder until
   SCRUM-14), and `/request-access` redirects to it (SCRUM-34).
+- Interest form consent (SCRUM-34): the text now covers ABR's launch, news and updates and says
+  the person can unsubscribe at any time. `interest_signups.consent_version` (not null, format
+  `YYYY-MM-vN`, migration `20261103201124_interest_consent_version`) records which text was
+  accepted; the current one is `2026-11-v2` (`INTEREST_CONSENT_VERSION` in
+  `supabase/functions/_shared/interest-options.ts`), earlier rows are `2026-11-v1`. The function
+  accepts only the current version; a resubmission refreshes `consent_at` and `consent_version`.
 - Phase 1 launch mode: build-time flag `VITE_AUTH_ENABLED` (`true` by default; `false` for
   production at tryabr.com, `true` for the dev preview). With `false`, `/sign-in`, `/sign-up` and
   `/forms/request-access` show a "Coming soon" page in the form layout (with links to the interest

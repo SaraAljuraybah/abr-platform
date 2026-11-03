@@ -4,7 +4,7 @@
 
 begin;
 
-select plan(80);
+select plan(87);
 
 set constraints all immediate;
 
@@ -55,7 +55,7 @@ as $$
     "role": "student", "full_name": "Sara Student", "email": "sara@student.test",
     "university_code": "king_saud", "field_of_study": "cs",
     "graduation_year": "2027_or_later", "project_stage": "idea",
-    "heard_from": "linkedin", "consent_contact": true, "locale": "ar"
+    "heard_from": "linkedin", "consent_contact": true, "consent_version": "2026-11-v2", "locale": "ar"
   }'::jsonb || p_changes;
 $$;
 create function pg_temp.organization(p_changes jsonb default '{}')
@@ -66,7 +66,7 @@ as $$
     "role": "organization", "full_name": "Omar Org", "email": "omar@org.test",
     "organization_name": "Org Labs", "sector": "technology",
     "looking_for": ["hire_talent", "sponsor_projects"], "org_size": "51_500",
-    "heard_from": "event", "consent_contact": true, "locale": "en"
+    "heard_from": "event", "consent_contact": true, "consent_version": "2026-11-v2", "locale": "en"
   }'::jsonb || p_changes;
 $$;
 create function pg_temp.mentor(p_changes jsonb default '{}')
@@ -76,7 +76,7 @@ as $$
   select '{
     "role": "mentor", "full_name": "Mona Mentor", "email": "mona@mentor.test",
     "expertise": "software_data", "experience": "8_15",
-    "heard_from": "friend", "consent_contact": true, "locale": "en"
+    "heard_from": "friend", "consent_contact": true, "consent_version": "2026-11-v2", "locale": "en"
   }'::jsonb || p_changes;
 $$;
 
@@ -221,11 +221,48 @@ select results_eq(
 );
 select throws_ok(
   $$ insert into public.interest_signups (role, full_name, email, expertise, experience, heard_from,
-       consent_contact, locale)
-     values ('mentor', 'Dup', 'Mona@Mentor.TEST', 'health', '0_3', 'x', true, 'en') $$,
+       consent_contact, consent_version, locale)
+     values ('mentor', 'Dup', 'Mona@Mentor.TEST', 'health', '0_3', 'x', true, '2026-11-v2', 'en') $$,
   '23505', null,
   'the email is unique whatever its case'
 );
+
+-- Consent version -----------------------------------------------------------------
+
+select col_not_null('public', 'interest_signups', 'consent_version', 'consent_version is required');
+select col_hasnt_default('public', 'interest_signups', 'consent_version',
+  'consent_version has no default: the caller states the version');
+select is(
+  (select consent_version from public.interest_signups where email = 'mona@mentor.test'),
+  '2026-11-v2',
+  'the accepted consent version is stored'
+);
+update public.interest_signups set consent_at = now() - interval '30 days', consent_version = '2026-11-v1'
+where email = 'mona@mentor.test';
+set local role service_role;
+select lives_ok(
+  $$ select public.submit_interest(pg_temp.mentor('{"consent_version": "2026-12-v3"}')) $$,
+  'a resubmission with a newer consent text is accepted'
+);
+reset role;
+select results_eq(
+  $$ select consent_version, consent_at = now() from public.interest_signups
+     where email = 'mona@mentor.test' $$,
+  $$ values ('2026-12-v3', true) $$,
+  'a resubmission updates consent_version and consent_at'
+);
+set local role service_role;
+select throws_ok(
+  $$ select public.submit_interest(pg_temp.mentor('{"email": "nv@mentor.test"}') - 'consent_version') $$,
+  '23502', null,
+  'a submission without a consent version is refused'
+);
+select throws_ok(
+  $$ select public.submit_interest(pg_temp.mentor('{"email": "bv@mentor.test", "consent_version": "v2"}')) $$,
+  '23514', null,
+  'a malformed consent version is refused'
+);
+reset role;
 
 -- CHECK constraints reject anything outside the option lists ---------------------
 

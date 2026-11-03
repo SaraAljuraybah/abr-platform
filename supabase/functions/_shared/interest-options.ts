@@ -83,6 +83,13 @@ export type InterestOptionKey = keyof typeof INTEREST_OPTIONS;
 export type InterestOption<K extends InterestOptionKey> = (typeof INTEREST_OPTIONS)[K][number];
 export type InterestRole = InterestOption<'role'>;
 
+/**
+ * Version of the consent text the form shows (forms.interest.consent in src/locales). Change it
+ * whenever that text changes: the function accepts only this version and stores it with the
+ * consent, so every row says which text the person agreed to.
+ */
+export const INTEREST_CONSENT_VERSION = '2026-11-v2';
+
 /** Length limits shared with the CHECK constraints. */
 export const INTEREST_LIMITS = {
   fullName: { min: 2, max: 120 },
