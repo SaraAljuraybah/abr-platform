@@ -244,11 +244,18 @@ placeholder universities seeded (no users).
   `true` for Preview (the `dev` preview). Build-time, so a change needs a redeploy.
 - Production project: repeat all of the above when it exists.
 
-### Pending CEO decisions
+### CTO decisions (2026-11-03)
 
-- Retention period for interest-form data (PDPL): how long `interest_signups` rows are kept and
-  when they are deleted (SCRUM-34).
-- Whether the landing page links to `/forms/interest` (SCRUM-34).
+- Interest consent text v2 (launch, news and updates; unsubscribe at any time), stored per row as
+  `consent_version` `2026-11-v2`; earlier rows are `2026-11-v1` (SCRUM-34).
+- Arabic copy names the platform «عَبْر»; English keeps "ABR"; the logo is unchanged (SCRUM-36).
+- Naif Arab University for Security Sciences is removed from the interest form (SCRUM-34).
+- Production data is hosted by Supabase in Central EU (Frankfurt, `eu-central-1`), project
+  abr-prod (SCRUM-36).
+- Interest-form data is kept while consent is active and deleted when the person unsubscribes or
+  asks; this replaces the open retention decision (SCRUM-34).
+- Temporary privacy contact: try0abr@gmail.com, until a company address exists (SCRUM-36).
+- In production the landing page links to `/forms/interest` (phase 1 launch mode, SCRUM-36).
 
 ### Pending brand sign-off
 
@@ -284,3 +291,4 @@ placeholder universities seeded (no users).
   delete or block on its history.
 - Block or re-validate a student's auth email change to a domain that is not allowlisted.
 - Admin RPCs: manage universities and domains, read `reviewer_id`.
+- Unsubscribe link and mechanism required in every marketing email (SCRUM-37).
