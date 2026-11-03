@@ -391,6 +391,13 @@ deno_version = 2
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
+# Public interest form endpoint (SCRUM-34). No JWT check: the publishable key is not a JWT and
+# callers are anonymous. Controls: validation, spam trap, per-IP rate limit, CORS allowlist.
+# Secrets (supabase/functions/.env locally, `supabase secrets set` hosted): INTEREST_IP_HASH_SECRET,
+# ALLOWED_ORIGINS. See supabase/functions/.env.example.
+[functions.submit-interest]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327

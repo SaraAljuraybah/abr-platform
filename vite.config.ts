@@ -17,6 +17,8 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
+        // Option lists and validation shared with the Edge Functions (plain TS, no Deno APIs).
+        '@shared': fileURLToPath(new URL('./supabase/functions/_shared', import.meta.url)),
       },
     },
     build: {
@@ -43,7 +45,7 @@ export default defineConfig(({ mode }) => {
     test: {
       environment: 'jsdom',
       setupFiles: ['./src/test/setup.ts'],
-      include: ['src/**/*.test.{ts,tsx}', 'tests/**/*.test.ts'],
+      include: ['src/**/*.test.{ts,tsx}', 'tests/**/*.test.ts', 'supabase/functions/**/*.test.ts'],
       restoreMocks: true,
       unstubEnvs: true,
       // Full-page render tests (landing) are heavy in jsdom. Half the cores and a 15 s budget keep
