@@ -131,9 +131,16 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Sign-in shows "Something went wrong" for a server error (any 5xx), not "We couldn't reach the
   server". supabase-js raises both as `AuthRetryableFetchError`; only status 0 is a network failure
   (SCRUM-13).
-- Auth card (sign-in, sign-up) is wider: 560 px on desktop (was 448), full width with 16 px margins
-  on mobile, 40 px inner padding on desktop (24 px mobile). The auth title is smaller than the
-  landing h1 (30 px EN / 32 px AR desktop, 26 / 28 px mobile) so it fits on one line (SCRUM-13).
+- Auth pages (sign-in, sign-up) use a split layout from 1024 px: an inset hero-gradient brand panel
+  at the start (45%, sticky at full height, 24 px from the viewport, 28 px corners) with the reverse
+  logo, the hero statement, three trust points and a faint "A" watermark; the form column at the
+  end (55%, form 480 px, vertically centred, no card) with "Back to home" and the language switch.
+  Mirrors in RTL. Panel text measures at least 7.14:1 on the rendered gradient. Below 1024 px: logo,
+  then the form in a card (560 px max, full width with 16 px margins, 24 / 40 px padding). The auth
+  title is smaller than the landing h1 (30 px EN / 32 px AR desktop, 26 / 28 px mobile) so it fits
+  on one line (SCRUM-13).
+- `public/brand/abr-logo-reverse.svg`: the logo with a white "BR" and a brighter "A" for dark
+  backgrounds (SCRUM-13).
 
 ### Removed
 
