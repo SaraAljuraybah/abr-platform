@@ -278,6 +278,9 @@ builds hide them, so they are tracked here:
   asks; this replaces the open retention decision (SCRUM-34).
 - Temporary privacy contact: try0abr@gmail.com, until a company address exists (SCRUM-36).
 - In production the landing page links to `/forms/interest` (phase 1 launch mode, SCRUM-36).
+- Phase 1: the interest form does not confirm email addresses (no double opt-in); revisit once
+  SMTP is set up (SCRUM-37). Every marketing email must include an unsubscribe link and a "not
+  you?" line (SCRUM-37).
 
 ### Pending brand sign-off
 

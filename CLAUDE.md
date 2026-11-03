@@ -151,6 +151,23 @@ docs/             definition-of-done.md, permissions.md, decisions/ (ADRs)
 - Never run `git checkout`, `git restore` or `git stash` on a file with uncommitted work. Never
   discard uncommitted changes.
 - Never commit `.env.local` or anything under `_context/` (confidential source documents).
+- Push only after `npm run ci` exits 0: use `npm run ci && git push`, never print-then-push.
+
+## Supabase projects
+
+| Project      | Ref                    | Use                                     |
+| ------------ | ---------------------- | --------------------------------------- |
+| **abr-dev**  | `rrlnuldywzmktqynomta` | Preview and testing (the `dev` preview) |
+| **abr-prod** | `atckrssxksvurzlxxnhj` | Production, **real data** (tryabr.com)  |
+
+- The repository stays linked to **abr-dev**. Every command for prod passes
+  `--project-ref atckrssxksvurzlxxnhj` explicitly; never re-link the default to prod.
+- The CTO runs every prod command that needs the database password (link, `db push`); Claude gives
+  the exact commands and reviews the output, and never handles the prod password.
+- Migrations reach abr-prod **before** `dev` is merged into `main`, so production code never runs
+  against an older schema. Apply them to abr-dev first.
+- Never copy production data to abr-dev or to a local stack, not even a single row. Test data on
+  any hosted project is synthetic and deleted after the check.
 
 ## Tools
 
