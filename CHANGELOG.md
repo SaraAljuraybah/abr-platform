@@ -40,12 +40,12 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   rate-limit and network messages; returns to a safe in-app `next` path, otherwise `/app`.
   Already signed-in visitors are redirected. `/forgot-password` placeholder.
 - First shared UI-kit pieces, grown page by page (SCRUM-33): `TextField`, `PasswordField`,
-  `Callout`, `Button` loading state, `AuthLayout`, `BuildNotice` (now on every route).
+  `Callout`, `Button` loading state, `AuthLayout`.
 - One localized Zod error map (`src/lib/zod-i18n.ts`): schemas return i18n keys, fields translate
   them, so messages follow a language switch.
 - Create an account at `/sign-up` (SCRUM-13), English and Arabic: role cards (Student,
   Organization, Mentor; pre-selected from `?role=`, anything else falls back to Student), numbered
-  fields per role with a `01—04` / `01—03` progress label, character counters on the name fields,
+  fields per role (01, 02, … badges), character counters on the name fields,
   a live password checklist matching the Supabase password policy, and the consent line with the
   privacy notice. Students pick an active university and are pre-checked with
   `check_student_email()` on blur and on submit; no sign-up request is sent for a mismatched
@@ -56,7 +56,8 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   audience cards link with `?role=`. Placeholders: `/request-access`, `/check-email`,
   `/auth/confirmed`.
 - UI kit (SCRUM-33): `RadioCardGroup`/`RadioCard` (Radix), `SelectField`, `NumberedLabel`,
-  `FieldProgress`, `CharacterCount`; `TextField` gains a `details` slot below the input.
+  `CharacterCount`; `TextField` and `SelectField` have a `details` slot below the field (used for
+  "Can't find your university?").
 - Identity schema (SCRUM-12), seven migrations:
   - shared enums (Plan §14), schema `private`, `updated_at` trigger, append-only `audit_events`
     (update, delete and truncate refused even for the owner) written only by `private.log_event()`;
@@ -109,6 +110,16 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Sign-in shows "Something went wrong" for a server error (any 5xx), not "We couldn't reach the
   server". supabase-js raises both as `AuthRetryableFetchError`; only status 0 is a network failure
   (SCRUM-13).
+- Auth card (sign-in, sign-up) is wider: 560 px on desktop (was 448), full width with 16 px margins
+  on mobile, 40 px inner padding on desktop (24 px mobile). The auth title is smaller than the
+  landing h1 (30 px EN / 32 px AR desktop, 26 / 28 px mobile) so it fits on one line (SCRUM-13).
+
+### Removed
+
+- The "Internal build. Only the platform foundation is available." notice, from every route
+  (landing, auth pages, app shell), with its component and locale key (SCRUM-13).
+- The "01—04" progress label above the sign-up fields and its screen-reader text; the per-field
+  number badges stay (SCRUM-13).
 
 ### Hosted settings to verify
 
