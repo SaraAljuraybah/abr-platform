@@ -425,3 +425,30 @@ enabled = true
 # declarative_schema_path = "./database"
 # JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
+
+# Hosted development project (abr-dev). These values replace the local ones above only when the CLI
+# targets this project ref (supabase config push / db push); local development is unchanged.
+[remotes.abr-dev]
+project_id = "rrlnuldywzmktqynomta"
+
+[remotes.abr-dev.auth]
+site_url = "https://abr-platform.vercel.app"
+additional_redirect_urls = [
+  "https://abr-platform.vercel.app/**",
+  "https://abr-platform-git-dev-saraaljuraybahs-projects.vercel.app/**",
+  "http://127.0.0.1:5173/**",
+  "http://localhost:5173/**",
+]
+
+# Keep the hosted values for settings this project does not set on purpose (local dev uses short
+# intervals and codes for convenience).
+[remotes.abr-dev.auth.email]
+max_frequency = "1m0s"
+otp_length = 8
+
+[remotes.abr-dev.auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[remotes.abr-dev.storage.vector]
+enabled = false
