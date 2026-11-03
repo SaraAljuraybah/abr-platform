@@ -250,7 +250,17 @@ placeholder universities seeded (no users).
   afterwards; both tables are empty.
 - Open: Vercel environment variable `VITE_AUTH_ENABLED`: `false` for Production (tryabr.com),
   `true` for Preview (the `dev` preview). Build-time, so a change needs a redeploy.
-- Production project: repeat all of the above when it exists.
+- abr-prod (`atckrssxksvurzlxxnhj`, Frankfurt), 2026-11-04: all 12 migrations pushed by the CTO
+  (local and remote match); `submit-interest` deployed with its own secrets
+  (`INTEREST_IP_HASH_SECRET` differs from dev; `ALLOWED_ORIGINS` = tryabr.com and the Vercel
+  production URL). Spoof check over HTTPS verified: one valid submission (200), then four more
+  with different spoofed `x-forwarded-for` (400 ×4) and a sixth refused (429); a spoofed
+  `cf-connecting-ip` is refused by Cloudflare (403, error 1000); another origin gets 403. No
+  universities seeded (sign-up is off). Open on abr-prod: delete the test rows, default-privilege
+  query and auth settings in the dashboard (CTO).
+- abr-dev, 2026-11-04: migrations `20261103201124` and `20261103203037` pushed (12 = 12) and
+  `submit-interest` redeployed; a valid submission stores `consent_version` `2026-11-v2`; test row
+  deleted.
 
 ### Before public launch
 
