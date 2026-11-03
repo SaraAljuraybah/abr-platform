@@ -35,6 +35,18 @@ const COPY = {
     create: 'Create an account',
     signIn: 'Sign in',
     dashboard: 'Go to dashboard',
+    badges: { private: 'Contact private', shared: 'Contact shared' },
+    join: ['Join as a student', 'Join as an organization', 'Join as a mentor'],
+    subline: 'Your contact details stay private until you accept a request.',
+    headers: [
+      ['The process', 'Five steps, and your contact details stay private until you say yes.'],
+      ["Who it's for", 'One platform, three roles, each with its own verified path.'],
+      [
+        'Trust & privacy',
+        'Every safeguard is enforced by the platform itself, not left to chance.',
+      ],
+      ['FAQ', 'The essentials, in short.'],
+    ],
   },
   ar: {
     h1: 'مشاريع التخرج تستحق حياة بعد التخرج.',
@@ -49,6 +61,15 @@ const COPY = {
     create: 'إنشاء حساب',
     signIn: 'تسجيل الدخول',
     dashboard: 'الانتقال إلى لوحة التحكم',
+    badges: { private: 'التواصل خاص', shared: 'تمت مشاركة التواصل' },
+    join: ['انضم كطالب', 'انضم كجهة', 'انضم كمرشد'],
+    subline: 'تبقى بيانات تواصلك خاصة حتى تقبل طلبًا.',
+    headers: [
+      ['آلية العمل', 'خمس خطوات، وتبقى بيانات تواصلك خاصة حتى توافق.'],
+      ['لمن المنصة', 'منصة واحدة وثلاثة أدوار، لكل منها مسار موثّق.'],
+      ['الثقة والخصوصية', 'كل ضمانة تفرضها المنصة نفسها، ولا تُترك للصدفة.'],
+      ['الأسئلة الشائعة', 'أهم ما تحتاج معرفته باختصار.'],
+    ],
   },
 } as const;
 
@@ -74,6 +95,27 @@ describe.each(['en', 'ar'] as const)('landing page (%s)', (language) => {
     expect(screen.getByRole('banner')).toBeInTheDocument();
     expect(screen.getByRole('contentinfo')).toBeInTheDocument();
     expect(screen.getAllByRole('listitem').length).toBeGreaterThan(5);
+  });
+
+  it('marks the consent moment: contact private in steps 1-2, shared at step 5', async () => {
+    await renderLanding(language);
+    const how = screen.getByRole('region', { name: copy.regions[1] });
+    const [first, second, , , fifth] = within(how).getAllByRole('listitem');
+    if (!first || !second || !fifth) throw new Error('expected five steps');
+    expect(within(first).getByText(copy.badges.private)).toBeInTheDocument();
+    expect(within(second).getByText(copy.badges.private)).toBeInTheDocument();
+    expect(within(fifth).getByText(copy.badges.shared)).toBeInTheDocument();
+    expect(within(how).getAllByText(copy.badges.private)).toHaveLength(2);
+    expect(within(how).getAllByText(copy.badges.shared)).toHaveLength(1);
+  });
+
+  it('gives each section after the hero an eyebrow and a one-line intro', async () => {
+    await renderLanding(language);
+    copy.headers.forEach(([eyebrow, intro], index) => {
+      const region = screen.getByRole('region', { name: copy.regions[index + 1] });
+      expect(within(region).getByText(eyebrow, { selector: 'p' })).toBeInTheDocument();
+      expect(within(region).getByText(intro)).toBeInTheDocument();
+    });
   });
 
   it('has five steps, three audience cards, four trust items and four FAQ entries', async () => {
@@ -143,12 +185,42 @@ describe.each(['en', 'ar'] as const)('landing page (%s)', (language) => {
     }
   });
 
-  it('audience cards link to sign-up only when signed out', async () => {
+  it('ends with a deep-gradient band: heading, subline and white-reverse actions', async () => {
+    await renderLanding(language);
+    const band = screen.getByRole('region', { name: copy.regions[5] });
+    expect(band).toHaveClass('bg-hero-gradient');
+    expect(within(band).getByText(copy.subline)).toBeInTheDocument();
+    expect(within(band).getByRole('link', { name: copy.create })).toHaveClass('bg-white');
+    expect(within(band).getByRole('link', { name: copy.signIn })).toHaveClass('border-white');
+  });
+
+  it('lays the FAQ out as a header column followed by the accordion column', async () => {
+    await renderLanding(language);
+    const faq = screen.getByRole('region', { name: copy.regions[4] });
+    const intro = faq.querySelector('[data-faq-intro]');
+    const list = faq.querySelector('[data-faq-list]');
+    if (!(intro instanceof HTMLElement) || !(list instanceof HTMLElement)) {
+      throw new Error('FAQ columns not found');
+    }
+    expect(within(intro).getByRole('heading', { level: 2 })).toHaveTextContent(copy.regions[4]);
+    expect(within(intro).getByText(copy.headers[3][1])).toBeInTheDocument();
+    expect(list.querySelectorAll(':scope > details')).toHaveLength(4);
+    expect(intro.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(intro.className).toMatch(/lg:sticky/);
+  });
+
+  it('audience cards offer role-specific join links when signed out', async () => {
     await renderLanding(language);
     const cards = screen.getByRole('region', { name: copy.regions[2] });
-    const links = within(cards).getAllByRole('link', { name: copy.create });
-    expect(links).toHaveLength(3);
-    for (const link of links) expect(link).toHaveAttribute('href', '/sign-up');
+    const roles = ['student', 'organization', 'mentor'];
+    copy.join.forEach((name, index) => {
+      expect(within(cards).getByRole('link', { name })).toHaveAttribute(
+        'href',
+        `/sign-up?role=${roles[index] ?? ''}`,
+      );
+    });
+    expect(within(cards).getAllByRole('link')).toHaveLength(3);
+    expect(within(cards).queryByRole('link', { name: copy.create })).toBeNull();
   });
 
   it('audience cards show no sign-up link when signed in', async () => {

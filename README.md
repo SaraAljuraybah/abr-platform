@@ -206,6 +206,7 @@ The app runs at `http://127.0.0.1:5173`. In local development, confirmation emai
 |---|---|
 | `VITE_SUPABASE_URL` | Supabase project URL |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Publishable (anon) key, safe for the browser |
+| `VITE_AUTH_ENABLED` | `true` (default) or `false`. `false` is phase 1 launch mode, used in production (tryabr.com): sign-in, sign-up, request access and the password and email-confirmation screens show "Coming soon", the signed-in area redirects there, and the landing page points to the interest form instead of account links. Build-time: set it in Vercel per environment and redeploy to change it. |
 
 > ⚠️ Never put a secret or service-role key in any `VITE_*` variable, in `.env.example`, or in Vercel. `VITE_*` values are bundled into public JavaScript.
 

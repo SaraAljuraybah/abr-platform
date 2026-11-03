@@ -38,4 +38,12 @@ describe('locale parity', () => {
       .map(([k]) => k);
     expect(bad).toEqual([]);
   });
+
+  // Brand rule: numbers use Latin digits in both languages (no Arabic-Indic or Persian digits).
+  it('uses Latin digits only in Arabic', () => {
+    const bad = [...arKeys]
+      .filter(([, v]) => typeof v === 'string' && /[\u0660-\u0669\u06F0-\u06F9]/u.test(v))
+      .map(([k]) => k);
+    expect(bad).toEqual([]);
+  });
 });

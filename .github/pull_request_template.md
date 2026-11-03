@@ -1,37 +1,28 @@
-## Summary
+<!-- dev → main promotion. Merge with "Create a merge commit" (never squash or rebase). -->
 
-<!-- What changed and why, in a few lines. -->
+## What's included
 
-## Jira
-
-SCRUM-<!-- n -->
+<!-- Jira keys and one line each, e.g. SCRUM-34: interest form at /forms/interest. -->
 
 ## Authorization impact
 
-<!-- Tables, RPCs, policies, grants or Edge Functions touched, and how access changes. Write "none" if nothing. -->
+<!-- Tables, policies, RPCs or Edge Functions added or changed, or "none". -->
 
-## Negative tests added
+## Database changes
 
-<!-- pgTAP / unit tests proving the forbidden action fails (actor → attempt → expected). Write "n/a" with a reason if none. -->
+<!-- New migrations, in order; anything that needs a hosted step. -->
 
-## RTL / LTR checked
+## Hosted settings to verify
 
-- [ ] English (LTR) checked
-- [ ] Arabic (RTL) checked: layout mirrors, logo and numbers do not
+<!-- Copied from the CHANGELOG section "Hosted settings to verify", if any. -->
 
-## Screenshots
+## Verification
 
-<!-- English and Arabic, desktop and 360 px mobile, for any UI change. -->
+- [ ] `npm run ci` green on dev
+- [ ] `supabase test db` green (<!-- N --> tests)
+- [ ] CI green on the last dev commit
 
-## Definition of Done
+## CTO review
 
-- [ ] Database migration written, reviewed and applied to development
-- [ ] Server-side authorization enforced (RLS / RPC / Edge Function)
-- [ ] Validation implemented on client and in the database
-- [ ] Loading, empty and error states handled
-- [ ] Arabic RTL and English LTR considered and checked
-- [ ] Happy-path tests pass
-- [ ] Unauthorized-access tests pass
-- [ ] No open critical defects
-- [ ] Generated types up to date; CI green
-- [ ] Documentation updated (permissions matrix, decisions, changelog)
+- [ ] Reviewed in the running site in Arabic (RTL) and English (LTR)
+- [ ] Merge with "Create a merge commit" (not squash or rebase)

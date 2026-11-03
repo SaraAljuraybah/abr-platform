@@ -2,21 +2,24 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/features/auth/auth-context';
+import { isAuthEnabled } from '@/lib/features';
 import { cn } from '@/lib/utils';
 
-type Placement = 'header' | 'menu' | 'hero' | 'band';
+/** `hero` = on a deep gradient (hero, final band): white-reverse buttons. */
+type Placement = 'header' | 'menu' | 'hero';
 
 const layout: Record<Placement, string> = {
   header: 'flex items-center gap-1 sm:gap-2',
   menu: 'flex flex-col gap-2',
   hero: 'flex flex-col gap-3 sm:flex-row',
-  band: 'flex flex-col gap-3 sm:flex-row',
 };
 
 /**
  * Account actions. Signed out: "Sign in" + "Create an account". Signed in (a session exists):
  * one "Go to dashboard" action. While the session is still loading, the signed-out pair shows.
- * UX only; it reveals nothing the server would not.
+ * Phase 1 launch mode (VITE_AUTH_ENABLED=false): "Register your interest" instead, plus "How it
+ * works" on the gradient bands; no account links at all. UX only; it reveals nothing the server
+ * would not.
  */
 export function AuthActions({
   placement,
@@ -29,9 +32,24 @@ export function AuthActions({
   const { session } = useAuth();
 
   const onDark = placement === 'hero';
-  const size = placement === 'hero' || placement === 'band' ? 'lg' : 'sm';
+  const size = onDark ? 'lg' : 'sm';
   const block = placement === 'menu' ? 'w-full' : undefined;
   const primary = onDark ? 'inverse' : 'default';
+
+  if (!isAuthEnabled()) {
+    return (
+      <div className={cn(layout[placement], className)}>
+        <Button asChild variant={primary} size={size} className={block}>
+          <Link to="/forms/interest">{t('nav.registerInterest')}</Link>
+        </Button>
+        {onDark && (
+          <Button asChild variant="outlineInverse" size={size}>
+            <a href="#how-it-works">{t('nav.howItWorks')}</a>
+          </Button>
+        )}
+      </div>
+    );
+  }
 
   if (session) {
     return (
@@ -45,12 +63,12 @@ export function AuthActions({
 
   return (
     <div className={cn(layout[placement], className)}>
-      {placement === 'hero' || placement === 'band' ? (
+      {onDark ? (
         <>
           <Button asChild variant={primary} size={size}>
             <Link to="/sign-up">{t('nav.createAccount')}</Link>
           </Button>
-          <Button asChild variant={onDark ? 'outlineInverse' : 'outline'} size={size}>
+          <Button asChild variant="outlineInverse" size={size}>
             <Link to="/sign-in">{t('nav.signIn')}</Link>
           </Button>
         </>

@@ -1,20 +1,11 @@
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, describe, expect, it } from 'vitest';
-import { AuthContext, type AuthState } from '@/features/auth/auth-context';
 import { changeLanguage } from '@/lib/i18n';
-import { routes } from '@/routes/routes';
-
-const signedOut: AuthState = { status: 'ready', session: null, role: null, onboarded: false };
+import { renderRoute } from '@/test/render-route';
 
 function renderAt(path: string) {
-  const router = createMemoryRouter(routes, { initialEntries: [path] });
-  render(
-    <AuthContext value={signedOut}>
-      <RouterProvider router={router} />
-    </AuthContext>,
-  );
+  renderRoute(path);
 }
 
 describe('AppLayout', () => {
@@ -27,7 +18,7 @@ describe('AppLayout', () => {
     const header = await screen.findByRole('banner');
     expect(within(header).getByRole('img', { name: 'ABR' })).toHaveAttribute(
       'src',
-      '/brand/abr-logo.png',
+      '/brand/abr-logo.svg',
     );
     expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute(
       'href',
@@ -44,16 +35,26 @@ describe('AppLayout', () => {
       within(footer).getByRole('button', { name: /Change language to Arabic/ }),
     ).toBeInTheDocument();
     expect(within(footer).getByText('© 2026 ABR')).toBeInTheDocument();
+    expect(
+      within(footer).getByText('Verified discovery and connection for graduation projects.'),
+    ).toBeInTheDocument();
   });
 
   it('shows section links on "/" only; other routes get the compact header and footer', async () => {
-    renderAt('/sign-in');
+    renderAt('/does-not-exist');
     const header = await screen.findByRole('banner');
     expect(within(header).queryByRole('link', { name: 'How it works' })).not.toBeInTheDocument();
     expect(
       within(screen.getByRole('contentinfo')).queryByRole('navigation'),
     ).not.toBeInTheDocument();
     expect(within(header).getByRole('link', { name: 'Create an account' })).toBeInTheDocument();
+  });
+
+  it.each(['/', '/sign-in'])('shows no internal-build notice on %s', async (path) => {
+    renderAt(path);
+    await screen.findByRole('main');
+    expect(screen.queryByText(/Internal build/)).toBeNull();
+    expect(screen.queryByRole('complementary', { name: 'Build status' })).toBeNull();
   });
 
   it('switches to Arabic (RTL) and back to English (LTR)', async () => {

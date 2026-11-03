@@ -3,7 +3,8 @@
     "name": "ABR",
     "skipToContent": "Skip to main content",
     "loading": "Loading…",
-    "homeLink": "ABR home"
+    "homeLink": "ABR home",
+    "descriptor": "Verified discovery and connection for graduation projects."
   },
   "meta": {
     "title": "ABR · Graduation projects, verified and connected",
@@ -16,6 +17,9 @@
     "signIn": "Sign in",
     "createAccount": "Create an account",
     "goToDashboard": "Go to dashboard",
+    "registerInterest": "Register your interest",
+    "howItWorks": "How it works",
+    "privacy": "Privacy",
     "sections": {
       "howItWorks": "How it works",
       "whoItsFor": "Who it's for",
@@ -23,12 +27,17 @@
       "faq": "FAQ"
     }
   },
+  "comingSoon": {
+    "title": "Coming soon",
+    "body": "Sign-in and accounts open with our pilot. Register your interest and we'll tell you first.",
+    "cta": "Register your interest",
+    "backHome": "Back to home"
+  },
   "language": {
     "switchLabel": "Change language to Arabic",
     "switchTo": "العربية"
   },
   "landing": {
-    "buildNotice": "Internal build. Only the platform foundation is available.",
     "copyright": "© 2026 ABR",
     "hero": {
       "eyebrow": "Graduation projects, verified and connected",
@@ -39,7 +48,15 @@
         "field": "Health tech",
         "reviewed": "Reviewed",
         "request": "Request to connect",
-        "lockNote": "Contact shared after acceptance"
+        "lockNote": "Contact shared after acceptance",
+        "summary": "Transcribes doctor–patient conversations in Saudi dialects into structured notes.",
+        "team": "Team of 3 · 2026",
+        "initials": {
+          "first": "N",
+          "second": "F",
+          "third": "A"
+        },
+        "toast": "Request accepted — contact unlocked"
       }
     },
     "how": {
@@ -65,18 +82,24 @@
           "title": "Contact",
           "body": "Each side sees the contact details the other agreed to share."
         }
+      },
+      "eyebrow": "The process",
+      "intro": "Five steps, and your contact details stay private until you say yes.",
+      "badges": {
+        "private": "Contact private",
+        "shared": "Contact shared"
       }
     },
     "who": {
       "title": "Built for everyone around a graduation project",
-      "cta": "Create an account",
       "students": {
         "title": "Students",
         "points": {
           "publish": "Publish your project on a reviewed, professional page",
           "requests": "Receive requests from verified organizations",
           "control": "You decide who gets your contact details"
-        }
+        },
+        "cta": "Join as a student"
       },
       "organizations": {
         "title": "Organizations",
@@ -84,7 +107,8 @@
           "browse": "Browse projects reviewed by the ABR team",
           "verified": "Every student has a verified university email",
           "requests": "Send structured requests; contact unlocks on acceptance"
-        }
+        },
+        "cta": "Join as an organization"
       },
       "mentors": {
         "title": "Mentors",
@@ -93,8 +117,11 @@
           "profile": "A verified professional profile",
           "requests": "Requests tied to specific projects",
           "contact": "Contact shared only for accepted mentorships"
-        }
-      }
+        },
+        "cta": "Join as a mentor"
+      },
+      "eyebrow": "Who it's for",
+      "intro": "One platform, three roles, each with its own verified path."
     },
     "trust": {
       "title": "Trust is built in, not added later",
@@ -115,7 +142,9 @@
           "title": "Private by default",
           "body": "Contact details unlock only after a request is accepted, and every access is logged."
         }
-      }
+      },
+      "eyebrow": "Trust & privacy",
+      "intro": "Every safeguard is enforced by the platform itself, not left to chance."
     },
     "faq": {
       "title": "Frequently asked questions",
@@ -126,7 +155,8 @@
         },
         "university": {
           "question": "My university isn't listed. What can I do?",
-          "answer": "You can request it during sign-up, and we'll review it."
+          "answer": "You can request it during sign-up, and we'll review it.",
+          "answerInterest": "Choose “Other” in the interest form and write its name."
         },
         "contact": {
           "question": "When are my contact details shared?",
@@ -136,10 +166,13 @@
           "question": "Can I message people on ABR?",
           "answer": "Not in this version. Once a connection is approved, you continue by email or phone."
         }
-      }
+      },
+      "eyebrow": "FAQ",
+      "intro": "The essentials, in short."
     },
     "cta": {
-      "title": "Give your project the audience it deserves."
+      "title": "Give your project the audience it deserves.",
+      "subline": "Your contact details stay private until you accept a request."
     }
   },
   "notFound": {
@@ -156,7 +189,345 @@
       "signUp": "Create an account",
       "onboarding": "Onboarding",
       "app": "Dashboard",
-      "admin": "Admin"
+      "admin": "Admin",
+      "forgotPassword": "Reset your password",
+      "requestAccess": "Request access",
+      "checkEmail": "Check your email",
+      "authConfirmed": "Email confirmed"
+    }
+  },
+  "auth": {
+    "backHome": "Back to home",
+    "signIn": {
+      "title": "Sign in",
+      "subtitle": "Welcome back to ABR.",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot your password?",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "newToAbr": "New to ABR?",
+      "createAccount": "Create an account"
+    },
+    "errors": {
+      "invalidCredentials": "Email or password is incorrect.",
+      "emailNotConfirmed": "Confirm your email to continue. We sent a link to {{email}}.",
+      "rateLimited": "Too many attempts. Please wait a minute and try again.",
+      "network": "We couldn't reach the server. Check your connection and try again.",
+      "unexpected": "Something went wrong. Please try again.",
+      "weakPassword": "Choose a stronger password that meets every requirement under the password field.",
+      "signUpFailed": "We couldn't create your account. Check your details and try again."
+    },
+    "resend": {
+      "action": "Resend link",
+      "sending": "Sending…",
+      "sent": "A new link is on its way."
+    },
+    "signUp": {
+      "title": "Create your account",
+      "intro": "Every project starts with an idea. This is the first step.",
+      "roleLabel": "I'm joining as",
+      "roles": {
+        "student": {
+          "title": "Student",
+          "description": "Publish your graduation project"
+        },
+        "organization": {
+          "title": "Organization",
+          "description": "Discover verified projects"
+        },
+        "mentor": {
+          "title": "Mentor",
+          "description": "Guide student teams"
+        }
+      },
+      "fullName": "Full name",
+      "yourFullName": "Your full name",
+      "organizationName": "Organization name",
+      "university": "University",
+      "universityPlaceholder": "Select your university",
+      "universitiesLoading": "Loading universities…",
+      "universitiesError": "We couldn't load the universities.",
+      "universitiesEmpty": "No universities are available yet.",
+      "retry": "Try again",
+      "cantFindUniversity": "Can't find your university?",
+      "universityEmail": "University email",
+      "universityEmailHint": "Use your university email. It's how we verify you're a student.",
+      "universityEmailTrouble": "Having trouble with your university email? Request an exception.",
+      "emailMismatch": "This email doesn't belong to {{university}}. Use your university email.",
+      "workEmail": "Work email",
+      "workEmailHint": "We review every organization before it can send requests.",
+      "email": "Email",
+      "password": "Password",
+      "passwordRulesTitle": "Password requirements",
+      "passwordRules": {
+        "length": "At least 10 characters",
+        "case": "An uppercase and a lowercase letter",
+        "digit": "A number"
+      },
+      "ruleMet": "Done:",
+      "ruleNotMet": "Not yet:",
+      "passwordNotMet": "Your password doesn't meet all the requirements yet.",
+      "mentorNotice": "Mentor workflows open after the pilot. You can register now, and we'll review your profile.",
+      "submit": "Create account",
+      "submitting": "Creating your account…",
+      "consent": "By creating an account, you agree to the use of your data to review your account and contact you about ABR, as described in the <privacyLink>privacy notice</privacyLink>.",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in"
+    }
+  },
+  "forms": {
+    "common": {
+      "honeypotLabel": "Leave this field empty",
+      "selectPlaceholder": "Select an option",
+      "chooseAtLeastOne": "Choose at least one option."
+    },
+    "errors": {
+      "rateLimited": "Too many submissions from your connection. Please try again in a few minutes.",
+      "network": "We couldn't reach the server. Check your connection and try again.",
+      "unexpected": "Something went wrong. Please try again."
+    },
+    "interest": {
+      "title": "Register your interest",
+      "intro": "Be among the first to use ABR when we launch. It takes about a minute.",
+      "roleLabel": "I'd like to join as",
+      "panel": {
+        "statement": "Be part of ABR from day one."
+      },
+      "fullName": "Full name",
+      "email": "Email",
+      "emailHint": "We'll only use it to contact you about ABR.",
+      "university": "University",
+      "universityGroups": {
+        "public": "Public universities",
+        "private": "Private universities"
+      },
+      "universityOther": "University name",
+      "fieldOfStudy": "Field of study",
+      "fieldOfStudyOther": "Your field of study",
+      "graduationYear": "Graduation year (or expected)",
+      "projectStage": "Project stage",
+      "organizationName": "Organization name",
+      "sector": "Sector",
+      "lookingFor": "What are you looking for?",
+      "orgSize": "Number of employees",
+      "expertise": "Field of expertise",
+      "experience": "Years of experience",
+      "heardFrom": "How did you hear about us?",
+      "heardFromOther": "Tell us where",
+      "consent": "Contact me about ABR, including its launch, news and updates. I can unsubscribe at any time. I've read the <privacyLink>privacy notice</privacyLink>.",
+      "consentRequired": "Agree to be contacted so we can register your interest.",
+      "submit": "Register my interest",
+      "submitting": "Sending…",
+      "success": {
+        "title": "Thank you, you're on the list.",
+        "body": "We'll email you when ABR opens for you.",
+        "home": "Back to home"
+      },
+      "options": {
+        "university_code": {
+          "king_saud": "King Saud University",
+          "imam": "Imam Mohammad Ibn Saud Islamic University",
+          "pnu": "Princess Nourah bint Abdulrahman University",
+          "ksau_hs": "King Saud bin Abdulaziz University for Health Sciences",
+          "seu": "Saudi Electronic University",
+          "psu": "Prince Sultan University",
+          "alfaisal": "Alfaisal University",
+          "yamamah": "Al Yamamah University",
+          "dau": "Dar Al Uloom University",
+          "reu": "Riyadh Elm University",
+          "maarefa": "AlMaarefa University",
+          "aou": "Arab Open University",
+          "other": "Other (write it)"
+        },
+        "field_of_study": {
+          "cs": "Computer Science",
+          "se": "Software Engineering",
+          "it": "Information Technology",
+          "is": "Information Systems",
+          "cyber": "Cybersecurity",
+          "ai": "Artificial Intelligence",
+          "data": "Data Science",
+          "ce": "Computer Engineering",
+          "other": "Other (write it)"
+        },
+        "graduation_year": {
+          "2027_or_later": "2027 or later"
+        },
+        "project_stage": {
+          "not_started": "I haven't started yet",
+          "idea": "I have a graduation project idea",
+          "in_progress": "I'm working on my graduation project now",
+          "finished": "I finished my graduation project",
+          "business": "I turned my project into a business"
+        },
+        "sector": {
+          "technology": "Technology",
+          "healthcare": "Healthcare",
+          "finance": "Finance",
+          "energy": "Energy",
+          "government": "Government",
+          "education": "Education",
+          "nonprofit": "Nonprofit",
+          "other": "Other"
+        },
+        "looking_for": {
+          "hire_talent": "Hire talent",
+          "sponsor_projects": "Sponsor projects",
+          "adopt_commercialize": "Adopt or commercialize projects",
+          "offer_mentoring": "Offer mentoring"
+        },
+        "org_size": {
+          "1_50": "1–50",
+          "51_500": "51–500",
+          "500_plus": "500+"
+        },
+        "expertise": {
+          "software_data": "Software & data",
+          "engineering": "Engineering",
+          "business_entrepreneurship": "Business & entrepreneurship",
+          "health": "Health",
+          "design": "Design",
+          "other": "Other"
+        },
+        "experience": {
+          "0_3": "0–3",
+          "4_7": "4–7",
+          "8_15": "8–15",
+          "15_plus": "15+"
+        },
+        "heard_from": {
+          "x": "X (Twitter)",
+          "linkedin": "LinkedIn",
+          "instagram": "Instagram",
+          "friend": "A friend or colleague",
+          "university": "My university",
+          "event": "An event",
+          "other": "Other"
+        }
+      }
+    }
+  },
+  "validation": {
+    "required": "This field is required.",
+    "email": "Enter a valid email address.",
+    "invalid": "Check this value.",
+    "tooShort": "Minimum length: {{min}} characters.",
+    "tooLong": "Maximum length: {{max}} characters."
+  },
+  "passwordField": {
+    "show": "Show password",
+    "hide": "Hide password"
+  },
+  "privacy": {
+    "eyebrow": "Your data at ABR",
+    "title": "Privacy, clearly.",
+    "updated": "Last updated: {{date}}",
+    "todoLabel": "TODO (development builds only):",
+    "todo": {
+      "legalReview": "Legal review of this notice before public launch.",
+      "legalName": "Add the company's legal name as the responsible party.",
+      "minors": "Legal review: age requirement and minors.",
+      "replyTime": "Legal review: reply time for privacy requests.",
+      "securityRetention": "Legal review: retention of the security log and review records."
+    },
+    "responsible": {
+      "title": "Who is responsible for your data?",
+      "body": "ABR is responsible for the personal data described here under the Saudi Personal Data Protection Law (PDPL). For any privacy question or request, write to <email>try0abr@gmail.com</email>.",
+      "age": "ABR is intended for people aged 18 or over."
+    },
+    "collect": {
+      "title": "What do we collect?",
+      "account": {
+        "title": "When you create an account",
+        "items": {
+          "identity": "Your role (student, organization or mentor), full name and email address.",
+          "password": "Your password, which is stored only in hashed form. We cannot read it.",
+          "university": "Students: your university. We check that your email belongs to it.",
+          "organization": "Organizations: your organization's name.",
+          "profile": "Profile details you choose to add. For everyone: a short bio and a photo. Students: major, academic level, skills, interests and a GitHub link. Organizations: a description, website, the kinds of support you offer and a logo. Mentors: job title, company, expertise, years of experience and a professional summary.",
+          "verification": "Your verification status. If the ABR team reviews your account, we keep the decision, the reason given and a copy of the profile as you submitted it.",
+          "universityRequest": "If you ask us to add a university: its name, its email domain and your email."
+        }
+      },
+      "interest": {
+        "title": "When you register your interest (no account)",
+        "items": {
+          "identity": "Your role, name and email.",
+          "answers": "Your answers for that role. Students: university, field of study, graduation year and project stage. Organizations: organization name, sector, what you are looking for and size. Mentors: field of expertise and years of experience.",
+          "heardFrom": "How you heard about ABR, with your own words if you chose \"Other\".",
+          "consent": "Your consent to be contacted, the time you gave it, which version of the consent text you agreed to and the language you used."
+        }
+      },
+      "contact": {
+        "title": "Contact details",
+        "body": "Your contact email (your sign-up email unless you change it) and, if you add them, a phone number and a LinkedIn link, with your choice of whether to share each of them."
+      },
+      "security": {
+        "title": "Security records",
+        "items": {
+          "log": "A log of security-relevant actions, such as verification decisions and access to contact details: what happened, who did it and when.",
+          "rateLimit": "To stop abuse of the interest form, we limit how often it can be sent from one connection. For this we keep a one-way, keyed code made from your network address, never the address itself."
+        }
+      }
+    },
+    "why": {
+      "title": "Why do we collect it?",
+      "items": {
+        "account": "To create and run your account, and to check that students belong to their university and that organizations and mentors are who they say they are.",
+        "discover": "To let verified members find graduation projects and connect with each other.",
+        "contact": "To contact you about ABR, including its launch, news and updates, if you registered your interest and agreed to be contacted. You can unsubscribe at any time.",
+        "secure": "To keep the platform secure and to investigate misuse."
+      },
+      "basis": "We use your data with your consent, which you give when you create an account or register your interest, and where it is needed to provide the service you asked for. We do not sell your data, show ads or use tracking or analytics tools."
+    },
+    "visibility": {
+      "title": "Will others see my data?",
+      "items": {
+        "public": "Nothing you give us appears on a public page.",
+        "profile": "Your profile is visible only to signed-in members, and only once your account is verified. Your email address is not part of your profile.",
+        "contact": "Your contact details are private by default. They are shared only after you accept a party's request, only the details you chose to share, and every access is logged.",
+        "interest": "Interest form answers are read only by the ABR team."
+      }
+    },
+    "processors": {
+      "title": "Who processes data for us, and where?",
+      "items": {
+        "supabase": "Supabase: our database, sign-in and server functions. Your data is stored in Supabase's Central EU region, in Frankfurt, Germany.",
+        "vercel": "Vercel: hosts the website. Like any web host, it handles technical request data such as your network address.",
+        "email": "An email provider for our emails, which we will add here once it is chosen."
+      },
+      "transfer": "This means your data is processed outside Saudi Arabia. Our providers protect it with their own security and contractual safeguards for personal data."
+    },
+    "browser": {
+      "title": "What do we keep in your browser?",
+      "body": "Your language choice and, while you are signed in, your session, so you stay signed in. No advertising or analytics cookies."
+    },
+    "retention": {
+      "title": "How long do we keep it?",
+      "items": {
+        "interest": "Interest form answers: as long as your consent is active. We delete them when you unsubscribe or ask us to.",
+        "accounts": "Accounts and profiles: while your account is open. You can ask us to delete your account at any time.",
+        "security": "Security log and review records: only as long as needed to protect the platform and meet our legal obligations.",
+        "rateLimit": "Rate-limit codes: they only count submissions within a 10-minute window and do not reveal your address."
+      }
+    },
+    "rights": {
+      "title": "Your rights",
+      "intro": "Under the PDPL you can:",
+      "items": {
+        "know": "know how your data is used (this notice);",
+        "access": "get access to your data and a copy of it;",
+        "correct": "ask us to correct it, or correct your profile yourself in your account;",
+        "delete": "ask us to delete it when it is no longer needed;",
+        "withdraw": "withdraw your consent at any time. This does not affect what was done before."
+      },
+      "how": "To use any of these rights, or to unsubscribe, write to <email>try0abr@gmail.com</email> from the email address you used with ABR. We will reply as soon as we can, within the time the PDPL requires.",
+      "complaint": "If you are not satisfied, you can complain to the Saudi Data and AI Authority (SDAIA)."
+    },
+    "changes": {
+      "title": "Changes to this notice",
+      "body": "When we change this notice, we update the date above. If a change affects how we use data you already gave us, we will tell you before it applies."
     }
   }
 }

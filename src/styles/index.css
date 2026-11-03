@@ -55,6 +55,18 @@
     #7c3aed 74%,
     #ec4899 108%
   );
+  /*
+   * Hero-only variant (pending brand sign-off, D-14): the approved Deep stops with the pink pushed
+   * from 108% to 160%, so the panel reads purple with only a faint warm hint in the far corner.
+   */
+  --abr-gradient-hero: linear-gradient(125deg, #0f0720 0%, #4b1c7a 42%, #7c3aed 74%, #ec4899 160%);
+  --abr-gradient-hero-rtl: linear-gradient(
+    235deg,
+    #0f0720 0%,
+    #4b1c7a 42%,
+    #7c3aed 74%,
+    #ec4899 160%
+  );
   --abr-gradient-soft: linear-gradient(135deg, #f3edff 0%, #fbcfe8 100%);
 
   /* shadcn/ui semantic tokens */
@@ -154,7 +166,11 @@
     font-size: 1.875rem; /* 30/38 mobile, 40/48 desktop */
     line-height: 1.2667;
     font-weight: 700;
-    letter-spacing: -0.015em;
+  }
+
+  /* English headings run slightly tight; Arabic resets to normal below (:lang(ar) *). */
+  :is(h1, h2, h3) {
+    letter-spacing: -0.02em;
   }
 
   @media (width >= 48rem) {
@@ -168,7 +184,6 @@
     font-size: 1.625rem; /* 26/34 mobile, 32/40 desktop */
     line-height: 1.3077;
     font-weight: 700;
-    letter-spacing: -0.01em;
   }
 
   @media (width >= 48rem) {
@@ -192,13 +207,67 @@
   }
 }
 
-/* The Deep gradient: one per view (Brand Guidelines p. 11). White text only. */
+/*
+ * Hero gradient (Deep with softened pink), mirrored in RTL. White text only. Never two gradient
+ * surfaces on screen together (Brand Guidelines p. 11).
+ */
 @utility bg-hero-gradient {
   background-color: var(--abr-dark);
-  background-image: var(--abr-gradient-deep);
+  background-image: var(--abr-gradient-hero);
 
   &:where([dir='rtl'], [dir='rtl'] *) {
-    background-image: var(--abr-gradient-deep-rtl);
+    background-image: var(--abr-gradient-hero-rtl);
+  }
+}
+
+/* Page content container: 1120px max, 24px gutters (40px from lg). */
+@utility container-page {
+  margin-inline: auto;
+  max-width: 1120px;
+  padding-inline: 1.5rem;
+
+  @media (width >= 64rem) {
+    padding-inline: 2.5rem;
+  }
+}
+
+/*
+ * Inset gradient panel (hero, final band): 16 / 24 / 32px from the viewport edges, 28px corners.
+ * The page background shows around it.
+ */
+@utility inset-panel {
+  margin-inline: 1rem;
+  border-radius: 28px;
+  overflow: hidden;
+
+  @media (width >= 40rem) {
+    margin-inline: 1.5rem;
+  }
+
+  @media (width >= 64rem) {
+    margin-inline: 2rem;
+  }
+}
+
+/*
+ * Section eyebrow: small, uppercase with +0.08em tracking in English. Arabic gets normal case and
+ * no tracking from the :lang(ar) * reset below. Colour is set where used (pink-text on light
+ * sections, light-pink on the gradient).
+ */
+@utility eyebrow {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Hero h1, about 10% under the base h1 scale: 27px mobile, 36px from md (Arabic: see below). */
+@utility text-hero-title {
+  font-size: 1.6875rem;
+
+  @media (width >= 48rem) {
+    font-size: 2.25rem;
   }
 }
 
@@ -226,8 +295,43 @@ body:lang(ar) {
   font-size: 2.5rem; /* 40/56 */
 }
 
+:lang(ar) h1.text-hero-title {
+  font-size: 2.25rem; /* hero: about 10% smaller, still one step above English */
+}
+
+:lang(ar) .eyebrow {
+  font-weight: 500;
+}
+
 :lang(ar) h2 {
   font-size: 2rem; /* 32/46 */
+}
+
+/*
+ * Auth card title (sign-in, sign-up): smaller than the landing h1 so the title fits on one line
+ * in the card. 26/34 mobile, 30/38 desktop; Arabic one step larger (28, 32).
+ */
+.auth-title {
+  font-size: 1.625rem;
+  line-height: 1.3077;
+}
+
+@media (width >= 48rem) {
+  .auth-title {
+    font-size: 1.875rem;
+    line-height: 1.2667;
+  }
+}
+
+:lang(ar) .auth-title {
+  font-size: 1.75rem;
+  line-height: 1.4;
+}
+
+@media (width >= 48rem) {
+  :lang(ar) .auth-title {
+    font-size: 2rem;
+  }
 }
 
 :lang(ar),

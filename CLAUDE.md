@@ -96,6 +96,15 @@ i18next · Supabase (Auth, Postgres, RLS, Storage, Edge Functions) · Vitest · 
 fails on drift. If Windows and Linux CLI output ever differ, **the CI-generated version wins**: copy it
 from the failed job and commit it.
 
+**Feature flag `VITE_AUTH_ENABLED`** (build-time, `true` by default, validated in
+`src/lib/env-schema.ts`, read with `isAuthEnabled()` from `src/lib/features.ts`). `false` is phase 1
+launch mode (production, tryabr.com): `/sign-in`, `/sign-up`, `/forms/request-access`, `/forgot-password`, `/check-email`
+and `/auth/confirmed` show
+"Coming soon", `/app`, `/onboarding` and `/admin` redirect there, and the landing page links to
+`/forms/interest` only. The flag is UX only: it hides account screens, it is not access control.
+New screens that lead to an account must respect it, with tests for both values
+(`src/features/landing/launch-mode.test.tsx`).
+
 ## Folder conventions
 
 ```
@@ -126,12 +135,74 @@ docs/             definition-of-done.md, permissions.md, decisions/ (ADRs)
 - Never mirror, recolour or stretch the logo, including in RTL. Use files from `public/brand/` only.
 - Visible 2px accent focus ring; respect `prefers-reduced-motion`; status never by colour alone.
 
-## Git
+## Git and workflow
 
 - Jira project key: **SCRUM**.
-- Branches: `feat/SCRUM-<n>-<slug>`, `fix/SCRUM-<n>-<slug>`, `db/SCRUM-<n>-<slug>`.
+- Two long-lived branches only. **`dev`**: all work is committed here directly. **`main`**:
+  production. No feature, fix or db branches.
 - Conventional Commits with the key: `feat(auth): student sign-up with university email (SCRUM-13)`.
   Small logical commits.
-- Every change goes through a pull request to `main`, using the PR template, including its
-  **Authorization impact** section. Never force-push `main`.
+- Flow: commit to `dev` → the CTO reviews the running site → the CTO merges `dev` → `main` through a
+  pull request (PR template, including its **Authorization impact** section) with **Create a merge
+  commit**, never rebase or squash, so the two branches stay in sync. Claude never merges into `main`
+  and never pushes to it.
+- CI runs on push to `dev`, on pull requests to `main` and on push to `main`.
+- Never force-push `dev` or `main`.
+- Never run `git checkout`, `git restore` or `git stash` on a file with uncommitted work. Never
+  discard uncommitted changes.
 - Never commit `.env.local` or anything under `_context/` (confidential source documents).
+- Push only after `npm run ci` exits 0: use `npm run ci && git push`, never print-then-push.
+
+## Supabase projects
+
+| Project      | Ref                    | Use                                     |
+| ------------ | ---------------------- | --------------------------------------- |
+| **abr-dev**  | `rrlnuldywzmktqynomta` | Preview and testing (the `dev` preview) |
+| **abr-prod** | `atckrssxksvurzlxxnhj` | Production, **real data** (tryabr.com)  |
+
+- The repository stays linked to **abr-dev**. Every command for prod passes
+  `--project-ref atckrssxksvurzlxxnhj` explicitly; never re-link the default to prod.
+- The CTO runs every prod command that needs the database password (link, `db push`); Claude gives
+  the exact commands and reviews the output, and never handles the prod password.
+- Migrations reach abr-prod **before** `dev` is merged into `main`, so production code never runs
+  against an older schema. Apply them to abr-dev first.
+- Never copy production data to abr-dev or to a local stack, not even a single row. Test data on
+  any hosted project is synthetic and deleted after the check.
+
+## Tools
+
+- Any tool needed more than once goes in `devDependencies` (pinned exact version) or is installed
+  globally. Never install it into a scratchpad, so it never re-downloads each session.
+- No Playwright or screenshot tooling. Lighthouse only when the CTO explicitly asks.
+- Accessibility checks use `axe-core` through the Vitest suite (jsdom), in English and Arabic.
+
+## Verification levels
+
+Pick the level from the change, and state it in every report. **Never skip FULL for database, auth or
+security work**, however small the change.
+
+| Level        | Use for                                               | Required                                                                                     |
+| ------------ | ----------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **QUICK**    | Copy, spacing, colours, small UI tweaks               | `npm run typecheck` + `npm run lint` + the related tests                                     |
+| **STANDARD** | A new page or component                               | `npm run ci` + axe for that page in EN and AR                                                |
+| **FULL**     | Migrations, RLS, RPCs, Edge Functions, auth, security | `npm run ci` + `supabase test db` + mutation check + live smoke test against the local stack |
+
+- **Mutation check:** commit the work first (a WIP commit is fine), then temporarily break the
+  control under test (for example, drop a policy condition or skip a role check), confirm the
+  matching negative test fails, then restore it by re-applying the committed version (or with
+  `git revert` if the mutant was committed) and confirm it passes again. Never push a mutant, and
+  never discard uncommitted changes to restore.
+- **Live smoke test:** exercise the change end to end against `npm run db:start` + `npm run dev`
+  (or the Edge Function served locally) with real requests, including at least one request that
+  must be refused.
+
+## Reports
+
+No screenshots in reports. Each report states:
+
+1. The verification level used.
+2. What changed (files and behaviour), and any deviation from the agreed plan with the reason.
+3. Which pages to look at on the running site (routes, in EN and AR).
+4. The `npm run ci` result.
+5. For database, auth or security work: the `supabase test db` result (files and test count) and
+   the mutation check (what was mutated, which test failed, and that it passes again).

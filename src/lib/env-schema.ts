@@ -38,6 +38,11 @@ export const envSchema = z.object({
     error: 'VITE_SUPABASE_URL must be an http(s) URL',
   }),
   VITE_SUPABASE_PUBLISHABLE_KEY: publishableKey,
+  // Phase 1 launch mode: "false" turns sign-in and sign-up into a "Coming soon" page. Read at
+  // runtime by src/lib/features.ts; validated here (and at build time by vite.config.ts).
+  VITE_AUTH_ENABLED: z
+    .enum(['true', 'false'], { error: 'VITE_AUTH_ENABLED must be "true" or "false"' })
+    .default('true'),
 });
 
 export type Env = z.infer<typeof envSchema>;

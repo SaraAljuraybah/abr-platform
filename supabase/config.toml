@@ -261,7 +261,10 @@ otp_expiry = 3600
 # Allow/disallow new user signups via SMS to your project.
 enable_signup = false
 # If enabled, users need to confirm their phone number before signing in.
-enable_confirmations = false
+# Must stay true even though SMS sign-up is off: Supabase Auth answers a sign-up for an existing,
+# confirmed email with 422 user_already_exists (account enumeration) when EITHER email or SMS
+# autoconfirm is on. With both off it returns the obfuscated success (SCRUM-13).
+enable_confirmations = true
 # Template for sending OTP to users
 template = "Your code is {{ .Code }}"
 # Controls the minimum amount of time that must pass before sending another sms otp.
@@ -388,6 +391,13 @@ deno_version = 2
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
+# Public interest form endpoint (SCRUM-34). No JWT check: the publishable key is not a JWT and
+# callers are anonymous. Controls: validation, spam trap, per-IP rate limit, CORS allowlist.
+# Secrets (supabase/functions/.env locally, `supabase secrets set` hosted): INTEREST_IP_HASH_SECRET,
+# ALLOWED_ORIGINS. See supabase/functions/.env.example.
+[functions.submit-interest]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327
@@ -415,3 +425,30 @@ enabled = true
 # declarative_schema_path = "./database"
 # JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
+
+# Hosted development project (abr-dev). These values replace the local ones above only when the CLI
+# targets this project ref (supabase config push / db push); local development is unchanged.
+[remotes.abr-dev]
+project_id = "rrlnuldywzmktqynomta"
+
+[remotes.abr-dev.auth]
+site_url = "https://abr-platform.vercel.app"
+additional_redirect_urls = [
+  "https://abr-platform.vercel.app/**",
+  "https://abr-platform-git-dev-saraaljuraybahs-projects.vercel.app/**",
+  "http://127.0.0.1:5173/**",
+  "http://localhost:5173/**",
+]
+
+# Keep the hosted values for settings this project does not set on purpose (local dev uses short
+# intervals and codes for convenience).
+[remotes.abr-dev.auth.email]
+max_frequency = "1m0s"
+otp_length = 8
+
+[remotes.abr-dev.auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[remotes.abr-dev.storage.vector]
+enabled = false
