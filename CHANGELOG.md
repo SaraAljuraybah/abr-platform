@@ -86,6 +86,28 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Seed: three PLACEHOLDER universities and four domains pending D-05. No users.
 - Docs: permissions matrix for every table and function; ADR-0011 note on default privileges.
 
+- Forms system (SCRUM-34, epic SCRUM-30): every form lives at `/forms/<slug>`, lazy-loaded, in
+  the shared `FormLayout` (the split layout, renamed from `AuthLayout`) with brand panel content
+  per form. Shared pieces in `src/features/forms/`: `FormShell` (title, intro, fields, spam trap,
+  focused error message, submit, consent line), `RoleCards`, `PrivacyLink`, `SpamTrap`,
+  `SuccessScreen`, option helpers and Edge Function error mapping. Sign-up now uses them too.
+  New UI pieces: `ChoiceGroup` (radio pills), `CheckboxGroup`, `CheckboxField`. An unknown slug
+  is a 404.
+- Interest form at `/forms/interest` (SCRUM-34), English and Arabic: role cards (pre-selected
+  from `?role=`), numbered fields per role that renumber when the role or "My university isn't
+  listed" changes, consent checkbox, success screen. No phone, student ID or national ID.
+- `public.interest_signups` (no client access), `private.rate_limits`, and the RPCs
+  `submit_interest()` and `consume_rate_limit()` (service role only) and `get_interest_stats()`
+  (admin only) (SCRUM-34).
+- Edge Function `submit-interest` (SCRUM-34): validation with the option lists shared with the
+  frontend and the CHECK constraints (`supabase/functions/_shared/`), spam trap, 5 submissions per
+  10 minutes per client address (HMAC, never stored raw), upsert by email with the same answer
+  for new and repeat emails, CORS allowlist. Secrets: `INTEREST_IP_HASH_SECRET`,
+  `ALLOWED_ORIGINS` (`supabase/functions/.env.example`).
+- Request access (SCRUM-14) moves to `/forms/request-access` on the forms system; the sign-up
+  "Can't find your university?" and "Request an exception" links point there (placeholder until
+  SCRUM-14), and `/request-access` redirects to it (SCRUM-34).
+
 ### Handoff to SCRUM-13 (sign-up UI)
 
 - The client must call `check_student_email(university_id, email)` before signing a student up.
@@ -160,6 +182,21 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   which tells anyone with the publishable key that the account exists. Check: sign up twice with a
   confirmed email; the second answer must be HTTP 200 with no identities (SCRUM-13).
 - Verify default privileges on the hosted development project once it is linked (ADR-0011 note).
+- `submit-interest` client address (SCRUM-34): confirm hosted Edge Functions receive
+  `cf-connecting-ip` set by Cloudflare. Check: send 6 requests, each with a different spoofed
+  `cf-connecting-ip` and `x-forwarded-for`; the 6th must still get 429. If the header can be
+  spoofed on hosted, switch `supabase/functions/_shared/client-ip.ts` to the right-most
+  `x-forwarded-for` entry only.
+- `submit-interest` secrets (SCRUM-34): `supabase secrets set INTEREST_IP_HASH_SECRET=...` (32+
+  random characters, different from local) and `ALLOWED_ORIGINS=...` (the Vercel production URL,
+  plus the team's preview pattern when decided; not tryabr.com). Without the secret the function
+  answers 500.
+
+### Pending CEO decisions
+
+- Retention period for interest-form data (PDPL): how long `interest_signups` rows are kept and
+  when they are deleted (SCRUM-34).
+- Whether the landing page links to `/forms/interest` (SCRUM-34).
 
 ### Pending brand sign-off
 
