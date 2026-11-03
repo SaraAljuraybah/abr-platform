@@ -50,7 +50,8 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   privacy notice. Students pick an active university and are pre-checked with
   `check_student_email()` on blur and on submit; no sign-up request is sent for a mismatched
   email. Sign-up metadata matches the trigger exactly per role. Success, an existing email and a
-  filled spam-trap field all land on `/check-email` (email in router state only). Rate-limit,
+  filled spam-trap field (labelled "Leave this field empty") all land on `/check-email` (email in
+  router state only). Length errors name the limit ("Minimum length: 2 characters."). Rate-limit,
   network, weak-password and the trigger's generic refusal have their own messages. Landing
   audience cards link with `?role=`. Placeholders: `/request-access`, `/check-email`,
   `/auth/confirmed`.
@@ -116,6 +117,7 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   autoconfirm on, a sign-up for an existing confirmed email returns `422 user_already_exists`,
   which tells anyone with the publishable key that the account exists. Check: sign up twice with a
   confirmed email; the second answer must be HTTP 200 with no identities (SCRUM-13).
+- Verify default privileges on the hosted development project once it is linked (ADR-0011 note).
 
 ### Planned
 
@@ -134,6 +136,5 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - PDPL erasure process for append-only history (admin procedure). `audit_events` and
   `verification_reviews` keep plain user ids without foreign keys, so deleting an account does not
   delete or block on its history.
-- Verify default privileges on the hosted development project once it is linked (ADR-0011 note).
 - Block or re-validate a student's auth email change to a domain that is not allowlisted.
 - Admin RPCs: manage universities and domains, read `reviewer_id`.
