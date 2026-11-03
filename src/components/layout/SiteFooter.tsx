@@ -22,6 +22,12 @@ export function SiteFooter({ showSections }: { showSections: boolean }) {
           </nav>
         )}
         <div className="flex flex-wrap items-center gap-4">
+          <Link
+            to="/privacy"
+            className="rounded-sm text-sm font-semibold text-brand underline-offset-4 hover:underline"
+          >
+            {t('nav.privacy')}
+          </Link>
           <LanguageSwitch />
           <p className="text-sm text-muted-foreground">{t('landing.copyright')}</p>
         </div>

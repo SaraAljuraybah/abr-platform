@@ -187,11 +187,10 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
       '/sign-in',
     );
 
-    const privacy = screen.getByRole('link', {
-      name: new RegExp(t.forms.common.opensInNewTab.replace(/[()]/g, '\\$&')),
-    });
-    expect(privacy).toHaveAttribute('href', 'https://tryabr.com/privacy');
-    expect(privacy).toHaveAttribute('rel', 'noopener noreferrer');
+    // The consent line links to the internal notice, in the same tab.
+    const privacy = document.querySelector('label a[href="/privacy"]');
+    expect(privacy).not.toBeNull();
+    expect(privacy).not.toHaveAttribute('target');
   });
 
   it('organization (?role=organization): fields and work-email hint', async () => {

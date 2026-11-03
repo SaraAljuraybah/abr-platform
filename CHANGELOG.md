@@ -123,6 +123,14 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Interest form university list (SCRUM-34): Naif Arab University for Security Sciences is removed
   (migration `20261103203037_interest_remove_naif`; any earlier answer becomes "Other" with the
   university's name).
+- Privacy notice at `/privacy` (SCRUM-36), English and Arabic, in the site layout: what accounts,
+  the interest form, contact details and security records store, why, who sees it, processors and
+  location (Supabase in Frankfurt, Vercel; processing outside Saudi Arabia), retention, PDPL rights
+  and the temporary contact try0abr@gmail.com. "Last updated" comes from one constant
+  (`PRIVACY_LAST_UPDATED`); open points show only in development builds (see "Before public
+  launch"). The footer and every form link to it; consent links now open `/privacy` in the same tab
+  (was https://tryabr.com/privacy in a new tab). `/register` redirects to `/forms/interest`
+  (`vercel.json` and the client router).
 - Phase 1 launch mode: build-time flag `VITE_AUTH_ENABLED` (`true` by default; `false` for
   production at tryabr.com, `true` for the dev preview). With `false`, `/sign-in`, `/sign-up` and
   `/forms/request-access` show a "Coming soon" page in the form layout (with links to the interest
@@ -243,6 +251,20 @@ placeholder universities seeded (no users).
 - Open: Vercel environment variable `VITE_AUTH_ENABLED`: `false` for Production (tryabr.com),
   `true` for Preview (the `dev` preview). Build-time, so a change needs a redeploy.
 - Production project: repeat all of the above when it exists.
+
+### Before public launch
+
+Open points in the privacy notice (`/privacy`). Development builds show them on the page; production
+builds hide them, so they are tracked here:
+
+- Legal review of the whole notice.
+- The company's legal name as the responsible party.
+- Legal review: the "18 or over" statement and minors.
+- Legal review: the reply time for privacy requests ("as soon as we can, within the time the PDPL
+  requires").
+- Legal review: retention of the security log and review records.
+- Set `PRIVACY_LAST_UPDATED` (`src/features/privacy/notice.ts`) to the launch date; it is
+  `2026-11-04` until the CTO gives the date.
 
 ### CTO decisions (2026-11-03)
 

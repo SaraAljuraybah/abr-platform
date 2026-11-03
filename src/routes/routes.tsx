@@ -1,4 +1,4 @@
-import type { RouteObject } from 'react-router';
+import { Navigate, type RouteObject } from 'react-router';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { FormLayout } from '@/components/layout/FormLayout';
 import { formRoutes, legacyFormRedirects } from '@/features/forms/registry';
@@ -80,6 +80,14 @@ export const routes: RouteObject[] = [
     element: <AppLayout />,
     children: [
       { index: true, element: <LandingPage /> },
+      {
+        path: 'privacy',
+        lazy: async () => ({
+          Component: (await import('@/features/privacy/PrivacyPage')).PrivacyPage,
+        }),
+      },
+      // Short link for campaigns; vercel.json redirects it too (before the SPA loads).
+      { path: 'register', element: <Navigate to="/forms/interest" replace /> },
       {
         element: <RequireAuthEnabled />,
         children: [

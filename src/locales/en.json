@@ -19,6 +19,7 @@
     "goToDashboard": "Go to dashboard",
     "registerInterest": "Register your interest",
     "howItWorks": "How it works",
+    "privacy": "Privacy",
     "sections": {
       "howItWorks": "How it works",
       "whoItsFor": "Who it's for",
@@ -278,7 +279,6 @@
   "forms": {
     "common": {
       "honeypotLabel": "Leave this field empty",
-      "opensInNewTab": "(opens in a new tab)",
       "selectPlaceholder": "Select an option",
       "chooseAtLeastOne": "Choose at least one option."
     },
@@ -418,5 +418,116 @@
   "passwordField": {
     "show": "Show password",
     "hide": "Hide password"
+  },
+  "privacy": {
+    "eyebrow": "Your data at ABR",
+    "title": "Privacy, clearly.",
+    "updated": "Last updated: {{date}}",
+    "todoLabel": "TODO (development builds only):",
+    "todo": {
+      "legalReview": "Legal review of this notice before public launch.",
+      "legalName": "Add the company's legal name as the responsible party.",
+      "minors": "Legal review: age requirement and minors.",
+      "replyTime": "Legal review: reply time for privacy requests.",
+      "securityRetention": "Legal review: retention of the security log and review records."
+    },
+    "responsible": {
+      "title": "Who is responsible for your data?",
+      "body": "ABR is responsible for the personal data described here under the Saudi Personal Data Protection Law (PDPL). For any privacy question or request, write to <email>try0abr@gmail.com</email>.",
+      "age": "ABR is intended for people aged 18 or over."
+    },
+    "collect": {
+      "title": "What do we collect?",
+      "account": {
+        "title": "When you create an account",
+        "items": {
+          "identity": "Your role (student, organization or mentor), full name and email address.",
+          "password": "Your password, which is stored only in hashed form. We cannot read it.",
+          "university": "Students: your university. We check that your email belongs to it.",
+          "organization": "Organizations: your organization's name.",
+          "profile": "Profile details you choose to add. For everyone: a short bio and a photo. Students: major, academic level, skills, interests and a GitHub link. Organizations: a description, website, the kinds of support you offer and a logo. Mentors: job title, company, expertise, years of experience and a professional summary.",
+          "verification": "Your verification status. If the ABR team reviews your account, we keep the decision, the reason given and a copy of the profile as you submitted it.",
+          "universityRequest": "If you ask us to add a university: its name, its email domain and your email."
+        }
+      },
+      "interest": {
+        "title": "When you register your interest (no account)",
+        "items": {
+          "identity": "Your role, name and email.",
+          "answers": "Your answers for that role. Students: university, field of study, graduation year and project stage. Organizations: organization name, sector, what you are looking for and size. Mentors: field of expertise and years of experience.",
+          "heardFrom": "How you heard about ABR, with your own words if you chose \"Other\".",
+          "consent": "Your consent to be contacted, the time you gave it, which version of the consent text you agreed to and the language you used."
+        }
+      },
+      "contact": {
+        "title": "Contact details",
+        "body": "Your contact email (your sign-up email unless you change it) and, if you add them, a phone number and a LinkedIn link, with your choice of whether to share each of them."
+      },
+      "security": {
+        "title": "Security records",
+        "items": {
+          "log": "A log of security-relevant actions, such as verification decisions and access to contact details: what happened, who did it and when.",
+          "rateLimit": "To stop abuse of the interest form, we limit how often it can be sent from one connection. For this we keep a one-way, keyed code made from your network address, never the address itself."
+        }
+      }
+    },
+    "why": {
+      "title": "Why do we collect it?",
+      "items": {
+        "account": "To create and run your account, and to check that students belong to their university and that organizations and mentors are who they say they are.",
+        "discover": "To let verified members find graduation projects and connect with each other.",
+        "contact": "To contact you about ABR, including its launch, news and updates, if you registered your interest and agreed to be contacted. You can unsubscribe at any time.",
+        "secure": "To keep the platform secure and to investigate misuse."
+      },
+      "basis": "We use your data with your consent, which you give when you create an account or register your interest, and where it is needed to provide the service you asked for. We do not sell your data, show ads or use tracking or analytics tools."
+    },
+    "visibility": {
+      "title": "Will others see my data?",
+      "items": {
+        "public": "Nothing you give us appears on a public page.",
+        "profile": "Your profile is visible only to signed-in members, and only once your account is verified. Your email address is not part of your profile.",
+        "contact": "Your contact details are private by default. They are shared only after you accept a party's request, only the details you chose to share, and every access is logged.",
+        "interest": "Interest form answers are read only by the ABR team."
+      }
+    },
+    "processors": {
+      "title": "Who processes data for us, and where?",
+      "items": {
+        "supabase": "Supabase: our database, sign-in and server functions. Your data is stored in Supabase's Central EU region, in Frankfurt, Germany.",
+        "vercel": "Vercel: hosts the website. Like any web host, it handles technical request data such as your network address.",
+        "email": "An email provider for our emails, which we will add here once it is chosen."
+      },
+      "transfer": "This means your data is processed outside Saudi Arabia. Our providers protect it with their own security and contractual safeguards for personal data."
+    },
+    "browser": {
+      "title": "What do we keep in your browser?",
+      "body": "Your language choice and, while you are signed in, your session, so you stay signed in. No advertising or analytics cookies."
+    },
+    "retention": {
+      "title": "How long do we keep it?",
+      "items": {
+        "interest": "Interest form answers: as long as your consent is active. We delete them when you unsubscribe or ask us to.",
+        "accounts": "Accounts and profiles: while your account is open. You can ask us to delete your account at any time.",
+        "security": "Security log and review records: only as long as needed to protect the platform and meet our legal obligations.",
+        "rateLimit": "Rate-limit codes: they only count submissions within a 10-minute window and do not reveal your address."
+      }
+    },
+    "rights": {
+      "title": "Your rights",
+      "intro": "Under the PDPL you can:",
+      "items": {
+        "know": "know how your data is used (this notice);",
+        "access": "get access to your data and a copy of it;",
+        "correct": "ask us to correct it, or correct your profile yourself in your account;",
+        "delete": "ask us to delete it when it is no longer needed;",
+        "withdraw": "withdraw your consent at any time. This does not affect what was done before."
+      },
+      "how": "To use any of these rights, or to unsubscribe, write to <email>try0abr@gmail.com</email> from the email address you used with ABR. We will reply as soon as we can, within the time the PDPL requires.",
+      "complaint": "If you are not satisfied, you can complain to the Saudi Data and AI Authority (SDAIA)."
+    },
+    "changes": {
+      "title": "Changes to this notice",
+      "body": "When we change this notice, we update the date above. If a change affects how we use data you already gave us, we will tell you before it applies."
+    }
   }
 }

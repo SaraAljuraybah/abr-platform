@@ -55,6 +55,15 @@ export function FormLayout() {
             <div className="rounded-lg border border-border bg-card p-6 shadow-md sm:p-10 lg:rounded-none lg:border-0 lg:p-0 lg:shadow-none">
               <Outlet />
             </div>
+            {/* Under every form and its consent line. */}
+            <p className="mt-6 text-center text-sm lg:text-start">
+              <Link
+                to="/privacy"
+                className="rounded-sm font-semibold text-brand underline-offset-4 hover:underline"
+              >
+                {t('nav.privacy')}
+              </Link>
+            </p>
           </div>
         </main>
       </div>
