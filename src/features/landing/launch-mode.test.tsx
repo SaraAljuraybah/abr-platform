@@ -46,28 +46,32 @@ describe.each(['en', 'ar'] as const)('VITE_AUTH_ENABLED=false (%s)', (language) 
     vi.stubEnv('VITE_AUTH_ENABLED', 'false');
   });
 
-  it.each(['/sign-in', '/sign-up', '/forms/request-access'])(
-    '%s shows "Coming soon" with the interest form and home links',
-    async (path) => {
-      await renderAt(path, language);
-      const main = screen.getByRole('main');
-      expect(
-        within(main).getByRole('heading', { level: 1, name: t.comingSoon.title }),
-      ).toBeInTheDocument();
-      expect(within(main).getByText(t.comingSoon.body)).toBeInTheDocument();
-      expect(within(main).getByRole('link', { name: t.comingSoon.cta })).toHaveAttribute(
-        'href',
-        '/forms/interest',
-      );
-      expect(within(main).getByRole('link', { name: t.comingSoon.backHome })).toHaveAttribute(
-        'href',
-        '/',
-      );
-      // The brand panel of FormLayout is there; no sign-in or sign-up form.
-      expect(screen.getByRole('complementary')).toBeInTheDocument();
-      expect(document.querySelector('input[type="password"]')).toBeNull();
-    },
-  );
+  it.each([
+    '/sign-in',
+    '/sign-up',
+    '/forms/request-access',
+    '/forgot-password',
+    '/check-email',
+    '/auth/confirmed',
+  ])('%s shows "Coming soon" with the interest form and home links', async (path) => {
+    await renderAt(path, language);
+    const main = screen.getByRole('main');
+    expect(
+      within(main).getByRole('heading', { level: 1, name: t.comingSoon.title }),
+    ).toBeInTheDocument();
+    expect(within(main).getByText(t.comingSoon.body)).toBeInTheDocument();
+    expect(within(main).getByRole('link', { name: t.comingSoon.cta })).toHaveAttribute(
+      'href',
+      '/forms/interest',
+    );
+    expect(within(main).getByRole('link', { name: t.comingSoon.backHome })).toHaveAttribute(
+      'href',
+      '/',
+    );
+    // The brand panel of FormLayout is there; no sign-in or sign-up form.
+    expect(screen.getByRole('complementary')).toBeInTheDocument();
+    expect(document.querySelector('input[type="password"]')).toBeNull();
+  });
 
   it.each([
     ['/app', signedOut],
@@ -148,6 +152,18 @@ describe.each(['en', 'ar'] as const)('VITE_AUTH_ENABLED=true (%s)', (language) =
 
   beforeEach(() => {
     vi.stubEnv('VITE_AUTH_ENABLED', 'true');
+  });
+
+  it.each([
+    ['/forgot-password', 'forgotPassword'],
+    ['/check-email', 'checkEmail'],
+    ['/auth/confirmed', 'authConfirmed'],
+  ] as const)('%s keeps its own page', async (path, page) => {
+    await renderAt(path, language);
+    expect(
+      screen.getByRole('heading', { level: 1, name: t.placeholder.pages[page] }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(t.comingSoon.body)).toBeNull();
   });
 
   it('/sign-in is the sign-in form', async () => {

@@ -7,6 +7,7 @@ import { isAuthEnabled } from '@/lib/features';
 import { ComingSoonPage } from '@/pages/ComingSoonPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
+import { AuthOnly } from './AuthOnly';
 import { RequireAuth } from './guards/RequireAuth';
 import { RequireAuthEnabled } from './guards/RequireAuthEnabled';
 import { RequireOnboarding } from './guards/RequireOnboarding';
@@ -47,16 +48,31 @@ export const routes: RouteObject[] = [
       },
       {
         path: 'forgot-password',
-        element: <PlaceholderPage page="forgotPassword" className={inCard} />,
+        element: (
+          <AuthOnly>
+            <PlaceholderPage page="forgotPassword" className={inCard} />
+          </AuthOnly>
+        ),
       },
       // Forms system (SCRUM-34): /forms/<slug>, including request access (SCRUM-14).
       ...formRoutes,
       ...legacyFormRedirects,
       // Placeholders until page 3 (check email, confirmed).
-      { path: 'check-email', element: <PlaceholderPage page="checkEmail" className={inCard} /> },
+      {
+        path: 'check-email',
+        element: (
+          <AuthOnly>
+            <PlaceholderPage page="checkEmail" className={inCard} />
+          </AuthOnly>
+        ),
+      },
       {
         path: 'auth/confirmed',
-        element: <PlaceholderPage page="authConfirmed" className={inCard} />,
+        element: (
+          <AuthOnly>
+            <PlaceholderPage page="authConfirmed" className={inCard} />
+          </AuthOnly>
+        ),
       },
     ],
   },

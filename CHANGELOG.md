@@ -121,7 +121,8 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   account links: the header and mobile menu show "Register your interest", the hero and final
   band show "Register your interest" and "How it works", the audience cards link to
   `/forms/interest?role=…`, and the FAQ on unlisted universities points to "Other" in the interest
-  form. UX only, not access control. Tests cover both values.
+  form. UX only, not access control. Tests cover both values. `/forgot-password`, `/check-email`
+  and `/auth/confirmed` also show "Coming soon" in this mode (SCRUM-36).
 
 ### Handoff to SCRUM-13 (sign-up UI)
 

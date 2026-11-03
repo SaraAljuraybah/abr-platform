@@ -98,7 +98,8 @@ from the failed job and commit it.
 
 **Feature flag `VITE_AUTH_ENABLED`** (build-time, `true` by default, validated in
 `src/lib/env-schema.ts`, read with `isAuthEnabled()` from `src/lib/features.ts`). `false` is phase 1
-launch mode (production, tryabr.com): `/sign-in`, `/sign-up` and `/forms/request-access` show
+launch mode (production, tryabr.com): `/sign-in`, `/sign-up`, `/forms/request-access`, `/forgot-password`, `/check-email`
+and `/auth/confirmed` show
 "Coming soon", `/app`, `/onboarding` and `/admin` redirect there, and the landing page links to
 `/forms/interest` only. The flag is UX only: it hides account screens, it is not access control.
 New screens that lead to an account must respect it, with tests for both values
