@@ -4,7 +4,7 @@
 
 begin;
 
-select plan(62);
+select plan(80);
 
 set constraints all immediate;
 
@@ -53,9 +53,9 @@ language sql
 as $$
   select '{
     "role": "student", "full_name": "Sara Student", "email": "sara@student.test",
-    "university_id": "aaaaaaaa-0000-4000-8000-0000000000a1", "field_of_study": "cs_it",
-    "graduation_year": "2027", "project_stage": "have_idea", "region": "riyadh",
-    "channel": "linkedin", "consent_contact": true, "locale": "ar"
+    "university_code": "king_saud", "field_of_study": "cs",
+    "graduation_year": "2027_or_later", "project_stage": "idea",
+    "heard_from": "linkedin", "consent_contact": true, "locale": "ar"
   }'::jsonb || p_changes;
 $$;
 create function pg_temp.organization(p_changes jsonb default '{}')
@@ -66,7 +66,7 @@ as $$
     "role": "organization", "full_name": "Omar Org", "email": "omar@org.test",
     "organization_name": "Org Labs", "sector": "technology",
     "looking_for": ["hire_talent", "sponsor_projects"], "org_size": "51_500",
-    "channel": "event", "consent_contact": true, "locale": "en"
+    "heard_from": "event", "consent_contact": true, "locale": "en"
   }'::jsonb || p_changes;
 $$;
 create function pg_temp.mentor(p_changes jsonb default '{}')
@@ -75,8 +75,8 @@ language sql
 as $$
   select '{
     "role": "mentor", "full_name": "Mona Mentor", "email": "mona@mentor.test",
-    "expertise": "software_data", "experience": "8_15", "region": "eastern",
-    "channel": "friend", "consent_contact": true, "locale": "en"
+    "expertise": "software_data", "experience": "8_15",
+    "heard_from": "friend", "consent_contact": true, "locale": "en"
   }'::jsonb || p_changes;
 $$;
 
@@ -133,6 +133,18 @@ select ok(
   'service_role can execute submit_interest and consume_rate_limit'
 );
 
+-- Columns: region and the old university link are gone -----------------------------
+
+select hasnt_column('public', 'interest_signups', 'region', 'region is removed');
+select hasnt_column('public', 'interest_signups', 'university_id', 'no link to public.universities');
+select hasnt_column('public', 'interest_signups', 'channel', 'channel is renamed heard_from');
+select is(
+  (select count(*)::int from pg_constraint
+   where conrelid = 'public.interest_signups'::regclass and contype = 'f'),
+  0,
+  'interest_signups has no foreign keys'
+);
+
 -- Direct client access (REST-client attacker) -------------------------------------
 
 select pg_temp.act_as('dddddddd-0000-4000-8000-00000000000a');
@@ -165,7 +177,7 @@ reset role;
 set local role anon;
 select set_config('request.jwt.claims', '{"role": "anon"}', true);
 select throws_ok(
-  $$ insert into public.interest_signups (role, full_name, email, channel, consent_contact, locale)
+  $$ insert into public.interest_signups (role, full_name, email, heard_from, consent_contact, locale)
      values ('mentor', 'Anon', 'anon@x.test', 'x', true, 'en') $$,
   '42501', null,
   'anon cannot insert into interest_signups'
@@ -184,8 +196,10 @@ select lives_ok($$ select public.submit_interest(pg_temp.organization()) $$, 'or
 select lives_ok($$ select public.submit_interest(pg_temp.mentor()) $$, 'mentor saved');
 select lives_ok(
   $$ select public.submit_interest(pg_temp.student('{"email": "noor@student.test",
-       "university_id": null, "university_other": "Unlisted University", "region": null}')) $$,
-  'student with an unlisted university and no region saved'
+       "university_code": "other", "university_other": "Unlisted University",
+       "field_of_study": "other", "field_of_study_other": "Robotics",
+       "heard_from": "other", "heard_from_other": "A podcast"}')) $$,
+  'student with "Other" university, field of study and heard_from, each with its text, saved'
 );
 reset role;
 
@@ -194,7 +208,7 @@ select is((select count(*)::int from public.interest_signups), 4, 'four rows');
 set local role service_role;
 select lives_ok(
   $$ select public.submit_interest(pg_temp.student('{"email": "SARA@Student.test",
-       "graduation_year": "2028_or_later"}')) $$,
+       "graduation_year": "2000"}')) $$,
   'the same email in another case is accepted'
 );
 reset role;
@@ -202,11 +216,11 @@ select is((select count(*)::int from public.interest_signups), 4, 'still four ro
 select results_eq(
   $$ select submission_count, graduation_year from public.interest_signups
      where lower(email) = 'sara@student.test' $$,
-  $$ values (2, '2028_or_later') $$,
+  $$ values (2, '2000') $$,
   'the repeat updates the row and counts the submission'
 );
 select throws_ok(
-  $$ insert into public.interest_signups (role, full_name, email, expertise, experience, channel,
+  $$ insert into public.interest_signups (role, full_name, email, expertise, experience, heard_from,
        consent_contact, locale)
      values ('mentor', 'Dup', 'Mona@Mentor.TEST', 'health', '0_3', 'x', true, 'en') $$,
   '23505', null,
@@ -220,22 +234,32 @@ select throws_ok(
 )
 from (values
   (pg_temp.mentor('{"role": "admin"}'), 'unknown role'),
-  (pg_temp.student('{"field_of_study": "law"}'), 'unknown field of study'),
-  (pg_temp.student('{"graduation_year": "2025"}'), 'unknown graduation year'),
-  (pg_temp.student('{"project_stage": "done"}'), 'unknown project stage'),
+  (pg_temp.student('{"university_code": "mit"}'), 'unknown university code'),
+  (pg_temp.student('{"field_of_study": "cs_it"}'), 'old field of study'),
+  (pg_temp.student('{"graduation_year": "1999"}'), 'graduation year before 2000'),
+  (pg_temp.student('{"graduation_year": "2028_or_later"}'), 'old graduation year'),
+  (pg_temp.student('{"project_stage": "have_idea"}'), 'old project stage'),
   (pg_temp.organization('{"sector": "retail"}'), 'unknown sector'),
   (pg_temp.organization('{"looking_for": ["hire_talent", "buy_data"]}'), 'unknown looking_for item'),
   (pg_temp.organization('{"looking_for": []}'), 'empty looking_for'),
   (pg_temp.organization('{"org_size": "5000_plus"}'), 'unknown organization size'),
   (pg_temp.mentor('{"expertise": "law"}'), 'unknown expertise'),
   (pg_temp.mentor('{"experience": "30_plus"}'), 'unknown experience'),
-  (pg_temp.mentor('{"region": "mars"}'), 'unknown region'),
-  (pg_temp.mentor('{"channel": "tv"}'), 'unknown channel'),
+  (pg_temp.mentor('{"heard_from": "tv"}'), 'unknown heard_from'),
   (pg_temp.mentor('{"locale": "fr"}'), 'unknown locale'),
   (pg_temp.mentor('{"consent_contact": false}'), 'consent not given'),
-  (pg_temp.student('{"university_other": "Both Given"}'), 'student with a listed and a free-text university'),
-  (pg_temp.student('{"university_id": null}'), 'student with no university'),
-  (pg_temp.organization('{"field_of_study": "cs_it"}'), 'organization with a student field'),
+  (pg_temp.student('{"university_code": "other"}'), 'university other without its text'),
+  (pg_temp.student('{"university_other": "Both Given"}'), 'university text without other'),
+  (pg_temp.student('{"university_code": "other", "university_other": "A"}'), 'university other text too short'),
+  (pg_temp.student('{"field_of_study": "other"}'), 'field of study other without its text'),
+  (pg_temp.student('{"field_of_study_other": "Robotics"}'), 'field of study text without other'),
+  (pg_temp.student(jsonb_build_object('field_of_study', 'other', 'field_of_study_other', repeat('x', 101))), 'field of study other text too long'),
+  (pg_temp.mentor('{"heard_from": "other"}'), 'heard_from other without its text'),
+  (pg_temp.mentor('{"heard_from_other": "A podcast"}'), 'heard_from text without other'),
+  (pg_temp.mentor('{"heard_from": "other", "heard_from_other": "A"}'), 'heard_from other text too short'),
+  (pg_temp.student('{"university_code": null}'), 'student with no university'),
+  (pg_temp.organization('{"field_of_study": "cs"}'), 'organization with a student field'),
+  (pg_temp.mentor('{"university_code": "king_saud"}'), 'mentor with a student university'),
   (pg_temp.mentor('{"sector": "technology"}'), 'mentor with an organization field')
 ) as c (payload, description);
 
@@ -285,23 +309,44 @@ select results_eq(
 );
 select results_eq(
   $$ select value, count from public.get_interest_stats() where dimension = 'university' $$,
-  $$ values ('Interest University', 1::bigint), ('other', 1::bigint) $$,
-  'admin: counts by university, free text as other'
+  $$ values ('king_saud', 1::bigint), ('other', 1::bigint) $$,
+  'admin: counts by university code, free text as other'
+);
+select results_eq(
+  $$ select value, count from public.get_interest_stats() where dimension = 'field_of_study' $$,
+  $$ values ('cs', 1::bigint), ('other', 1::bigint) $$,
+  'admin: counts by field of study, free text as other'
+);
+select results_eq(
+  $$ select value, count from public.get_interest_stats() where dimension = 'graduation_year' $$,
+  $$ values ('2000', 1::bigint), ('2027_or_later', 1::bigint) $$,
+  'admin: counts by graduation year'
+);
+select results_eq(
+  $$ select value, count from public.get_interest_stats() where dimension = 'project_stage' $$,
+  $$ values ('idea', 2::bigint) $$,
+  'admin: counts by project stage'
+);
+select results_eq(
+  $$ select value, count from public.get_interest_stats() where dimension = 'heard_from' $$,
+  $$ values ('event', 1::bigint), ('friend', 1::bigint), ('linkedin', 1::bigint),
+            ('other', 1::bigint) $$,
+  'admin: counts by heard_from, free text as other'
 );
 select results_eq(
   $$ select value, count from public.get_interest_stats() where dimension = 'looking_for' $$,
   $$ values ('hire_talent', 1::bigint), ('sponsor_projects', 1::bigint) $$,
   'admin: counts per looking_for item'
 );
-select results_eq(
-  $$ select value, count from public.get_interest_stats() where dimension = 'region' $$,
-  $$ values ('eastern', 1::bigint), ('not_given', 2::bigint), ('riyadh', 1::bigint) $$,
-  'admin: counts by region, including not given'
+select is(
+  (select count(*)::int from public.get_interest_stats() where dimension in ('region', 'channel')),
+  0,
+  'admin: no region or channel dimension'
 );
 select is(
   (select count(*)::int from public.get_interest_stats()
    where value ilike '%@%' or value in ('Sara Student', 'Omar Org', 'Mona Mentor', 'Org Labs',
-     'Unlisted University')),
+     'Unlisted University', 'Robotics', 'A podcast')),
   0,
   'admin: no emails, names or free text in the stats'
 );

@@ -66,7 +66,6 @@ export type Database = {
       }
       interest_signups: {
         Row: {
-          channel: string
           consent_at: string
           consent_contact: boolean
           created_at: string
@@ -74,24 +73,25 @@ export type Database = {
           experience: string | null
           expertise: string | null
           field_of_study: string | null
+          field_of_study_other: string | null
           full_name: string
           graduation_year: string | null
+          heard_from: string
+          heard_from_other: string | null
           id: string
           locale: string
           looking_for: string[] | null
           org_size: string | null
           organization_name: string | null
           project_stage: string | null
-          region: string | null
           role: string
           sector: string | null
           submission_count: number
-          university_id: string | null
+          university_code: string | null
           university_other: string | null
           updated_at: string
         }
         Insert: {
-          channel: string
           consent_at?: string
           consent_contact: boolean
           created_at?: string
@@ -99,24 +99,25 @@ export type Database = {
           experience?: string | null
           expertise?: string | null
           field_of_study?: string | null
+          field_of_study_other?: string | null
           full_name: string
           graduation_year?: string | null
+          heard_from: string
+          heard_from_other?: string | null
           id?: string
           locale: string
           looking_for?: string[] | null
           org_size?: string | null
           organization_name?: string | null
           project_stage?: string | null
-          region?: string | null
           role: string
           sector?: string | null
           submission_count?: number
-          university_id?: string | null
+          university_code?: string | null
           university_other?: string | null
           updated_at?: string
         }
         Update: {
-          channel?: string
           consent_at?: string
           consent_contact?: boolean
           created_at?: string
@@ -124,31 +125,25 @@ export type Database = {
           experience?: string | null
           expertise?: string | null
           field_of_study?: string | null
+          field_of_study_other?: string | null
           full_name?: string
           graduation_year?: string | null
+          heard_from?: string
+          heard_from_other?: string | null
           id?: string
           locale?: string
           looking_for?: string[] | null
           org_size?: string | null
           organization_name?: string | null
           project_stage?: string | null
-          region?: string | null
           role?: string
           sector?: string | null
           submission_count?: number
-          university_id?: string | null
+          university_code?: string | null
           university_other?: string | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "interest_signups_university_id_fkey"
-            columns: ["university_id"]
-            isOneToOne: false
-            referencedRelation: "universities"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       mentor_profiles: {
         Row: {
