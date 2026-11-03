@@ -109,6 +109,14 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   server". supabase-js raises both as `AuthRetryableFetchError`; only status 0 is a network failure
   (SCRUM-13).
 
+### Hosted settings to verify
+
+- Supabase Auth, phone settings: **SMS confirmations on**, as
+  `[auth.sms] enable_confirmations = true` locally (SMS sign-up stays disabled). With SMS or email
+  autoconfirm on, a sign-up for an existing confirmed email returns `422 user_already_exists`,
+  which tells anyone with the publishable key that the account exists. Check: sign up twice with a
+  confirmed email; the second answer must be HTTP 200 with no identities (SCRUM-13).
+
 ### Planned
 
 - Branch protection on `main` (set manually in GitHub).
