@@ -1,0 +1,8 @@
+# Supabase images the CI Database job uses with Supabase CLI 2.113.0 (pinned in ci.yml), pulled
+# from GHCR (SUPABASE_INTERNAL_IMAGE_REGISTRY=ghcr.io) and cached between runs. Editing this file
+# changes the cache key. After a CLI bump, run `supabase db start`, `supabase gen types --local`
+# and `supabase test db` locally and copy the tags from `docker images`; CI fails if an image it
+# used is missing here.
+ghcr.io/supabase/postgres:17.6.1.158
+ghcr.io/supabase/postgres-meta:v0.96.8
+ghcr.io/supabase/pg_prove:3.36

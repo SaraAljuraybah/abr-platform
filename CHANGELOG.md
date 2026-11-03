@@ -173,6 +173,15 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Dependabot (npm) no longer opens semver-major updates; majors are a separate maintenance story
   after Sprint 1. `@types/node` majors stay ignored permanently to match the Node 22 runtime.
   Weekly grouped minor/patch updates and GitHub Actions updates are unchanged (SCRUM-11).
+- CI Database job no longer pulls Supabase images anonymously from `public.ecr.aws`, whose shared
+  rate limit ("toomanyrequests") failed runs unrelated to our code (SCRUM-11). It logs in to GHCR
+  with `GITHUB_TOKEN` (`SUPABASE_INTERNAL_IMAGE_REGISTRY=ghcr.io`), caches the images listed in
+  `.github/supabase-images.txt` (key: runner OS, CLI version, list hash; saved on a miss from pushes
+  to `dev` and `main`), fails if Docker has a Supabase image the list lacks, retries
+  `db start`, `test db` and `gen types` up to 3 times (`scripts/ci/retry.sh`, waits 30 s then
+  90 s, a rate limit is reported as not a code problem) and ends with a
+  `registry pulls this run: N (cache hit|miss)` notice. Both jobs run on `ubuntu-24.04` (pinned
+  before `ubuntu-latest` moves to Ubuntu 26 on 19 Oct 2026); the Database job timeout is 30 min.
 
 ### Removed
 
