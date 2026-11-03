@@ -2,6 +2,7 @@ import {
   INTEREST_EMAIL_PATTERN,
   INTEREST_LIMITS,
   INTEREST_OPTIONS,
+  OTHER,
   type InterestOption,
   type InterestOptionKey,
   type InterestRole,
@@ -12,9 +13,10 @@ export interface InterestSubmission {
   role: InterestRole;
   full_name: string;
   email: string;
-  university_id: string | null;
+  university_code: InterestOption<'university_code'> | null;
   university_other: string | null;
   field_of_study: InterestOption<'field_of_study'> | null;
+  field_of_study_other: string | null;
   graduation_year: InterestOption<'graduation_year'> | null;
   project_stage: InterestOption<'project_stage'> | null;
   organization_name: string | null;
@@ -23,8 +25,8 @@ export interface InterestSubmission {
   org_size: InterestOption<'org_size'> | null;
   expertise: InterestOption<'expertise'> | null;
   experience: InterestOption<'experience'> | null;
-  region: InterestOption<'region'> | null;
-  channel: InterestOption<'channel'>;
+  heard_from: InterestOption<'heard_from'>;
+  heard_from_other: string | null;
   consent_contact: true;
   locale: InterestOption<'locale'>;
 }
@@ -32,9 +34,10 @@ export interface InterestSubmission {
 /** Keys each role may send, besides the common ones. Anything else is refused. */
 const ROLE_KEYS: Record<InterestRole, readonly string[]> = {
   student: [
-    'university_id',
+    'university_code',
     'university_other',
     'field_of_study',
+    'field_of_study_other',
     'graduation_year',
     'project_stage',
   ],
@@ -45,15 +48,13 @@ const COMMON_KEYS = [
   'role',
   'full_name',
   'email',
-  'region',
-  'channel',
+  'heard_from',
+  'heard_from_other',
   'consent_contact',
   'locale',
 ];
 /** The spam trap travels in the same body; the handler reads it before validation. */
 export const HONEYPOT_KEY = 'website';
-
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 class Invalid extends Error {}
 
@@ -76,6 +77,18 @@ function text(key: string, value: unknown, min: number, max: number): string {
 /** Absent, null and '' all mean "not given" for optional fields. */
 const given = (value: unknown) => value !== undefined && value !== null && value !== '';
 
+/** The text that goes with "Other": required with it, refused without it. */
+function otherText(
+  key: string,
+  choice: string,
+  value: unknown,
+  limits: { min: number; max: number },
+): string | null {
+  if (choice === OTHER) return text(key, value, limits.min, limits.max);
+  if (given(value)) throw new Invalid(key);
+  return null;
+}
+
 /**
  * Validates an interest submission with the same rules as the database. Returns null when the
  * input is invalid; the caller answers 400 without echoing anything back.
@@ -93,6 +106,7 @@ export function validateInterest(input: unknown): InterestSubmission | null {
     const email = text('email', input.email, 3, INTEREST_LIMITS.email.max);
     if (!INTEREST_EMAIL_PATTERN.test(email)) throw new Invalid('email');
 
+    const heardFrom = option('heard_from', input.heard_from);
     const submission: InterestSubmission = {
       role,
       full_name: text(
@@ -102,9 +116,10 @@ export function validateInterest(input: unknown): InterestSubmission | null {
         INTEREST_LIMITS.fullName.max,
       ),
       email,
-      university_id: null,
+      university_code: null,
       university_other: null,
       field_of_study: null,
+      field_of_study_other: null,
       graduation_year: null,
       project_stage: null,
       organization_name: null,
@@ -113,30 +128,34 @@ export function validateInterest(input: unknown): InterestSubmission | null {
       org_size: null,
       expertise: null,
       experience: null,
-      region: given(input.region) ? option('region', input.region) : null,
-      channel: option('channel', input.channel),
+      heard_from: heardFrom,
+      heard_from_other: otherText(
+        'heard_from_other',
+        heardFrom,
+        input.heard_from_other,
+        INTEREST_LIMITS.heardFromOther,
+      ),
       consent_contact: true,
       locale: option('locale', input.locale),
     };
 
     if (role === 'student') {
-      const hasId = given(input.university_id);
-      const hasOther = given(input.university_other);
-      if (hasId === hasOther) throw new Invalid('university');
-      if (hasId) {
-        if (typeof input.university_id !== 'string' || !UUID.test(input.university_id)) {
-          throw new Invalid('university_id');
-        }
-        submission.university_id = input.university_id.toLowerCase();
-      } else {
-        submission.university_other = text(
-          'university_other',
-          input.university_other,
-          INTEREST_LIMITS.universityOther.min,
-          INTEREST_LIMITS.universityOther.max,
-        );
-      }
-      submission.field_of_study = option('field_of_study', input.field_of_study);
+      const university = option('university_code', input.university_code);
+      submission.university_code = university;
+      submission.university_other = otherText(
+        'university_other',
+        university,
+        input.university_other,
+        INTEREST_LIMITS.universityOther,
+      );
+      const field = option('field_of_study', input.field_of_study);
+      submission.field_of_study = field;
+      submission.field_of_study_other = otherText(
+        'field_of_study_other',
+        field,
+        input.field_of_study_other,
+        INTEREST_LIMITS.fieldOfStudyOther,
+      );
       submission.graduation_year = option('graduation_year', input.graduation_year);
       submission.project_stage = option('project_stage', input.project_stage);
     } else if (role === 'organization') {

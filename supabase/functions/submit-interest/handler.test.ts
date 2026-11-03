@@ -11,12 +11,11 @@ const student = {
   role: 'student',
   full_name: '  Sara Student ',
   email: 'sara@student.test',
-  university_id: 'aaaaaaaa-0000-4000-8000-0000000000a1',
-  field_of_study: 'cs_it',
-  graduation_year: '2027',
-  project_stage: 'have_idea',
-  region: 'riyadh',
-  channel: 'linkedin',
+  university_code: 'king_saud',
+  field_of_study: 'cs',
+  graduation_year: '2027_or_later',
+  project_stage: 'idea',
+  heard_from: 'linkedin',
   consent_contact: true,
   locale: 'ar',
   website: '',
@@ -29,7 +28,7 @@ const organization = {
   sector: 'technology',
   looking_for: ['hire_talent', 'offer_mentoring'],
   org_size: '51_500',
-  channel: 'event',
+  heard_from: 'event',
   consent_contact: true,
   locale: 'en',
 };
@@ -39,8 +38,8 @@ const mentor = {
   email: 'mona@mentor.test',
   expertise: 'software_data',
   experience: '8_15',
-  region: '',
-  channel: 'friend',
+  heard_from: 'friend',
+  heard_from_other: '',
   consent_contact: true,
   locale: 'en',
 };
@@ -103,30 +102,62 @@ describe('submit-interest: validation', () => {
       looking_for: null,
       expertise: null,
     });
-    expect(validateInterest(mentor)?.region).toBeNull();
+    expect(validateInterest(mentor)?.heard_from_other).toBeNull();
   });
 
-  it('accepts a student with an unlisted university', () => {
-    const body = { ...student, university_id: '', university_other: 'Unlisted University' };
-    expect(validateInterest(body)).toMatchObject({
-      university_id: null,
-      university_other: 'Unlisted University',
-    });
+  it.each([
+    ['university', { university_code: 'other', university_other: ' Unlisted University ' }],
+    ['field of study', { field_of_study: 'other', field_of_study_other: ' Robotics ' }],
+    ['heard from', { heard_from: 'other', heard_from_other: ' A podcast ' }],
+  ])('accepts "Other" %s with its text, trimmed', (_name, changes) => {
+    const result = validateInterest({ ...student, ...changes });
+    const [key, value] = Object.entries(changes)[1] ?? [];
+    expect(result).not.toBeNull();
+    expect(result?.[key as keyof typeof result]).toBe(value?.trim());
   });
 
   it.each([
     ['role admin', { ...mentor, role: 'admin' }],
-    ['unknown option', { ...student, field_of_study: 'law' }],
-    ['unknown region', { ...mentor, region: 'mars' }],
-    ['unknown channel', { ...mentor, channel: 'tv' }],
+    ['unknown option', { ...student, field_of_study: 'cs_it' }],
+    ['region (removed)', { ...mentor, region: 'riyadh' }],
+    ['unknown heard_from', { ...mentor, heard_from: 'tv' }],
+    ['the old channel key', { ...mentor, channel: 'x' }],
+    ['heard_from other with empty text', { ...mentor, heard_from: 'other' }],
+    ['heard_from other with blank text', { ...mentor, heard_from: 'other', heard_from_other: ' ' }],
+    [
+      'heard_from other text too long',
+      { ...mentor, heard_from: 'other', heard_from_other: 'x'.repeat(101) },
+    ],
+    ['heard_from text without other', { ...mentor, heard_from_other: 'A podcast' }],
+    ['university other without text', { ...student, university_code: 'other' }],
+    [
+      'university other text too short',
+      { ...student, university_code: 'other', university_other: 'A' },
+    ],
+    ['university text without other', { ...student, university_other: 'Another' }],
+    ['field other without text', { ...student, field_of_study: 'other' }],
+    [
+      'field other text too long',
+      { ...student, field_of_study: 'other', field_of_study_other: 'x'.repeat(101) },
+    ],
+    ['field text without other', { ...student, field_of_study_other: 'Robotics' }],
+    ['unknown university', { ...student, university_code: 'mit' }],
+    [
+      'a university uuid (old shape)',
+      { ...student, university_code: 'aaaaaaaa-0000-4000-8000-0000000000a1' },
+    ],
+    [
+      'the old university_id key',
+      { ...student, university_id: 'aaaaaaaa-0000-4000-8000-0000000000a1' },
+    ],
+    ['graduation year outside the list', { ...student, graduation_year: '1999' }],
+    ['old project stage', { ...student, project_stage: 'have_idea' }],
     ['empty looking_for', { ...organization, looking_for: [] }],
     ['unknown looking_for item', { ...organization, looking_for: ['hire_talent', 'buy_data'] }],
     ['repeated looking_for item', { ...organization, looking_for: ['hire_talent', 'hire_talent'] }],
     ['consent not given', { ...mentor, consent_contact: false }],
     ['consent as a string', { ...mentor, consent_contact: 'true' }],
-    ['both university fields', { ...student, university_other: 'Another' }],
-    ['no university', { ...student, university_id: '' }],
-    ['bad university id', { ...student, university_id: 'not-a-uuid' }],
+    ['no university', { ...student, university_code: '' }],
     ['another role’s field', { ...mentor, sector: 'technology' }],
     ['an unknown key', { ...mentor, phone: '0500000000' }],
     ['a national id', { ...student, national_id: '1000000000' }],

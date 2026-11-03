@@ -1,3 +1,4 @@
+import { INTEREST_OPTIONS, INTEREST_UNIVERSITY_GROUPS } from '@shared/interest-options';
 import { validateInterest } from '@shared/interest-validate';
 import { FunctionsFetchError, FunctionsHttpError } from '@supabase/supabase-js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -13,12 +14,6 @@ import { routes } from '@/routes/routes';
 import { axeViolations } from '@/test/axe';
 import { signedOut } from '@/test/render-route';
 
-const KSU = '0a7f7f0e-5d2c-4c8e-9b1a-000000000001';
-const UNIVERSITIES = [
-  { id: KSU, name_ar: 'جامعة الملك سعود', name_en: 'King Saud University' },
-  { id: '0a7f7f0e-5d2c-4c8e-9b1a-000000000002', name_ar: 'جامعة الفيصل', name_en: 'Alfaisal' },
-];
-
 const supabase = vi.hoisted(() => ({
   from: vi.fn(),
   functions: { invoke: vi.fn() },
@@ -28,12 +23,6 @@ vi.mock('@/lib/supabase', () => ({ supabase }));
 const copy = { en, ar } as const;
 type Copy = (typeof copy)[Language];
 const AXE_TIMEOUT = 60_000;
-
-function mockUniversities() {
-  supabase.from.mockImplementation(() => ({
-    select: () => ({ eq: () => Promise.resolve({ data: UNIVERSITIES, error: null }) }),
-  }));
-}
 
 async function renderForm(path = '/forms/interest') {
   const router = createMemoryRouter(routes, { initialEntries: [path] });
@@ -61,6 +50,13 @@ const numbered = () =>
 // Label text includes the decorative number badge; the accessible name does not.
 const field = (label: string) =>
   screen.getByLabelText(label, { normalizer: (text) => text.replace(/^\d{2}/, '').trim() });
+const queryField = (label: string) =>
+  screen.queryByLabelText(label, { normalizer: (text) => text.replace(/^\d{2}/, '').trim() });
+
+const optionTexts = (select: HTMLElement) =>
+  within(select)
+    .getAllByRole('option')
+    .map((option) => option.textContent);
 
 async function enter(user: User, element: HTMLElement, text: string) {
   await user.click(element);
@@ -79,25 +75,40 @@ async function fillCommon(user: User, t: Copy, email: string) {
   await enter(user, field(f.email), email);
 }
 
-async function fillEnd(user: User, t: Copy) {
+async function fillEnd(user: User, t: Copy, { heardOther = false } = {}) {
   const f = t.forms.interest;
-  await user.selectOptions(field(f.region), 'riyadh');
-  await user.selectOptions(field(f.channel), 'linkedin');
+  await user.selectOptions(field(f.heardFrom), heardOther ? 'other' : 'linkedin');
+  if (heardOther) await enter(user, field(f.heardFromOther), 'A podcast');
   await user.click(consentBox());
 }
 
-async function fillStudent(user: User, t: Copy, { unlisted = false } = {}) {
+interface StudentChoices {
+  universityOther?: boolean;
+  fieldOther?: boolean;
+  heardOther?: boolean;
+  /** Choose "Other" but leave its text empty. */
+  blank?: 'universityOther' | 'fieldOfStudyOther' | 'heardFromOther';
+}
+
+async function fillStudent(user: User, t: Copy, choices: StudentChoices = {}) {
   const f = t.forms.interest;
+  const other = (flag: boolean | undefined, key: StudentChoices['blank']) =>
+    flag === true || choices.blank === key;
   await fillCommon(user, t, 'sara@example.com');
-  await waitFor(() => {
-    expect(within(field(f.university)).getAllByRole('option').length).toBeGreaterThan(2);
-  });
-  await user.selectOptions(field(f.university), unlisted ? 'not_listed' : KSU);
-  if (unlisted) await enter(user, field(f.universityOther), 'Unlisted University');
-  await user.selectOptions(field(f.fieldOfStudy), 'cs_it');
-  await user.click(screen.getByRole('radio', { name: f.options.graduation_year['2027'] }));
-  await user.click(screen.getByRole('radio', { name: f.options.project_stage.have_idea }));
-  await fillEnd(user, t);
+  const universityOther = other(choices.universityOther, 'universityOther');
+  await user.selectOptions(field(f.university), universityOther ? 'other' : 'king_saud');
+  if (choices.universityOther) await enter(user, field(f.universityOther), 'Unlisted University');
+  const fieldOther = other(choices.fieldOther, 'fieldOfStudyOther');
+  await user.selectOptions(field(f.fieldOfStudy), fieldOther ? 'other' : 'cs');
+  if (choices.fieldOther) await enter(user, field(f.fieldOfStudyOther), 'Robotics');
+  await user.selectOptions(field(f.graduationYear), '2027_or_later');
+  await user.click(screen.getByRole('radio', { name: f.options.project_stage.idea }));
+  if (choices.blank === 'heardFromOther') {
+    await user.selectOptions(field(f.heardFrom), 'other');
+    await user.click(consentBox());
+  } else {
+    await fillEnd(user, t, { heardOther: choices.heardOther });
+  }
 }
 
 async function fillOrganization(user: User, t: Copy) {
@@ -129,7 +140,6 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
-  mockUniversities();
   supabase.functions.invoke.mockResolvedValue({ data: { ok: true }, error: null });
 });
 
@@ -140,6 +150,7 @@ afterEach(async () => {
 describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
   const t = copy[language];
   const f = t.forms.interest;
+  const o = f.options;
 
   beforeEach(async () => {
     await changeLanguage(language);
@@ -157,8 +168,7 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
       `04${f.fieldOfStudy}`,
       `05${f.graduationYear}`,
       `06${f.projectStage}`,
-      `07${f.region}`,
-      `08${f.channel}`,
+      `07${f.heardFrom}`,
     ]);
     expect(field(f.email)).toHaveAttribute('dir', 'ltr');
     expect(field(f.email)).toHaveAccessibleDescription(f.emailHint);
@@ -166,8 +176,11 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
     const panel = screen.getByRole('complementary');
     expect(within(panel).getByText(f.panel.statement).tagName).toBe('P');
     expect(within(panel).queryByRole('list')).toBeNull();
-    // No phone, student ID or national ID field.
+    // No phone, student ID, national ID or region field.
     expect(screen.queryByRole('textbox', { name: /phone|هاتف|جوال|ID|هوية/i })).toBeNull();
+    expect(screen.queryByRole('combobox', { name: /region|المنطقة/i })).toBeNull();
+    // The form's own university list: it never reads the sign-up universities table.
+    expect(supabase.from).not.toHaveBeenCalled();
   });
 
   it('organization (?role=organization): its fields, numbered', async () => {
@@ -182,8 +195,7 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
       `04${f.sector}`,
       `05${f.lookingFor}`,
       `06${f.orgSize}`,
-      `07${f.region}`,
-      `08${f.channel}`,
+      `07${f.heardFrom}`,
     ]);
     expect(screen.getAllByRole('checkbox')).toHaveLength(5); // four needs + consent
   });
@@ -195,8 +207,7 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
       `02${f.email}`,
       `03${f.expertise}`,
       `04${f.experience}`,
-      `05${f.region}`,
-      `06${f.channel}`,
+      `05${f.heardFrom}`,
     ]);
   });
 
@@ -210,26 +221,114 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
     },
   );
 
-  it('"My university isn\'t listed" reveals University name and renumbers', async () => {
-    const user = setupUser();
+  it('university: public and private groups, Other last', async () => {
     await renderForm();
-    await waitFor(() => {
-      expect(
-        within(field(f.university)).getByRole('option', { name: f.universityNotListed }),
-      ).toBeInTheDocument();
-    });
-    // It is the last option.
-    expect(within(field(f.university)).getAllByRole('option').at(-1)).toHaveTextContent(
-      f.universityNotListed,
-    );
-    await user.selectOptions(field(f.university), 'not_listed');
-    expect(numbered().slice(2, 6)).toEqual([
-      `03${f.university}`,
-      `04${f.universityOther}`,
-      `05${f.fieldOfStudy}`,
-      `06${f.graduationYear}`,
+    const select = field(f.university);
+    const groups = Array.from(select.querySelectorAll('optgroup'));
+    expect(groups.map((group) => group.label)).toEqual([
+      f.universityGroups.public,
+      f.universityGroups.private,
     ]);
-    expect(field(f.universityOther)).toHaveAttribute('maxlength', '150');
+    const labels = (codes: readonly string[]) =>
+      codes.map((code) => o.university_code[code as keyof typeof o.university_code]);
+    expect(
+      within(groups[0] as HTMLElement)
+        .getAllByRole('option')
+        .map((x) => x.textContent),
+    ).toEqual(labels(INTEREST_UNIVERSITY_GROUPS.public));
+    expect(
+      within(groups[1] as HTMLElement)
+        .getAllByRole('option')
+        .map((x) => x.textContent),
+    ).toEqual(labels(INTEREST_UNIVERSITY_GROUPS.private));
+    expect(optionTexts(select).at(-1)).toBe(o.university_code.other);
+  });
+
+  it('field of study: the tech list, Other last', async () => {
+    await renderForm();
+    expect(optionTexts(field(f.fieldOfStudy))).toEqual([
+      t.forms.common.selectPlaceholder,
+      ...INTEREST_OPTIONS.field_of_study.map((code) => o.field_of_study[code]),
+    ]);
+  });
+
+  it('graduation year: "2027 or later" first, then 2026 down to 2000', async () => {
+    await renderForm();
+    const years = Array.from({ length: 27 }, (_, i) => String(2026 - i));
+    expect(optionTexts(field(f.graduationYear))).toEqual([
+      t.forms.common.selectPlaceholder,
+      o.graduation_year['2027_or_later'],
+      ...years,
+    ]);
+  });
+
+  it('project stage: five options as a vertical radio list', async () => {
+    await renderForm();
+    const group = screen.getByRole('radiogroup', { name: f.projectStage });
+    expect(group).toHaveAttribute('aria-orientation', 'vertical');
+    expect(
+      within(group)
+        .getAllByRole('radio')
+        .map((radio) => radio.textContent),
+    ).toEqual([
+      o.project_stage.not_started,
+      o.project_stage.idea,
+      o.project_stage.in_progress,
+      o.project_stage.finished,
+      o.project_stage.business,
+    ]);
+  });
+
+  it.each([
+    ['university', 'universityOther', 150, 2],
+    ['fieldOfStudy', 'fieldOfStudyOther', 100, 3],
+    ['heardFrom', 'heardFromOther', 100, 6],
+  ] as const)(
+    'Other on %s reveals %s right after it and renumbers',
+    async (choice, text, max, at) => {
+      const user = setupUser();
+      await renderForm();
+      expect(queryField(f[text])).toBeNull();
+      await user.selectOptions(field(f[choice]), 'other');
+      expect(numbered()[at + 1]).toBe(`${String(at + 2).padStart(2, '0')}${f[text]}`);
+      expect(numbered()).toHaveLength(8);
+      expect(field(f[text])).toHaveAttribute('maxlength', String(max));
+      // Choosing something else hides it again.
+      const other = { university: 'king_saud', fieldOfStudy: 'cs', heardFrom: 'x' }[choice];
+      await user.selectOptions(field(f[choice]), other);
+      expect(queryField(f[text])).toBeNull();
+      expect(numbered()).toHaveLength(7);
+    },
+  );
+
+  it.each(['universityOther', 'fieldOfStudyOther', 'heardFromOther'] as const)(
+    'Other without its text: %s is required and nothing is sent',
+    async (blank) => {
+      const user = setupUser();
+      await renderForm();
+      await fillStudent(user, t, { blank });
+      await submit(user, t);
+      await waitFor(() => {
+        expect(field(f[blank])).toHaveAccessibleDescription(
+          expect.stringContaining(t.validation.required),
+        );
+      });
+      expect(field(f[blank])).toHaveAttribute('aria-invalid', 'true');
+      expect(supabase.functions.invoke).not.toHaveBeenCalled();
+    },
+  );
+
+  it('Other text too short shows the length message', async () => {
+    const user = setupUser();
+    await renderForm('/forms/interest?role=mentor');
+    await fillMentor(user, t);
+    await user.selectOptions(field(f.heardFrom), 'other');
+    await enter(user, field(f.heardFromOther), 'A');
+    await submit(user, t);
+    expect(
+      await screen.findByText(t.validation.tooShort.replace('{{min}}', '2')),
+    ).toBeInTheDocument();
+    expect(supabase.functions.invoke).not.toHaveBeenCalled();
   });
 
   it('empty submit: required errors, consent error, nothing sent', async () => {
@@ -238,8 +337,6 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
     await submit(user, t);
     expect((await screen.findAllByText(t.validation.required)).length).toBeGreaterThanOrEqual(6);
     expect(screen.getByText(f.consentRequired)).toBeInTheDocument();
-    // Region is the only optional field.
-    expect(field(f.region)).not.toHaveAttribute('aria-invalid');
     expect(supabase.functions.invoke).not.toHaveBeenCalled();
   });
 
@@ -247,7 +344,7 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
     const user = setupUser();
     await renderForm('/forms/interest?role=organization');
     await fillOrganization(user, t);
-    await user.click(screen.getByRole('checkbox', { name: f.options.looking_for.hire_talent }));
+    await user.click(screen.getByRole('checkbox', { name: o.looking_for.hire_talent }));
     await submit(user, t);
     expect(await screen.findByText(t.forms.common.chooseAtLeastOne)).toBeInTheDocument();
     expect(supabase.functions.invoke).not.toHaveBeenCalled();
@@ -287,21 +384,49 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
       expect(supabase.functions.invoke).toHaveBeenCalledTimes(1);
       expect(supabase.functions.invoke.mock.calls[0]?.[0]).toBe('submit-interest');
       const payload = sentPayload();
-      expect(payload).toMatchObject({ role, locale: language, consent_contact: true, website: '' });
+      expect(payload).toMatchObject({
+        role,
+        locale: language,
+        consent_contact: true,
+        website: '',
+        heard_from: 'linkedin',
+        heard_from_other: null,
+      });
+      expect(payload).not.toHaveProperty('region');
       // The shared validator (same as the function) accepts exactly what the form sends.
       expect(validateInterest(payload)).not.toBeNull();
     },
   );
 
-  it('student with an unlisted university sends the free-text name only', async () => {
+  it('student: codes, and each "Other" text only with Other', async () => {
     const user = setupUser();
     await renderForm();
-    await fillStudent(user, t, { unlisted: true });
+    await fillStudent(user, t);
     await submit(user, t);
     await screen.findByRole('heading', { level: 1, name: f.success.title });
     expect(sentPayload()).toMatchObject({
-      university_id: null,
+      university_code: 'king_saud',
+      university_other: null,
+      field_of_study: 'cs',
+      field_of_study_other: null,
+      graduation_year: '2027_or_later',
+      project_stage: 'idea',
+    });
+  });
+
+  it('student with Other everywhere sends the three texts', async () => {
+    const user = setupUser();
+    await renderForm();
+    await fillStudent(user, t, { universityOther: true, fieldOther: true, heardOther: true });
+    await submit(user, t);
+    await screen.findByRole('heading', { level: 1, name: f.success.title });
+    expect(sentPayload()).toMatchObject({
+      university_code: 'other',
       university_other: 'Unlisted University',
+      field_of_study: 'other',
+      field_of_study_other: 'Robotics',
+      heard_from: 'other',
+      heard_from_other: 'A podcast',
     });
     expect(validateInterest(sentPayload())).not.toBeNull();
   });
@@ -336,11 +461,15 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
   });
 
   it(
-    'axe: every role, validation errors and the success screen have no violations',
+    'axe: every role, the "Other" fields, validation errors and the success screen',
     async () => {
       const user = setupUser();
       await renderForm();
       expect(await axeViolations()).toEqual([]);
+      await user.selectOptions(field(f.university), 'other');
+      await user.selectOptions(field(f.fieldOfStudy), 'other');
+      await user.selectOptions(field(f.heardFrom), 'other');
+      await user.click(screen.getByRole('radio', { name: o.project_stage.finished }));
       await submit(user, t);
       await screen.findByText(f.consentRequired);
       expect(await axeViolations()).toEqual([]);
@@ -357,6 +486,7 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
       );
       expect(await axeViolations()).toEqual([]);
       await fillMentor(user, t);
+      await user.selectOptions(field(f.heardFrom), 'x');
       await submit(user, t);
       await screen.findByRole('heading', { level: 1, name: f.success.title });
       expect(await axeViolations()).toEqual([]);

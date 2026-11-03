@@ -5,11 +5,55 @@
  * Values are stable codes; labels live in src/locales under forms.interest.options.
  * Plain TypeScript with no imports, so Deno and Vite can both load it.
  */
+/** University codes for this form, by group (not public.universities, which is for sign-up). */
+export const INTEREST_UNIVERSITY_GROUPS = {
+  public: ['king_saud', 'imam', 'pnu', 'ksau_hs', 'seu', 'naif'],
+  private: ['psu', 'alfaisal', 'yamamah', 'dau', 'reu', 'maarefa', 'aou'],
+} as const;
+
+/** The option that reveals a required free-text field. */
+export const OTHER = 'other';
+
 export const INTEREST_OPTIONS = {
   role: ['student', 'organization', 'mentor'],
-  field_of_study: ['cs_it', 'engineering', 'business', 'health', 'design', 'other'],
-  graduation_year: ['2026', '2027', '2028_or_later'],
-  project_stage: ['have_project', 'have_idea', 'not_yet'],
+  university_code: [
+    ...INTEREST_UNIVERSITY_GROUPS.public,
+    ...INTEREST_UNIVERSITY_GROUPS.private,
+    'other',
+  ],
+  field_of_study: ['cs', 'se', 'it', 'is', 'cyber', 'ai', 'data', 'ce', 'other'],
+  // Newest first; years are shown as digits, only 2027_or_later has a label.
+  graduation_year: [
+    '2027_or_later',
+    '2026',
+    '2025',
+    '2024',
+    '2023',
+    '2022',
+    '2021',
+    '2020',
+    '2019',
+    '2018',
+    '2017',
+    '2016',
+    '2015',
+    '2014',
+    '2013',
+    '2012',
+    '2011',
+    '2010',
+    '2009',
+    '2008',
+    '2007',
+    '2006',
+    '2005',
+    '2004',
+    '2003',
+    '2002',
+    '2001',
+    '2000',
+  ],
+  project_stage: ['not_started', 'idea', 'in_progress', 'finished', 'business'],
   sector: [
     'technology',
     'healthcare',
@@ -31,8 +75,7 @@ export const INTEREST_OPTIONS = {
     'other',
   ],
   experience: ['0_3', '4_7', '8_15', '15_plus'],
-  region: ['riyadh', 'makkah', 'eastern', 'other'],
-  channel: ['x', 'linkedin', 'instagram', 'friend', 'university', 'event', 'other'],
+  heard_from: ['x', 'linkedin', 'instagram', 'friend', 'university', 'event', 'other'],
   locale: ['en', 'ar'],
 } as const;
 
@@ -45,6 +88,8 @@ export const INTEREST_LIMITS = {
   fullName: { min: 2, max: 120 },
   email: { max: 254 },
   universityOther: { min: 2, max: 150 },
+  fieldOfStudyOther: { min: 2, max: 100 },
+  heardFromOther: { min: 2, max: 100 },
   organizationName: { min: 2, max: 150 },
 } as const;
 

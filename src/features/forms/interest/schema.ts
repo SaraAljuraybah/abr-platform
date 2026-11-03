@@ -1,19 +1,17 @@
-import { INTEREST_LIMITS, INTEREST_OPTIONS } from '@shared/interest-options';
+import { INTEREST_LIMITS, INTEREST_OPTIONS, OTHER } from '@shared/interest-options';
 import type { InterestSubmission } from '@shared/interest-validate';
 import { z } from '@/lib/zod-i18n';
 import type { FormRole } from '../roles';
-
-/** Last university option: reveals the free-text "University name" field. */
-export const UNIVERSITY_NOT_LISTED = 'not_listed';
 
 /** Flat form state: every role's fields live in one form so switching role keeps what was typed. */
 export interface InterestFormValues {
   role: FormRole;
   fullName: string;
   email: string;
-  universityId: string;
+  universityCode: string;
   universityOther: string;
   fieldOfStudy: string;
+  fieldOfStudyOther: string;
   graduationYear: string;
   projectStage: string;
   organizationName: string;
@@ -22,8 +20,8 @@ export interface InterestFormValues {
   orgSize: string;
   expertise: string;
   experience: string;
-  region: string;
-  channel: string;
+  heardFrom: string;
+  heardFromOther: string;
   consent: boolean;
   /** Spam trap. Not in the schema, so it never reaches the submitted values. */
   website: string;
@@ -33,9 +31,10 @@ export const interestDefaults = (role: FormRole): InterestFormValues => ({
   role,
   fullName: '',
   email: '',
-  universityId: '',
+  universityCode: '',
   universityOther: '',
   fieldOfStudy: '',
+  fieldOfStudyOther: '',
   graduationYear: '',
   projectStage: '',
   organizationName: '',
@@ -44,21 +43,20 @@ export const interestDefaults = (role: FormRole): InterestFormValues => ({
   orgSize: '',
   expertise: '',
   experience: '',
-  region: '',
-  channel: '',
+  heardFrom: '',
+  heardFromOther: '',
   consent: false,
   website: '',
 });
 
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const { fullName, organizationName, universityOther, email } = INTEREST_LIMITS;
+const { fullName, organizationName, email } = INTEREST_LIMITS;
 
 // Same rules as the Edge Function and the CHECK constraints (shared option lists and limits).
 const common = z.object({
   fullName: z.string().trim().min(1).min(fullName.min).max(fullName.max),
   email: z.string().trim().min(1).max(email.max).pipe(z.email()),
-  region: z.union([z.literal(''), z.enum(INTEREST_OPTIONS.region)]),
-  channel: z.enum(INTEREST_OPTIONS.channel),
+  heardFrom: z.enum(INTEREST_OPTIONS.heard_from),
+  heardFromOther: z.string(),
   consent: z.literal(true),
 });
 
@@ -66,9 +64,10 @@ export const interestSchema = z
   .discriminatedUnion('role', [
     common.extend({
       role: z.literal('student'),
-      universityId: z.string().min(1),
+      universityCode: z.enum(INTEREST_OPTIONS.university_code),
       universityOther: z.string(),
       fieldOfStudy: z.enum(INTEREST_OPTIONS.field_of_study),
+      fieldOfStudyOther: z.string(),
       graduationYear: z.enum(INTEREST_OPTIONS.graduation_year),
       projectStage: z.enum(INTEREST_OPTIONS.project_stage),
     }),
@@ -91,25 +90,40 @@ export const interestSchema = z
     }),
   ])
   .superRefine((values, ctx) => {
-    if (values.role !== 'student') return;
-    if (values.universityId === UNIVERSITY_NOT_LISTED) {
-      const length = values.universityOther.trim().length;
-      // Messages are i18n keys, as the error map returns (limits travel after the colon).
+    // "Other" requires its text. Messages are i18n keys, as the error map returns (limits travel
+    // after the colon).
+    const requireText = (
+      path: 'universityOther' | 'fieldOfStudyOther' | 'heardFromOther',
+      value: string,
+      { min, max }: { min: number; max: number },
+    ) => {
+      const length = value.trim().length;
       const message =
         length === 0
           ? 'validation.required'
-          : length < universityOther.min
-            ? `validation.tooShort:${String(universityOther.min)}`
-            : length > universityOther.max
-              ? `validation.tooLong:${String(universityOther.max)}`
+          : length < min
+            ? `validation.tooShort:${String(min)}`
+            : length > max
+              ? `validation.tooLong:${String(max)}`
               : null;
-      if (message) ctx.addIssue({ code: 'custom', path: ['universityOther'], message });
-    } else if (!UUID.test(values.universityId)) {
-      ctx.addIssue({ code: 'custom', path: ['universityId'], message: 'validation.invalid' });
+      if (message) ctx.addIssue({ code: 'custom', path: [path], message });
+    };
+    if (values.heardFrom === OTHER) {
+      requireText('heardFromOther', values.heardFromOther, INTEREST_LIMITS.heardFromOther);
+    }
+    if (values.role !== 'student') return;
+    if (values.universityCode === OTHER) {
+      requireText('universityOther', values.universityOther, INTEREST_LIMITS.universityOther);
+    }
+    if (values.fieldOfStudy === OTHER) {
+      requireText('fieldOfStudyOther', values.fieldOfStudyOther, INTEREST_LIMITS.fieldOfStudyOther);
     }
   });
 
 export type InterestValues = z.infer<typeof interestSchema>;
+
+/** The text that goes with "Other", or null (the function refuses text without "Other"). */
+const otherText = (choice: string, text: string) => (choice === OTHER ? text.trim() : null);
 
 /** The Edge Function payload: exactly the keys its validator accepts for the role. */
 export function toSubmission(
@@ -120,14 +134,15 @@ export function toSubmission(
     role: values.role,
     full_name: values.fullName.trim(),
     email: values.email.trim(),
-    region: values.region === '' ? null : values.region,
-    channel: values.channel,
+    heard_from: values.heardFrom,
+    heard_from_other: otherText(values.heardFrom, values.heardFromOther),
     consent_contact: true as const,
     locale,
     website: '',
-    university_id: null,
+    university_code: null,
     university_other: null,
     field_of_study: null,
+    field_of_study_other: null,
     graduation_year: null,
     project_stage: null,
     organization_name: null,
@@ -138,17 +153,16 @@ export function toSubmission(
     experience: null,
   };
   switch (values.role) {
-    case 'student': {
-      const unlisted = values.universityId === UNIVERSITY_NOT_LISTED;
+    case 'student':
       return {
         ...base,
-        university_id: unlisted ? null : values.universityId,
-        university_other: unlisted ? values.universityOther.trim() : null,
+        university_code: values.universityCode,
+        university_other: otherText(values.universityCode, values.universityOther),
         field_of_study: values.fieldOfStudy,
+        field_of_study_other: otherText(values.fieldOfStudy, values.fieldOfStudyOther),
         graduation_year: values.graduationYear,
         project_stage: values.projectStage,
       };
-    }
     case 'organization':
       return {
         ...base,
@@ -166,9 +180,10 @@ export function toSubmission(
 export function payloadFor(submission: InterestSubmission & { website: string }) {
   const keep: Record<FormRole, readonly (keyof InterestSubmission)[]> = {
     student: [
-      'university_id',
+      'university_code',
       'university_other',
       'field_of_study',
+      'field_of_study_other',
       'graduation_year',
       'project_stage',
     ],
@@ -179,8 +194,8 @@ export function payloadFor(submission: InterestSubmission & { website: string })
     'role',
     'full_name',
     'email',
-    'region',
-    'channel',
+    'heard_from',
+    'heard_from_other',
     'consent_contact',
     'locale',
   ] as const;

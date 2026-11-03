@@ -289,10 +289,14 @@
       "email": "Email",
       "emailHint": "We'll only use it to contact you about ABR.",
       "university": "University",
-      "universityNotListed": "My university isn't listed",
+      "universityGroups": {
+        "public": "Public universities",
+        "private": "Private universities"
+      },
       "universityOther": "University name",
       "fieldOfStudy": "Field of study",
-      "graduationYear": "Graduation year",
+      "fieldOfStudyOther": "Your field of study",
+      "graduationYear": "Graduation year (or expected)",
       "projectStage": "Project stage",
       "organizationName": "Organization name",
       "sector": "Sector",
@@ -300,8 +304,8 @@
       "orgSize": "Number of employees",
       "expertise": "Field of expertise",
       "experience": "Years of experience",
-      "region": "Region (optional)",
-      "channel": "How did you hear about us?",
+      "heardFrom": "How did you hear about us?",
+      "heardFromOther": "Tell us where",
       "consent": "Contact me about ABR's launch. I've read the <privacyLink>privacy notice</privacyLink>.",
       "consentRequired": "Agree to be contacted so we can register your interest.",
       "submit": "Register my interest",
@@ -312,23 +316,42 @@
         "home": "Back to home"
       },
       "options": {
+        "university_code": {
+          "king_saud": "King Saud University",
+          "imam": "Imam Mohammad Ibn Saud Islamic University",
+          "pnu": "Princess Nourah bint Abdulrahman University",
+          "ksau_hs": "King Saud bin Abdulaziz University for Health Sciences",
+          "seu": "Saudi Electronic University",
+          "naif": "Naif Arab University for Security Sciences",
+          "psu": "Prince Sultan University",
+          "alfaisal": "Alfaisal University",
+          "yamamah": "Al Yamamah University",
+          "dau": "Dar Al Uloom University",
+          "reu": "Riyadh Elm University",
+          "maarefa": "AlMaarefa University",
+          "aou": "Arab Open University",
+          "other": "Other (write it)"
+        },
         "field_of_study": {
-          "cs_it": "Computer science & IT",
-          "engineering": "Engineering",
-          "business": "Business",
-          "health": "Health sciences",
-          "design": "Design",
-          "other": "Other"
+          "cs": "Computer Science",
+          "se": "Software Engineering",
+          "it": "Information Technology",
+          "is": "Information Systems",
+          "cyber": "Cybersecurity",
+          "ai": "Artificial Intelligence",
+          "data": "Data Science",
+          "ce": "Computer Engineering",
+          "other": "Other (write it)"
         },
         "graduation_year": {
-          "2026": "2026",
-          "2027": "2027",
-          "2028_or_later": "2028 or later"
+          "2027_or_later": "2027 or later"
         },
         "project_stage": {
-          "have_project": "I have a project",
-          "have_idea": "I have an idea",
-          "not_yet": "Not yet"
+          "not_started": "I haven't started yet",
+          "idea": "I have a graduation project idea",
+          "in_progress": "I'm working on my graduation project now",
+          "finished": "I finished my graduation project",
+          "business": "I turned my project into a business"
         },
         "sector": {
           "technology": "Technology",
@@ -365,13 +388,7 @@
           "8_15": "8–15",
           "15_plus": "15+"
         },
-        "region": {
-          "riyadh": "Riyadh",
-          "makkah": "Makkah",
-          "eastern": "Eastern Province",
-          "other": "Other"
-        },
-        "channel": {
+        "heard_from": {
           "x": "X (Twitter)",
           "linkedin": "LinkedIn",
           "instagram": "Instagram",

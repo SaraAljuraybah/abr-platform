@@ -2,20 +2,19 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   INTEREST_LIMITS,
   INTEREST_OPTIONS,
+  INTEREST_UNIVERSITY_GROUPS,
   type InterestOptionKey,
+  OTHER,
 } from '@shared/interest-options';
 import { useState } from 'react';
 import { Controller, type Resolver, useForm, useWatch } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
-import { Button } from '@/components/ui/button';
-import { Callout } from '@/components/ui/callout';
 import { CheckboxField, CheckboxGroup } from '@/components/ui/checkbox-group';
 import { ChoiceGroup } from '@/components/ui/choice-group';
 import { CharacterCount, NumberedLabel } from '@/components/ui/field-number';
 import { SelectField } from '@/components/ui/select-field';
 import { TextField } from '@/components/ui/text-field';
-import { useUniversities } from '@/features/auth/api';
 import { useDirection } from '@/hooks/useDirection';
 import { validationMessage } from '@/lib/zod-i18n';
 import { FormShell } from '../components/FormShell';
@@ -32,15 +31,15 @@ import {
   type InterestValues,
   payloadFor,
   toSubmission,
-  UNIVERSITY_NOT_LISTED,
 } from './schema';
 
 type FieldKey =
   | 'fullName'
   | 'email'
-  | 'universityId'
+  | 'universityCode'
   | 'universityOther'
   | 'fieldOfStudy'
+  | 'fieldOfStudyOther'
   | 'graduationYear'
   | 'projectStage'
   | 'organizationName'
@@ -49,23 +48,46 @@ type FieldKey =
   | 'orgSize'
   | 'expertise'
   | 'experience'
-  | 'region'
-  | 'channel';
+  | 'heardFrom'
+  | 'heardFromOther';
 
-/** The numbered fields per role, in order (the free-text university only when chosen). */
-function visibleFields(role: FormRole, universityId: string): FieldKey[] {
+type OtherTextKey = 'universityOther' | 'fieldOfStudyOther' | 'heardFromOther';
+
+/** Each "Other (write it)" text field, shown right after the choice that reveals it. */
+const OTHER_TEXT: Record<OtherTextKey, { max: number }> = {
+  universityOther: INTEREST_LIMITS.universityOther,
+  fieldOfStudyOther: INTEREST_LIMITS.fieldOfStudyOther,
+  heardFromOther: INTEREST_LIMITS.heardFromOther,
+};
+
+interface Choices {
+  universityCode: string;
+  fieldOfStudy: string;
+  heardFrom: string;
+}
+
+/** The numbered fields per role, in order (an "Other" text only when Other is chosen). */
+function visibleFields(role: FormRole, choices: Choices): FieldKey[] {
+  const ifOther = (value: string, key: OtherTextKey): FieldKey[] => (value === OTHER ? [key] : []);
   const roleFields: Record<FormRole, FieldKey[]> = {
     student: [
-      'universityId',
-      ...(universityId === UNIVERSITY_NOT_LISTED ? (['universityOther'] as const) : []),
+      'universityCode',
+      ...ifOther(choices.universityCode, 'universityOther'),
       'fieldOfStudy',
+      ...ifOther(choices.fieldOfStudy, 'fieldOfStudyOther'),
       'graduationYear',
       'projectStage',
     ],
     organization: ['organizationName', 'sector', 'lookingFor', 'orgSize'],
     mentor: ['expertise', 'experience'],
   };
-  return ['fullName', 'email', ...roleFields[role], 'region', 'channel'];
+  return [
+    'fullName',
+    'email',
+    ...roleFields[role],
+    'heardFrom',
+    ...ifOther(choices.heardFrom, 'heardFromOther'),
+  ];
 }
 
 const OPTIONS_PREFIX = 'forms.interest.options';
@@ -74,7 +96,6 @@ export function InterestForm() {
   const { t } = useTranslation();
   const { language, direction } = useDirection();
   const [params] = useSearchParams();
-  const universities = useUniversities(language);
   const submit = useSubmitInterest();
   const [done, setDone] = useState(false);
 
@@ -95,14 +116,23 @@ export function InterestForm() {
     defaultValues: interestDefaults(roleFromParam(params.get('role'))),
   });
 
-  const [role, universityId, fullName, organizationName, universityOther] = useWatch({
+  const [role, universityCode, fieldOfStudy, heardFrom, fullName, organizationName] = useWatch({
     control,
-    name: ['role', 'universityId', 'fullName', 'organizationName', 'universityOther'],
+    name: ['role', 'universityCode', 'fieldOfStudy', 'heardFrom', 'fullName', 'organizationName'],
   });
+  const otherTexts = useWatch({
+    control,
+    name: ['universityOther', 'fieldOfStudyOther', 'heardFromOther'],
+  });
+  const otherLength: Record<OtherTextKey, number> = {
+    universityOther: otherTexts[0].length,
+    fieldOfStudyOther: otherTexts[1].length,
+    heardFromOther: otherTexts[2].length,
+  };
 
   const fieldError = (message: string | undefined) => validationMessage(t, message);
-  const items = (key: InterestOptionKey) =>
-    optionItems(t, `${OPTIONS_PREFIX}.${key}`, INTEREST_OPTIONS[key]);
+  const items = (key: InterestOptionKey, values: readonly string[] = INTEREST_OPTIONS[key]) =>
+    optionItems(t, `${OPTIONS_PREFIX}.${key}`, values);
 
   const onSubmit = handleSubmit(async (values) => {
     submit.reset();
@@ -129,8 +159,16 @@ export function InterestForm() {
     );
   }
 
+  const placeholder = <option value="">{t('forms.common.selectPlaceholder')}</option>;
+  const optionList = (list: { value: string; label: string }[]) =>
+    list.map((item) => (
+      <option key={item.value} value={item.value}>
+        {item.label}
+      </option>
+    ));
+
   const select = (
-    key: 'fieldOfStudy' | 'sector' | 'expertise' | 'region' | 'channel',
+    key: 'fieldOfStudy' | 'sector' | 'expertise' | 'heardFrom',
     option: InterestOptionKey,
     n: number,
   ) => (
@@ -140,17 +178,13 @@ export function InterestForm() {
       error={fieldError(errors[key]?.message)}
       {...register(key)}
     >
-      <option value="">{t('forms.common.selectPlaceholder')}</option>
-      {items(option).map((item) => (
-        <option key={item.value} value={item.value}>
-          {item.label}
-        </option>
-      ))}
+      {placeholder}
+      {optionList(items(option))}
     </SelectField>
   );
 
   const choice = (
-    key: 'graduationYear' | 'projectStage' | 'orgSize' | 'experience',
+    key: 'projectStage' | 'orgSize' | 'experience',
     option: InterestOptionKey,
     n: number,
   ) => (
@@ -166,9 +200,22 @@ export function InterestForm() {
           value={field.value}
           onValueChange={field.onChange}
           dir={direction}
+          layout={key === 'projectStage' ? 'list' : 'pills'}
           error={fieldError(errors[key]?.message)}
         />
       )}
+    />
+  );
+
+  const otherText = (key: OtherTextKey, n: number) => (
+    <TextField
+      key={key}
+      label={<NumberedLabel n={n}>{t(`forms.interest.${key}`)}</NumberedLabel>}
+      autoComplete={key === 'universityOther' ? 'organization' : 'off'}
+      maxLength={OTHER_TEXT[key].max}
+      error={fieldError(errors[key]?.message)}
+      details={<CharacterCount value={otherLength[key]} max={OTHER_TEXT[key].max} />}
+      {...register(key)}
     />
   );
 
@@ -202,68 +249,50 @@ export function InterestForm() {
             {...register('email')}
           />
         );
-      case 'universityId':
+      case 'universityCode':
+        // The form's own list in two groups, "Other" last (not the sign-up universities table).
         return (
-          <div key={key} className="flex flex-col gap-2">
-            <SelectField
-              label={<NumberedLabel n={n}>{t('forms.interest.university')}</NumberedLabel>}
-              disabled={!universities.data && !universities.isError}
-              aria-busy={universities.isPending || undefined}
-              error={fieldError(errors.universityId?.message)}
-              details={
-                universities.data?.length === 0 ? (
-                  <p>{t('auth.signUp.universitiesEmpty')}</p>
-                ) : undefined
-              }
-              {...register('universityId')}
-            >
-              <option value="">
-                {universities.isPending
-                  ? t('auth.signUp.universitiesLoading')
-                  : t('auth.signUp.universityPlaceholder')}
-              </option>
-              {universities.data?.map((university) => (
-                <option key={university.id} value={university.id}>
-                  {university.name}
-                </option>
-              ))}
-              <option value={UNIVERSITY_NOT_LISTED}>
-                {t('forms.interest.universityNotListed')}
-              </option>
-            </SelectField>
-            {universities.isError && (
-              <Callout live variant="error">
-                <p>{t('auth.signUp.universitiesError')}</p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="mt-3"
-                  onClick={() => void universities.refetch()}
-                >
-                  {t('auth.signUp.retry')}
-                </Button>
-              </Callout>
+          <SelectField
+            key={key}
+            label={<NumberedLabel n={n}>{t('forms.interest.university')}</NumberedLabel>}
+            error={fieldError(errors.universityCode?.message)}
+            {...register('universityCode')}
+          >
+            {placeholder}
+            <optgroup label={t('forms.interest.universityGroups.public')}>
+              {optionList(items('university_code', INTEREST_UNIVERSITY_GROUPS.public))}
+            </optgroup>
+            <optgroup label={t('forms.interest.universityGroups.private')}>
+              {optionList(items('university_code', INTEREST_UNIVERSITY_GROUPS.private))}
+            </optgroup>
+            {optionList(items('university_code', [OTHER]))}
+          </SelectField>
+        );
+      case 'graduationYear':
+        // Years are digits; only "2027 or later" is translated.
+        return (
+          <SelectField
+            key={key}
+            label={<NumberedLabel n={n}>{t('forms.interest.graduationYear')}</NumberedLabel>}
+            error={fieldError(errors.graduationYear?.message)}
+            {...register('graduationYear')}
+          >
+            {placeholder}
+            {optionList(
+              INTEREST_OPTIONS.graduation_year.map((value) => ({
+                value,
+                label:
+                  value === '2027_or_later'
+                    ? t('forms.interest.options.graduation_year.2027_or_later')
+                    : value,
+              })),
             )}
-          </div>
+          </SelectField>
         );
       case 'universityOther':
-        return (
-          <TextField
-            key={key}
-            label={<NumberedLabel n={n}>{t('forms.interest.universityOther')}</NumberedLabel>}
-            autoComplete="organization"
-            maxLength={INTEREST_LIMITS.universityOther.max}
-            error={fieldError(errors.universityOther?.message)}
-            details={
-              <CharacterCount
-                value={universityOther.length}
-                max={INTEREST_LIMITS.universityOther.max}
-              />
-            }
-            {...register('universityOther')}
-          />
-        );
+      case 'fieldOfStudyOther':
+      case 'heardFromOther':
+        return otherText(key, n);
       case 'organizationName':
         return (
           <TextField
@@ -297,12 +326,8 @@ export function InterestForm() {
         return select(key, 'sector', n);
       case 'expertise':
         return select(key, 'expertise', n);
-      case 'region':
-        return select(key, 'region', n);
-      case 'channel':
-        return select(key, 'channel', n);
-      case 'graduationYear':
-        return choice(key, 'graduation_year', n);
+      case 'heardFrom':
+        return select(key, 'heard_from', n);
       case 'projectStage':
         return choice(key, 'project_stage', n);
       case 'orgSize':
@@ -344,7 +369,9 @@ export function InterestForm() {
 
       <div aria-hidden="true" className="-mb-2 border-t border-border" />
 
-      {visibleFields(role, universityId).map((key, index) => renderField(key, index + 1))}
+      {visibleFields(role, { universityCode, fieldOfStudy, heardFrom }).map((key, index) =>
+        renderField(key, index + 1),
+      )}
 
       <CheckboxField
         label={
