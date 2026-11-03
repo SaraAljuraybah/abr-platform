@@ -28,8 +28,8 @@ export function AuthLayout() {
         tabIndex={-1}
         className="flex-1 px-4 pt-4 pb-16 outline-none sm:px-6 sm:pt-10"
       >
-        <div className="mx-auto w-full max-w-md">
-          <div className="rounded-lg border border-border bg-card p-6 shadow-md sm:p-8">
+        <div className="mx-auto w-full max-w-[560px]">
+          <div className="rounded-lg border border-border bg-card p-6 shadow-md sm:p-10">
             <Outlet />
           </div>
         </div>

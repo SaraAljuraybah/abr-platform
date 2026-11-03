@@ -46,7 +46,7 @@ export function SignInForm() {
 
   return (
     <>
-      <h1 className="text-brand">{t('auth.signIn.title')}</h1>
+      <h1 className="auth-title text-brand">{t('auth.signIn.title')}</h1>
       <p className="mt-2 text-muted-foreground">{t('auth.signIn.subtitle')}</p>
 
       {failure && (

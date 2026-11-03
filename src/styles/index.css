@@ -230,6 +230,33 @@ body:lang(ar) {
   font-size: 2rem; /* 32/46 */
 }
 
+/*
+ * Auth card title (sign-in, sign-up): smaller than the landing h1 so the title fits on one line
+ * in the card. 26/34 mobile, 30/38 desktop; Arabic one step larger (28, 32).
+ */
+.auth-title {
+  font-size: 1.625rem;
+  line-height: 1.3077;
+}
+
+@media (width >= 48rem) {
+  .auth-title {
+    font-size: 1.875rem;
+    line-height: 1.2667;
+  }
+}
+
+:lang(ar) .auth-title {
+  font-size: 1.75rem;
+  line-height: 1.4;
+}
+
+@media (width >= 48rem) {
+  :lang(ar) .auth-title {
+    font-size: 2rem;
+  }
+}
+
 :lang(ar),
 :lang(ar) * {
   letter-spacing: normal;
