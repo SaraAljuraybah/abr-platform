@@ -91,11 +91,18 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   per form. Shared pieces in `src/features/forms/`: `FormShell` (title, intro, fields, spam trap,
   focused error message, submit, consent line), `RoleCards`, `PrivacyLink`, `SpamTrap`,
   `SuccessScreen`, option helpers and Edge Function error mapping. Sign-up now uses them too.
-  New UI pieces: `ChoiceGroup` (radio pills), `CheckboxGroup`, `CheckboxField`. An unknown slug
+  New UI pieces: `ChoiceGroup` (radio pills or a vertical list), `CheckboxGroup`, `CheckboxField`. An unknown slug
   is a 404.
 - Interest form at `/forms/interest` (SCRUM-34), English and Arabic: role cards (pre-selected
-  from `?role=`), numbered fields per role that renumber when the role or "My university isn't
-  listed" changes, consent checkbox, success screen. No phone, student ID or national ID.
+  from `?role=`), numbered fields per role that renumber when the role or an "Other" choice
+  changes, consent checkbox, success screen. No phone, student ID, national ID or region.
+  Students choose from the form's own university list (public and private groups, a stable code,
+  not `public.universities`, which stays sign-up's verified email-domain list), a tech-only field
+  of study, a graduation year from "2027 or later" down to 2000 and one of five project stages
+  (a vertical radio list). "Other" on university, field of study and "How did you hear about
+  us?" reveals a required text field (follow-up migration `20261103165341_interest_form_options`:
+  `university_code` replaces `university_id` and its foreign key, `region` is dropped, `channel`
+  is renamed `heard_from`, and `field_of_study_other` and `heard_from_other` are added).
 - `public.interest_signups` (no client access), `private.rate_limits`, and the RPCs
   `submit_interest()` and `consume_rate_limit()` (service role only) and `get_interest_stats()`
   (admin only) (SCRUM-34).
