@@ -91,7 +91,7 @@ const fieldLabels = () =>
   Array.from(document.querySelectorAll('form label'))
     .map((label) => label.textContent)
     .filter(
-      (text) => text !== en.auth.signUp.honeypotLabel && text !== ar.auth.signUp.honeypotLabel,
+      (text) => text !== en.forms.common.honeypotLabel && text !== ar.forms.common.honeypotLabel,
     );
 
 async function waitForUniversities() {
@@ -170,7 +170,7 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
 
     expect(screen.getByText(s.universityEmailHint)).toBeInTheDocument();
     const cantFind = screen.getByRole('link', { name: s.cantFindUniversity });
-    expect(cantFind).toHaveAttribute('href', '/request-access');
+    expect(cantFind).toHaveAttribute('href', '/forms/request-access');
     // Helper link below the select, not between its label and the field.
     const university = screen.getByRole('combobox', { name: new RegExp(s.university) });
     expect(
@@ -178,7 +178,7 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
     ).toBeTruthy();
     expect(screen.getByRole('link', { name: s.universityEmailTrouble })).toHaveAttribute(
       'href',
-      '/request-access',
+      '/forms/request-access',
     );
     expect(field(s.universityEmail)).toHaveAttribute('dir', 'ltr');
     expect(field(s.password)).toHaveAttribute('autocomplete', 'new-password');
@@ -188,7 +188,7 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
     );
 
     const privacy = screen.getByRole('link', {
-      name: new RegExp(s.opensInNewTab.replace(/[()]/g, '\\$&')),
+      name: new RegExp(t.forms.common.opensInNewTab.replace(/[()]/g, '\\$&')),
     });
     expect(privacy).toHaveAttribute('href', 'https://tryabr.com/privacy');
     expect(privacy).toHaveAttribute('rel', 'noopener noreferrer');
@@ -436,7 +436,7 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
   it('labels the hidden spam trap with an instruction to leave it empty', async () => {
     await renderSignUp();
     const trap = document.querySelector<HTMLInputElement>('input[name="website"]');
-    expect(trap?.labels?.[0]?.textContent).toBe(s.honeypotLabel);
+    expect(trap?.labels?.[0]?.textContent).toBe(t.forms.common.honeypotLabel);
     expect(trap?.closest('.sr-only')).not.toBeNull();
     expect(trap?.closest('[aria-hidden="true"]')).not.toBeNull();
     expect(trap).toHaveAttribute('tabindex', '-1');

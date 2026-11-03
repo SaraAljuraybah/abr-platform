@@ -1,6 +1,7 @@
 import type { RouteObject } from 'react-router';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { AuthLayout } from '@/components/layout/AuthLayout';
+import { FormLayout } from '@/components/layout/FormLayout';
+import { formRoutes, legacyFormRedirects } from '@/features/forms/registry';
 import { LandingPage } from '@/features/landing';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
@@ -20,7 +21,7 @@ const inCard = 'p-0 sm:p-0';
 
 export const routes: RouteObject[] = [
   {
-    element: <AuthLayout />,
+    element: <FormLayout />,
     children: [
       {
         path: 'sign-in',
@@ -35,11 +36,10 @@ export const routes: RouteObject[] = [
         path: 'forgot-password',
         element: <PlaceholderPage page="forgotPassword" className={inCard} />,
       },
-      // Placeholders until SCRUM-14 (request access) and page 3 (check email, confirmed).
-      {
-        path: 'request-access',
-        element: <PlaceholderPage page="requestAccess" className={inCard} />,
-      },
+      // Forms system (SCRUM-34): /forms/<slug>, including request access (SCRUM-14).
+      ...formRoutes,
+      ...legacyFormRedirects,
+      // Placeholders until page 3 (check email, confirmed).
       { path: 'check-email', element: <PlaceholderPage page="checkEmail" className={inCard} /> },
       {
         path: 'auth/confirmed',

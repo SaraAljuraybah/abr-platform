@@ -25,6 +25,8 @@ export function isValidationKey(value: unknown): value is ValidationKey {
  */
 export const errorMap: z.core.$ZodErrorMap = (issue) => {
   if (issue.code === 'invalid_type' && issue.input === undefined) return 'validation.required';
+  // An unanswered select or radio group holds '' (not one of its options).
+  if (issue.code === 'invalid_value' && issue.input === '') return 'validation.required';
   if (issue.code === 'too_small' && issue.origin === 'string' && issue.minimum === 1) {
     return 'validation.required';
   }

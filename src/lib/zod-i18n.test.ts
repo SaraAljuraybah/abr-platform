@@ -27,6 +27,12 @@ describe('validation messages carry the limit from the Zod issue', () => {
     expect(validationMessage(i18n.t, messageFor('ABCDEF'))).toBe(tooLong);
   });
 
+  it('an unanswered choice (empty string) is "required", an unknown one "invalid"', () => {
+    const choice = z.enum(['a', 'b']);
+    expect(choice.safeParse('').error?.issues[0]?.message).toBe('validation.required');
+    expect(choice.safeParse('c').error?.issues[0]?.message).toBe('validation.invalid');
+  });
+
   it('ignores anything that is not a validation key', () => {
     expect(validationMessage(i18n.t, 'Some raw text')).toBeUndefined();
     expect(validationMessage(i18n.t, undefined)).toBeUndefined();

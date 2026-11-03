@@ -259,13 +259,131 @@
       "ruleNotMet": "Not yet:",
       "passwordNotMet": "Your password doesn't meet all the requirements yet.",
       "mentorNotice": "Mentor workflows open after the pilot. You can register now, and we'll review your profile.",
-      "honeypotLabel": "Leave this field empty",
       "submit": "Create account",
       "submitting": "Creating your account…",
       "consent": "By creating an account, you agree to the use of your data to review your account and contact you about ABR, as described in the <privacyLink>privacy notice</privacyLink>.",
-      "opensInNewTab": "(opens in a new tab)",
       "haveAccount": "Already have an account?",
       "signIn": "Sign in"
+    }
+  },
+  "forms": {
+    "common": {
+      "honeypotLabel": "Leave this field empty",
+      "opensInNewTab": "(opens in a new tab)",
+      "selectPlaceholder": "Select an option",
+      "chooseAtLeastOne": "Choose at least one option."
+    },
+    "errors": {
+      "rateLimited": "Too many submissions from your connection. Please try again in a few minutes.",
+      "network": "We couldn't reach the server. Check your connection and try again.",
+      "unexpected": "Something went wrong. Please try again."
+    },
+    "interest": {
+      "title": "Register your interest",
+      "intro": "Be among the first to use ABR when we launch. It takes about a minute.",
+      "roleLabel": "I'd like to join as",
+      "panel": {
+        "statement": "Be part of ABR from day one.",
+        "minute": "Takes about a minute",
+        "noAccount": "No account needed",
+        "emailOnly": "Your email is used only for ABR"
+      },
+      "fullName": "Full name",
+      "email": "Email",
+      "emailHint": "We'll only use it to contact you about ABR.",
+      "university": "University",
+      "universityNotListed": "My university isn't listed",
+      "universityOther": "University name",
+      "fieldOfStudy": "Field of study",
+      "graduationYear": "Graduation year",
+      "projectStage": "Project stage",
+      "organizationName": "Organization name",
+      "sector": "Sector",
+      "lookingFor": "What are you looking for?",
+      "orgSize": "Number of employees",
+      "expertise": "Field of expertise",
+      "experience": "Years of experience",
+      "region": "Region (optional)",
+      "channel": "How did you hear about us?",
+      "consent": "Contact me about ABR's launch. I've read the <privacyLink>privacy notice</privacyLink>.",
+      "consentRequired": "Agree to be contacted so we can register your interest.",
+      "submit": "Register my interest",
+      "submitting": "Sending…",
+      "success": {
+        "title": "Thank you, you're on the list.",
+        "body": "We'll email you when ABR opens for you.",
+        "home": "Back to home"
+      },
+      "options": {
+        "field_of_study": {
+          "cs_it": "Computer science & IT",
+          "engineering": "Engineering",
+          "business": "Business",
+          "health": "Health sciences",
+          "design": "Design",
+          "other": "Other"
+        },
+        "graduation_year": {
+          "2026": "2026",
+          "2027": "2027",
+          "2028_or_later": "2028 or later"
+        },
+        "project_stage": {
+          "have_project": "I have a project",
+          "have_idea": "I have an idea",
+          "not_yet": "Not yet"
+        },
+        "sector": {
+          "technology": "Technology",
+          "healthcare": "Healthcare",
+          "finance": "Finance",
+          "energy": "Energy",
+          "government": "Government",
+          "education": "Education",
+          "nonprofit": "Nonprofit",
+          "other": "Other"
+        },
+        "looking_for": {
+          "hire_talent": "Hire talent",
+          "sponsor_projects": "Sponsor projects",
+          "adopt_commercialize": "Adopt or commercialize projects",
+          "offer_mentoring": "Offer mentoring"
+        },
+        "org_size": {
+          "1_50": "1–50",
+          "51_500": "51–500",
+          "500_plus": "500+"
+        },
+        "expertise": {
+          "software_data": "Software & data",
+          "engineering": "Engineering",
+          "business_entrepreneurship": "Business & entrepreneurship",
+          "health": "Health",
+          "design": "Design",
+          "other": "Other"
+        },
+        "experience": {
+          "0_3": "0–3",
+          "4_7": "4–7",
+          "8_15": "8–15",
+          "15_plus": "15+"
+        },
+        "region": {
+          "riyadh": "Riyadh",
+          "makkah": "Makkah",
+          "eastern": "Eastern Province",
+          "other": "Other"
+        },
+        "channel": {
+          "x": "X (Twitter)",
+          "linkedin": "LinkedIn",
+          "instagram": "Instagram",
+          "friend": "A friend or colleague",
+          "university": "My university",
+          "event": "An event",
+          "other": "Other"
+        }
+      }
     }
   },
   "validation": {

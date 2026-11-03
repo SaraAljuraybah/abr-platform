@@ -9,7 +9,7 @@ const twoDigits = (n: number) => String(n).padStart(2, '0');
  */
 export function NumberedLabel({ n, children }: { n: number; children: ReactNode }) {
   return (
-    <span className="flex items-center gap-2">
+    <span data-numbered-label="" className="flex items-center gap-2">
       <span
         aria-hidden="true"
         dir="ltr"

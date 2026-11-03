@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Building2, ExternalLink, GraduationCap, UserRound } from 'lucide-react';
-import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Controller, type Resolver, useForm, useWatch } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router';
@@ -8,9 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Callout } from '@/components/ui/callout';
 import { CharacterCount, NumberedLabel } from '@/components/ui/field-number';
 import { PasswordField } from '@/components/ui/password-field';
-import { RadioCard, RadioCardGroup } from '@/components/ui/radio-card';
 import { SelectField } from '@/components/ui/select-field';
 import { TextField } from '@/components/ui/text-field';
+import { FormShell } from '@/features/forms/components/FormShell';
+import { PrivacyLink } from '@/features/forms/components/PrivacyLink';
+import { RoleCards } from '@/features/forms/components/RoleCards';
+import { linkClass } from '@/features/forms/styles';
 import { useDirection } from '@/hooks/useDirection';
 import { validationMessage } from '@/lib/zod-i18n';
 import {
@@ -22,7 +24,6 @@ import {
 } from '../api';
 import {
   FULL_NAME_MAX,
-  isSignUpRole,
   roleFromParam,
   ORGANIZATION_NAME_MAX,
   signUpSchema,
@@ -31,8 +32,6 @@ import {
   type SignUpValues,
 } from '../schemas';
 import { PasswordChecklist } from './PasswordChecklist';
-
-const PRIVACY_URL = 'https://tryabr.com/privacy';
 
 type FieldKey = 'fullName' | 'organizationName' | 'universityId' | 'email' | 'password';
 
@@ -43,43 +42,20 @@ const ROLE_FIELDS: Record<SignUpRole, readonly FieldKey[]> = {
   mentor: ['fullName', 'email', 'password'],
 };
 
-const ROLE_ICONS = { student: GraduationCap, organization: Building2, mentor: UserRound } as const;
-
 /** Set on the email field when check_student_email() says no; translated at render. */
 const MISMATCH = 'mismatch';
 
-const linkClass = 'rounded-sm font-semibold text-primary underline-offset-4 hover:underline';
-
 const looksLikeEmail = (value: string) => /^[^\s@]+@[^\s@]+$/.test(value.trim());
-
-function PrivacyLink({ children }: { children?: ReactNode }) {
-  const { t } = useTranslation();
-  return (
-    <a
-      href={PRIVACY_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`inline-flex items-center gap-1 ${linkClass}`}
-    >
-      {children}
-      <span className="sr-only">{t('auth.signUp.opensInNewTab')}</span>
-      <ExternalLink aria-hidden="true" strokeWidth={1.75} className="size-3.5" />
-    </a>
-  );
-}
 
 export function SignUpForm() {
   const { t } = useTranslation();
-  const { language, direction } = useDirection();
+  const { language } = useDirection();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const signUp = useSignUp();
   const universities = useUniversities(language);
   const checkStudentEmail = useCheckStudentEmail();
   const [preCheckFailure, setPreCheckFailure] = useState<AuthFailure | null>(null);
-  const errorRef = useRef<HTMLDivElement>(null);
-  const honeypotId = useId();
-  const roleLabelId = useId();
 
   const {
     register,
@@ -114,11 +90,6 @@ export function SignUpForm() {
   });
   const fields = ROLE_FIELDS[role];
   const failure = preCheckFailure ?? signUp.error;
-
-  // A new failure is a new error object: move focus to the message so it is read once.
-  useEffect(() => {
-    if (failure) errorRef.current?.focus();
-  }, [failure]);
 
   const universityName = (id: string) =>
     universities.data?.find((university) => university.id === id)?.name ?? '';
@@ -230,7 +201,7 @@ export function SignUpForm() {
               details={
                 <p>
                   {universities.data?.length === 0 && <>{t('auth.signUp.universitiesEmpty')} </>}
-                  <Link to="/request-access" className={linkClass}>
+                  <Link to="/forms/request-access" className={linkClass}>
                     {t('auth.signUp.cantFindUniversity')}
                   </Link>
                 </p>
@@ -301,7 +272,7 @@ export function SignUpForm() {
             error={emailError()}
             details={
               student && (
-                <Link to="/request-access" className={`inline-block text-sm ${linkClass}`}>
+                <Link to="/forms/request-access" className={`inline-block text-sm ${linkClass}`}>
                   {t('auth.signUp.universityEmailTrouble')}
                 </Link>
               )
@@ -325,101 +296,56 @@ export function SignUpForm() {
   }
 
   return (
-    <>
-      <h1 className="auth-title text-brand">{t('auth.signUp.title')}</h1>
-      <p className="mt-2 text-muted-foreground">{t('auth.signUp.intro')}</p>
-
-      <form
-        noValidate
-        onSubmit={(event) => void onSubmit(event)}
-        className="mt-6 flex flex-col gap-5"
-      >
-        <div className="flex flex-col gap-2">
-          <p id={roleLabelId} className="text-sm font-semibold text-foreground">
-            {t('auth.signUp.roleLabel')}
-          </p>
-          <Controller
-            control={control}
-            name="role"
-            render={({ field }) => (
-              <RadioCardGroup
-                aria-labelledby={roleLabelId}
-                // No app-wide Radix DirectionProvider: arrow keys must follow the reading direction.
-                dir={direction}
-                value={field.value}
-                onValueChange={(value) => {
-                  if (!isSignUpRole(value)) return;
-                  field.onChange(value);
-                  clearErrors();
-                  setPreCheckFailure(null);
-                  signUp.reset();
-                }}
-              >
-                {(['student', 'organization', 'mentor'] as const).map((value) => (
-                  <RadioCard
-                    key={value}
-                    value={value}
-                    icon={ROLE_ICONS[value]}
-                    title={t(`auth.signUp.roles.${value}.title`)}
-                    description={t(`auth.signUp.roles.${value}.description`)}
-                  />
-                ))}
-              </RadioCardGroup>
-            )}
+    <FormShell
+      title={t('auth.signUp.title')}
+      intro={t('auth.signUp.intro')}
+      onSubmit={(event) => void onSubmit(event)}
+      spamTrap={register('website')}
+      error={failure && t(`auth.errors.${failure.kind}`)}
+      errorToken={failure}
+      submitLabel={t('auth.signUp.submit')}
+      submittingLabel={t('auth.signUp.submitting')}
+      submitting={isSubmitting}
+      afterSubmit={
+        <p className="text-sm text-muted-foreground">
+          <Trans i18nKey="auth.signUp.consent" components={{ privacyLink: <PrivacyLink /> }} />
+        </p>
+      }
+      footer={
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          {t('auth.signUp.haveAccount')}{' '}
+          <Link to="/sign-in" className={linkClass}>
+            {t('auth.signUp.signIn')}
+          </Link>
+        </p>
+      }
+    >
+      <Controller
+        control={control}
+        name="role"
+        render={({ field }) => (
+          <RoleCards
+            label={t('auth.signUp.roleLabel')}
+            value={field.value}
+            onChange={(next) => {
+              field.onChange(next);
+              clearErrors();
+              setPreCheckFailure(null);
+              signUp.reset();
+            }}
           />
-        </div>
-
-        {role === 'mentor' && (
-          <Callout live variant="info">
-            <p>{t('auth.signUp.mentorNotice')}</p>
-          </Callout>
         )}
+      />
 
-        <div aria-hidden="true" className="-mb-2 border-t border-border" />
+      {role === 'mentor' && (
+        <Callout live variant="info">
+          <p>{t('auth.signUp.mentorNotice')}</p>
+        </Callout>
+      )}
 
-        {fields.map((key, index) => renderField(key, index + 1))}
+      <div aria-hidden="true" className="-mb-2 border-t border-border" />
 
-        {/* Spam trap: hidden from people and assistive technology; bots fill it. The label is an
-            instruction, so anyone who still reaches it knows to leave it empty. */}
-        <div aria-hidden="true" className="sr-only">
-          <label htmlFor={honeypotId}>{t('auth.signUp.honeypotLabel')}</label>
-          <input
-            id={honeypotId}
-            type="text"
-            tabIndex={-1}
-            autoComplete="off"
-            {...register('website')}
-          />
-        </div>
-
-        {failure && (
-          <Callout ref={errorRef} tabIndex={-1} variant="error">
-            <p>{t(`auth.errors.${failure.kind}`)}</p>
-          </Callout>
-        )}
-
-        <div className="flex flex-col gap-3">
-          <Button
-            type="submit"
-            size="lg"
-            className="w-full"
-            loading={isSubmitting}
-            loadingText={t('auth.signUp.submitting')}
-          >
-            {t('auth.signUp.submit')}
-          </Button>
-          <p className="text-sm text-muted-foreground">
-            <Trans i18nKey="auth.signUp.consent" components={{ privacyLink: <PrivacyLink /> }} />
-          </p>
-        </div>
-      </form>
-
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        {t('auth.signUp.haveAccount')}{' '}
-        <Link to="/sign-in" className={linkClass}>
-          {t('auth.signUp.signIn')}
-        </Link>
-      </p>
-    </>
+      {fields.map((key, index) => renderField(key, index + 1))}
+    </FormShell>
   );
 }
