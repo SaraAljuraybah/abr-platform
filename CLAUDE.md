@@ -139,6 +139,8 @@ docs/             definition-of-done.md, permissions.md, decisions/ (ADRs)
   and never pushes to it.
 - CI runs on push to `dev`, on pull requests to `main` and on push to `main`.
 - Never force-push `dev` or `main`.
+- Never run `git checkout`, `git restore` or `git stash` on a file with uncommitted work. Never
+  discard uncommitted changes.
 - Never commit `.env.local` or anything under `_context/` (confidential source documents).
 
 ## Tools
@@ -159,9 +161,11 @@ security work**, however small the change.
 | **STANDARD** | A new page or component                               | `npm run ci` + axe for that page in EN and AR                                                |
 | **FULL**     | Migrations, RLS, RPCs, Edge Functions, auth, security | `npm run ci` + `supabase test db` + mutation check + live smoke test against the local stack |
 
-- **Mutation check:** temporarily break the control under test (for example, drop a policy
-  condition or skip a role check), confirm the matching negative test fails, then restore it and
-  confirm it passes again. Never commit the mutant.
+- **Mutation check:** commit the work first (a WIP commit is fine), then temporarily break the
+  control under test (for example, drop a policy condition or skip a role check), confirm the
+  matching negative test fails, then restore it by re-applying the committed version (or with
+  `git revert` if the mutant was committed) and confirm it passes again. Never push a mutant, and
+  never discard uncommitted changes to restore.
 - **Live smoke test:** exercise the change end to end against `npm run db:start` + `npm run dev`
   (or the Edge Function served locally) with real requests, including at least one request that
   must be refused.
