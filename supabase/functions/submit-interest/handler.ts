@@ -72,6 +72,39 @@ export function createSubmitInterestHandler(deps: SubmitInterestDeps) {
   };
 }
 
+/** HMAC key length floor: a short key makes the stored address hashes guessable. */
+export const MIN_IP_SECRET_LENGTH = 32;
+
+type Handler = (request: Request) => Promise<Response>;
+
+/**
+ * Fails closed: with a missing, blank or short INTEREST_IP_HASH_SECRET (or no Supabase
+ * environment) every request gets the generic 500 and the reason is logged server-side only,
+ * never the secret itself. Otherwise `build` makes the real handler with the secret.
+ */
+export function createConfiguredHandler(
+  env: {
+    ipSecret: string | undefined;
+    supabaseUrl: string | undefined;
+    serviceKey: string | undefined;
+  },
+  build: (config: { ipSecret: string; supabaseUrl: string; serviceKey: string }) => Handler,
+  logError: SubmitInterestDeps['logError'],
+): Handler {
+  const misconfigured =
+    (reason: string): Handler =>
+    () => {
+      logError(reason, {});
+      return Promise.resolve(json(500, { error: 'failed' }));
+    };
+  const { ipSecret, supabaseUrl, serviceKey } = env;
+  if (!ipSecret || ipSecret.trim().length < MIN_IP_SECRET_LENGTH) {
+    return misconfigured('misconfigured: IP hash secret');
+  }
+  if (!supabaseUrl || !serviceKey) return misconfigured('misconfigured: Supabase environment');
+  return build({ ipSecret, supabaseUrl, serviceKey });
+}
+
 function json(status: number, body: unknown, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(body), {
     status,

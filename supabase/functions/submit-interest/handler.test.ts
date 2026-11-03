@@ -2,7 +2,12 @@
 import { describe, expect, it, vi } from 'vitest';
 import { clientIp, hmacHex } from '../_shared/client-ip.ts';
 import { validateInterest } from '../_shared/interest-validate.ts';
-import { createSubmitInterestHandler, type SubmitInterestDeps } from './handler.ts';
+import {
+  createConfiguredHandler,
+  createSubmitInterestHandler,
+  MIN_IP_SECRET_LENGTH,
+  type SubmitInterestDeps,
+} from './handler.ts';
 
 const ORIGIN = 'http://127.0.0.1:5173';
 const SECRET = 'test-secret-of-at-least-32-characters!!';
@@ -305,5 +310,57 @@ describe('submit-interest: failures', () => {
     expect(response.status).toBe(500);
     expect(await response.json()).toEqual({ error: 'failed' });
     expect(deps.logError).toHaveBeenCalledWith('submit-interest failed', { code: '23505' });
+  });
+});
+
+describe('submit-interest: configuration', () => {
+  const env = { supabaseUrl: 'http://localhost:54321', serviceKey: 'service-key-for-tests' };
+  const configured = (ipSecret: string | undefined) => {
+    const logError = vi.fn();
+    const build = vi.fn(() => setup().handler);
+    return {
+      handler: createConfiguredHandler({ ...env, ipSecret }, build, logError),
+      build,
+      logError,
+    };
+  };
+
+  it.each([
+    ['missing', undefined],
+    ['empty', ''],
+    ['blank', ' '.repeat(40)],
+    ['short (31 characters)', 'x'.repeat(MIN_IP_SECRET_LENGTH - 1)],
+  ])(
+    'IP hash secret %s: generic 500 for every request, reason logged, secret never',
+    async (_name, secret) => {
+      const { handler, build, logError } = configured(secret);
+      expect(build).not.toHaveBeenCalled();
+      for (const request of [post(mentor), post(mentor, { origin: 'https://evil.example' })]) {
+        const response = await handler(request);
+        expect(response.status).toBe(500);
+        expect(await response.text()).toBe('{"error":"failed"}');
+      }
+      expect(logError).toHaveBeenCalledWith('misconfigured: IP hash secret', {});
+      if (secret) expect(JSON.stringify(logError.mock.calls)).not.toContain(secret);
+    },
+  );
+
+  it('a 32-character secret builds the real handler', async () => {
+    const secret = 'y'.repeat(MIN_IP_SECRET_LENGTH);
+    const { handler, build, logError } = configured(secret);
+    expect(build).toHaveBeenCalledWith({ ...env, ipSecret: secret });
+    expect((await handler(post(mentor))).status).toBe(200);
+    expect(logError).not.toHaveBeenCalled();
+  });
+
+  it('no Supabase environment: generic 500', async () => {
+    const logError = vi.fn();
+    const handler = createConfiguredHandler(
+      { ipSecret: SECRET, supabaseUrl: undefined, serviceKey: undefined },
+      () => setup().handler,
+      logError,
+    );
+    expect((await handler(post(mentor))).status).toBe(500);
+    expect(logError).toHaveBeenCalledWith('misconfigured: Supabase environment', {});
   });
 });
