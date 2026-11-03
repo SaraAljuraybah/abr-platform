@@ -187,10 +187,10 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
       '/sign-in',
     );
 
-    // The consent line links to the internal notice, in the same tab.
-    const privacy = document.querySelector('label a[href="/privacy"]');
-    expect(privacy).not.toBeNull();
-    expect(privacy).not.toHaveAttribute('target');
+    // The consent line and the link under the form open the internal notice, in the same tab.
+    const privacy = Array.from(document.querySelectorAll('main a[href="/privacy"]'));
+    expect(privacy).toHaveLength(2);
+    for (const link of privacy) expect(link).not.toHaveAttribute('target');
   });
 
   it('organization (?role=organization): fields and work-email hint', async () => {
