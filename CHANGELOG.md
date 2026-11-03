@@ -105,6 +105,9 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - `[auth.sms] enable_confirmations = true` (was `false`; SMS sign-up stays disabled) (SCRUM-13).
 - Tests wait up to 5 s for lazy routes (`asyncUtilTimeout`); jsdom gets a `ResizeObserver` stub
   for Radix (SCRUM-13).
+- Sign-in shows "Something went wrong" for a server error (any 5xx), not "We couldn't reach the
+  server". supabase-js raises both as `AuthRetryableFetchError`; only status 0 is a network failure
+  (SCRUM-13).
 
 ### Planned
 
