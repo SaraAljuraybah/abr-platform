@@ -29,7 +29,9 @@ export function toAuthFailure(error: unknown): AuthFailure {
       return new AuthFailure('rateLimited');
     }
   }
-  if (isAuthRetryableFetchError(error) || error instanceof TypeError) {
+  // supabase-js raises every 5xx as AuthRetryableFetchError with that status; only status 0 means
+  // the request never got an answer. A 5xx is the server failing, so it gets the generic message.
+  if ((isAuthRetryableFetchError(error) && error.status === 0) || error instanceof TypeError) {
     return new AuthFailure('network');
   }
 

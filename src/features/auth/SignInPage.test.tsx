@@ -216,6 +216,9 @@ describe.each(['en', 'ar'] as const)('sign-in page (%s)', (language) => {
       'rateLimited',
     ],
     ['network', () => new AuthRetryableFetchError('Failed to fetch', 0), 'network'],
+    // supabase-js raises a 5xx as a retryable fetch error too; it is the server failing.
+    ['500', () => new AuthRetryableFetchError('Internal Server Error', 500), 'unexpected'],
+    ['503', () => new AuthRetryableFetchError('Service Unavailable', 503), 'unexpected'],
   ] as const)('shows the %s message', async (_name, makeError, key) => {
     const user = userEvent.setup();
     auth.signInWithPassword.mockResolvedValue({ data: {}, error: makeError() });

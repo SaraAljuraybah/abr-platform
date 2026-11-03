@@ -50,6 +50,9 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Error and info status colours are one shade darker (#B91C1C, #1D4ED8) to meet WCAG AA; the
   guidelines' values measure 3.95:1 and 4.24:1. Pending brand sign-off (D-14) (SCRUM-31).
 - The Supabase client and env validation load on demand, off the critical path (SCRUM-31).
+- Sign-in shows "Something went wrong" for a server error (any 5xx), not "We couldn't reach the
+  server". supabase-js raises both as `AuthRetryableFetchError`; only status 0 is a network failure
+  (SCRUM-13).
 
 ### Planned
 
