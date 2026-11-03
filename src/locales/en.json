@@ -187,6 +187,7 @@
     }
   },
   "auth": {
+    "backHome": "Back to home",
     "signIn": {
       "title": "Sign in",
       "subtitle": "Welcome back to ABR.",

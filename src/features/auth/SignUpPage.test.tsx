@@ -272,7 +272,7 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
     const user = setupUser();
     await renderSignUp();
     const items = () =>
-      screen
+      within(screen.getByRole('main'))
         .getAllByRole('listitem')
         .map((item) => [item.getAttribute('data-met'), item.textContent]);
     expect(items()).toEqual([
@@ -523,7 +523,9 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
       });
       expect(callout).not.toHaveAttribute('role');
       expect(router.state.location.pathname).toBe('/sign-up');
-      if (kind === 'weakPassword') expect(screen.getAllByRole('listitem')).toHaveLength(3);
+      if (kind === 'weakPassword') {
+        expect(within(screen.getByRole('main')).getAllByRole('listitem')).toHaveLength(3);
+      }
     },
   );
 

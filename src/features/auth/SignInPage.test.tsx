@@ -1,6 +1,6 @@
 import { AuthApiError, AuthRetryableFetchError, type Session } from '@supabase/supabase-js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type ReactNode, useSyncExternalStore } from 'react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
@@ -118,6 +118,45 @@ describe.each(['en', 'ar'] as const)('sign-in page (%s)', (language) => {
       'href',
       '/sign-up',
     );
+  });
+
+  it('auth layout: brand panel at the start, one h1, back-home link in the form column', async () => {
+    await renderSignIn();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+
+    const panel = screen.getByRole('complementary');
+    expect(panel).toHaveClass('hidden', 'lg:block');
+    // The panel comes first in the DOM, so it sits at the start side (left LTR, right RTL).
+    expect(
+      panel.compareDocumentPosition(screen.getByRole('main')) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    const statement = within(panel).getByText(t.landing.hero.title);
+    expect(statement.tagName).toBe('P');
+    expect(within(panel).queryByRole('heading')).toBeNull();
+    expect(
+      within(panel)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual([
+      t.landing.trust.items.students.title,
+      t.landing.trust.items.projects.title,
+      t.landing.trust.items.privacy.title,
+    ]);
+
+    const home = within(panel).getByRole('link', { name: t.app.homeLink });
+    expect(home).toHaveAttribute('href', '/');
+    const logo = within(home).getByRole('img', { hidden: true });
+    expect(logo).toHaveAttribute('src', '/brand/abr-logo-reverse.svg');
+    expect(logo).toHaveAttribute('alt', 'ABR');
+
+    const watermark = panel.querySelector('img[src="/brand/abr-symbol.svg"]');
+    expect(watermark).toHaveAttribute('alt', '');
+    expect(watermark).toHaveAttribute('aria-hidden', 'true');
+    expect(watermark?.className).not.toMatch(/scale-x/);
+
+    const back = screen.getByRole('link', { name: t.auth.backHome });
+    expect(back).toHaveAttribute('href', '/');
+    expect(panel.contains(back)).toBe(false);
   });
 
   it('shows localized validation errors and does not call Supabase', async () => {
