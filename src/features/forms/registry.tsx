@@ -1,5 +1,5 @@
 import { Navigate, type RouteObject } from 'react-router';
-import { PlaceholderPage } from '@/pages/PlaceholderPage';
+import { RequestAccessRoute } from './RequestAccessRoute';
 
 /**
  * Every form under /forms/<slug>, rendered in FormLayout. One entry per form: lazy-loaded, with
@@ -17,7 +17,7 @@ export const formRoutes: RouteObject[] = [
   // SCRUM-14 builds this form on the same system; placeholder until then.
   {
     path: 'forms/request-access',
-    element: <PlaceholderPage page="requestAccess" className="p-0 sm:p-0" />,
+    Component: RequestAccessRoute,
   },
 ];
 

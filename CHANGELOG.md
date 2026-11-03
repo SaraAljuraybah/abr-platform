@@ -114,6 +114,14 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - Request access (SCRUM-14) moves to `/forms/request-access` on the forms system; the sign-up
   "Can't find your university?" and "Request an exception" links point there (placeholder until
   SCRUM-14), and `/request-access` redirects to it (SCRUM-34).
+- Phase 1 launch mode: build-time flag `VITE_AUTH_ENABLED` (`true` by default; `false` for
+  production at tryabr.com, `true` for the dev preview). With `false`, `/sign-in`, `/sign-up` and
+  `/forms/request-access` show a "Coming soon" page in the form layout (with links to the interest
+  form and home), `/app`, `/onboarding` and `/admin` redirect to it, and the landing page has no
+  account links: the header and mobile menu show "Register your interest", the hero and final
+  band show "Register your interest" and "How it works", the audience cards link to
+  `/forms/interest?role=…`, and the FAQ on unlisted universities points to "Other" in the interest
+  form. UX only, not access control. Tests cover both values.
 
 ### Handoff to SCRUM-13 (sign-up UI)
 
@@ -219,6 +227,8 @@ placeholder universities seeded (no users).
   as `misconfigured: IP hash secret`). A valid submission from the production origin returned 200
   and saved one row. All test rows (`interest_signups`, `private.rate_limits`) were deleted
   afterwards; both tables are empty.
+- Open: Vercel environment variable `VITE_AUTH_ENABLED`: `false` for Production (tryabr.com),
+  `true` for Preview (the `dev` preview). Build-time, so a change needs a redeploy.
 - Production project: repeat all of the above when it exists.
 
 ### Pending CEO decisions

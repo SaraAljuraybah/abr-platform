@@ -17,7 +17,17 @@ const valid = {
 
 describe('parseEnv', () => {
   it('accepts a URL and a publishable key', () => {
-    expect(parseEnv(valid)).toEqual(valid);
+    expect(parseEnv(valid)).toEqual({ ...valid, VITE_AUTH_ENABLED: 'true' });
+  });
+
+  it('VITE_AUTH_ENABLED defaults to "true" and accepts "true" or "false" only', () => {
+    expect(parseEnv({ ...valid, VITE_AUTH_ENABLED: 'false' }).VITE_AUTH_ENABLED).toBe('false');
+    expect(parseEnv({ ...valid, VITE_AUTH_ENABLED: 'true' }).VITE_AUTH_ENABLED).toBe('true');
+    for (const value of ['0', 'no', 'FALSE', '']) {
+      expect(() => parseEnv({ ...valid, VITE_AUTH_ENABLED: value })).toThrow(
+        /VITE_AUTH_ENABLED must be "true" or "false"/,
+      );
+    }
   });
 
   it('accepts a legacy anon JWT', () => {

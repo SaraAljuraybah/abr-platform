@@ -17,12 +17,20 @@
     "signIn": "Sign in",
     "createAccount": "Create an account",
     "goToDashboard": "Go to dashboard",
+    "registerInterest": "Register your interest",
+    "howItWorks": "How it works",
     "sections": {
       "howItWorks": "How it works",
       "whoItsFor": "Who it's for",
       "trust": "Trust & privacy",
       "faq": "FAQ"
     }
+  },
+  "comingSoon": {
+    "title": "Coming soon",
+    "body": "Sign-in and accounts open with our pilot. Register your interest and we'll tell you first.",
+    "cta": "Register your interest",
+    "backHome": "Back to home"
   },
   "language": {
     "switchLabel": "Change language to Arabic",
@@ -146,7 +154,8 @@
         },
         "university": {
           "question": "My university isn't listed. What can I do?",
-          "answer": "You can request it during sign-up, and we'll review it."
+          "answer": "You can request it during sign-up, and we'll review it.",
+          "answerInterest": "Choose “Other” in the interest form and write its name."
         },
         "contact": {
           "question": "When are my contact details shared?",

@@ -3,9 +3,12 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { FormLayout } from '@/components/layout/FormLayout';
 import { formRoutes, legacyFormRedirects } from '@/features/forms/registry';
 import { LandingPage } from '@/features/landing';
+import { isAuthEnabled } from '@/lib/features';
+import { ComingSoonPage } from '@/pages/ComingSoonPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
 import { RequireAuth } from './guards/RequireAuth';
+import { RequireAuthEnabled } from './guards/RequireAuthEnabled';
 import { RequireOnboarding } from './guards/RequireOnboarding';
 import { RequireRole } from './guards/RequireRole';
 
@@ -15,6 +18,8 @@ import { RequireRole } from './guards/RequireRole';
  *   /app        → RequireAuth → RequireOnboarding
  *   /admin      → RequireAuth → RequireOnboarding → RequireRole(allow: 'admin')
  * RequireOnboarding redirects to /onboarding and RequireRole to /app, so neither can loop.
+ * With VITE_AUTH_ENABLED=false (phase 1 launch mode) RequireAuthEnabled sends all three to
+ * /sign-in, which then shows the "Coming soon" page instead of the form.
  */
 // Placeholders inside the auth card drop the page padding.
 const inCard = 'p-0 sm:p-0';
@@ -26,11 +31,19 @@ export const routes: RouteObject[] = [
       {
         path: 'sign-in',
         // Lazy: keeps the Supabase client and zod off the landing page's critical path.
-        lazy: async () => ({ Component: (await import('@/features/auth/SignInPage')).SignInPage }),
+        lazy: async () => ({
+          Component: isAuthEnabled()
+            ? (await import('@/features/auth/SignInPage')).SignInPage
+            : ComingSoonPage,
+        }),
       },
       {
         path: 'sign-up',
-        lazy: async () => ({ Component: (await import('@/features/auth/SignUpPage')).SignUpPage }),
+        lazy: async () => ({
+          Component: isAuthEnabled()
+            ? (await import('@/features/auth/SignUpPage')).SignUpPage
+            : ComingSoonPage,
+        }),
       },
       {
         path: 'forgot-password',
@@ -52,16 +65,21 @@ export const routes: RouteObject[] = [
     children: [
       { index: true, element: <LandingPage /> },
       {
-        element: <RequireAuth />,
+        element: <RequireAuthEnabled />,
         children: [
-          { path: 'onboarding', element: <PlaceholderPage page="onboarding" /> },
           {
-            element: <RequireOnboarding />,
+            element: <RequireAuth />,
             children: [
-              { path: 'app', element: <PlaceholderPage page="app" /> },
+              { path: 'onboarding', element: <PlaceholderPage page="onboarding" /> },
               {
-                element: <RequireRole allow="admin" />,
-                children: [{ path: 'admin', element: <PlaceholderPage page="admin" /> }],
+                element: <RequireOnboarding />,
+                children: [
+                  { path: 'app', element: <PlaceholderPage page="app" /> },
+                  {
+                    element: <RequireRole allow="admin" />,
+                    children: [{ path: 'admin', element: <PlaceholderPage page="admin" /> }],
+                  },
+                ],
               },
             ],
           },

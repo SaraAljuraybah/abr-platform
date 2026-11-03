@@ -1,5 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { isAuthEnabled } from '@/lib/features';
 import { SectionHeader } from './SectionHeader';
 
 const QUESTIONS = ['join', 'university', 'contact', 'messaging'] as const;
@@ -33,7 +34,9 @@ export function Faq() {
                 />
               </summary>
               <p className="mb-4 rounded-md bg-muted px-4 py-3 text-muted-foreground">
-                {t(`landing.faq.items.${key}.answer`)}
+                {key === 'university' && !isAuthEnabled()
+                  ? t('landing.faq.items.university.answerInterest')
+                  : t(`landing.faq.items.${key}.answer`)}
               </p>
             </details>
           ))}

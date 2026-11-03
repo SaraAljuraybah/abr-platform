@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/features/auth/auth-context';
+import { isAuthEnabled } from '@/lib/features';
 import { cn } from '@/lib/utils';
 
 /** `hero` = on a deep gradient (hero, final band): white-reverse buttons. */
@@ -16,7 +17,9 @@ const layout: Record<Placement, string> = {
 /**
  * Account actions. Signed out: "Sign in" + "Create an account". Signed in (a session exists):
  * one "Go to dashboard" action. While the session is still loading, the signed-out pair shows.
- * UX only; it reveals nothing the server would not.
+ * Phase 1 launch mode (VITE_AUTH_ENABLED=false): "Register your interest" instead, plus "How it
+ * works" on the gradient bands; no account links at all. UX only; it reveals nothing the server
+ * would not.
  */
 export function AuthActions({
   placement,
@@ -32,6 +35,21 @@ export function AuthActions({
   const size = onDark ? 'lg' : 'sm';
   const block = placement === 'menu' ? 'w-full' : undefined;
   const primary = onDark ? 'inverse' : 'default';
+
+  if (!isAuthEnabled()) {
+    return (
+      <div className={cn(layout[placement], className)}>
+        <Button asChild variant={primary} size={size} className={block}>
+          <Link to="/forms/interest">{t('nav.registerInterest')}</Link>
+        </Button>
+        {onDark && (
+          <Button asChild variant="outlineInverse" size={size}>
+            <a href="#how-it-works">{t('nav.howItWorks')}</a>
+          </Button>
+        )}
+      </div>
+    );
+  }
 
   if (session) {
     return (

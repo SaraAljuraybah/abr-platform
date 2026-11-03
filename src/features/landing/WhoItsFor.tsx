@@ -2,6 +2,7 @@ import { ArrowRight, Building2, Check, Clock, GraduationCap, UserRound } from 'l
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useAuth } from '@/features/auth/auth-context';
+import { isAuthEnabled } from '@/lib/features';
 import { SectionHeader } from './SectionHeader';
 
 /** `role` is read by sign-up (SCRUM-13) to pre-select the account type. */
@@ -41,6 +42,7 @@ const AUDIENCES = [
 export function WhoItsFor() {
   const { t } = useTranslation();
   const { session } = useAuth();
+  const authEnabled = isAuthEnabled();
 
   return (
     <section id="who-its-for" aria-labelledby="who-title" className="scroll-mt-20 py-10 lg:py-16">
@@ -84,10 +86,11 @@ export function WhoItsFor() {
                   {t('landing.who.mentors.note')}
                 </p>
               )}
-              {/* Signed-in visitors already have an account: no join link (UX only). */}
-              {!session && (
+              {/* Signed-in visitors already have an account: no join link (UX only). In phase 1
+                  launch mode the link goes to the interest form, with the same role. */}
+              {(!session || !authEnabled) && (
                 <Link
-                  to={`/sign-up?role=${role}`}
+                  to={authEnabled ? `/sign-up?role=${role}` : `/forms/interest?role=${role}`}
                   className="mt-6 inline-flex items-center gap-1.5 self-start rounded-sm font-semibold text-primary hover:underline"
                 >
                   {t(`landing.who.${key}.cta`)}
