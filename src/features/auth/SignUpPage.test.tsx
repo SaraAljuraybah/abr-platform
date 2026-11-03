@@ -90,7 +90,9 @@ const field = (label: string) =>
 const fieldLabels = () =>
   Array.from(document.querySelectorAll('form label'))
     .map((label) => label.textContent)
-    .filter((text) => text !== en.auth.signUp.website && text !== ar.auth.signUp.website);
+    .filter(
+      (text) => text !== en.auth.signUp.honeypotLabel && text !== ar.auth.signUp.honeypotLabel,
+    );
 
 async function waitForUniversities() {
   await waitFor(() => {
@@ -395,7 +397,9 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
     await enter(user, name, 'A');
     expect(screen.getByText('1/150')).toBeInTheDocument();
     await submit(user, t);
-    expect(await screen.findByText(t.validation.tooShort)).toBeInTheDocument();
+    expect(
+      await screen.findByText(t.validation.tooShort.replace('{{min}}', '2')),
+    ).toBeInTheDocument();
     expect(supabase.auth.signUp).not.toHaveBeenCalled();
   });
 
@@ -426,6 +430,16 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
       supabase.auth.signUp.mock.calls[0]?.[0] as { options: { data: { role: string } } }
     ).options.data;
     expect(data.role).toBe('student');
+  });
+
+  it('labels the hidden spam trap with an instruction to leave it empty', async () => {
+    await renderSignUp();
+    const trap = document.querySelector<HTMLInputElement>('input[name="website"]');
+    expect(trap?.labels?.[0]?.textContent).toBe(s.honeypotLabel);
+    expect(trap?.closest('.sr-only')).not.toBeNull();
+    expect(trap?.closest('[aria-hidden="true"]')).not.toBeNull();
+    expect(trap).toHaveAttribute('tabindex', '-1');
+    expect(trap).toHaveAttribute('autocomplete', 'off');
   });
 
   it('a filled spam trap shows the normal success and calls nothing', async () => {

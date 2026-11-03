@@ -12,7 +12,7 @@ import { RadioCard, RadioCardGroup } from '@/components/ui/radio-card';
 import { SelectField } from '@/components/ui/select-field';
 import { TextField } from '@/components/ui/text-field';
 import { useDirection } from '@/hooks/useDirection';
-import { isValidationKey } from '@/lib/zod-i18n';
+import { validationMessage } from '@/lib/zod-i18n';
 import {
   type AuthFailure,
   toAuthFailure,
@@ -123,8 +123,7 @@ export function SignUpForm() {
   const universityName = (id: string) =>
     universities.data?.find((university) => university.id === id)?.name ?? '';
 
-  const fieldError = (message: string | undefined) =>
-    isValidationKey(message) ? t(message) : undefined;
+  const fieldError = (message: string | undefined) => validationMessage(t, message);
 
   const emailError = () => {
     const error = errors.email;
@@ -384,9 +383,10 @@ export function SignUpForm() {
 
         {fields.map((key, index) => renderField(key, index + 1))}
 
-        {/* Spam trap: hidden from people and assistive technology; bots fill it. */}
+        {/* Spam trap: hidden from people and assistive technology; bots fill it. The label is an
+            instruction, so anyone who still reaches it knows to leave it empty. */}
         <div aria-hidden="true" className="sr-only">
-          <label htmlFor={honeypotId}>{t('auth.signUp.website')}</label>
+          <label htmlFor={honeypotId}>{t('auth.signUp.honeypotLabel')}</label>
           <input
             id={honeypotId}
             type="text"

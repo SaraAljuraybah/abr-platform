@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Callout } from '@/components/ui/callout';
 import { PasswordField } from '@/components/ui/password-field';
 import { TextField } from '@/components/ui/text-field';
-import { isValidationKey } from '@/lib/zod-i18n';
+import { validationMessage } from '@/lib/zod-i18n';
 import { useResendConfirmation, useSignIn } from '../api';
 import { signInSchema, type SignInValues } from '../schemas';
 
@@ -34,8 +34,7 @@ export function SignInForm() {
     if (signIn.error) errorRef.current?.focus();
   }, [signIn.error]);
 
-  const fieldError = (message: string | undefined) =>
-    isValidationKey(message) ? t(message) : undefined;
+  const fieldError = (message: string | undefined) => validationMessage(t, message);
 
   const onSubmit = handleSubmit((values) => {
     resend.reset();

@@ -236,7 +236,7 @@
       "ruleNotMet": "Not yet:",
       "passwordNotMet": "Your password doesn't meet all the requirements yet.",
       "mentorNotice": "Mentor workflows open after the pilot. You can register now, and we'll review your profile.",
-      "website": "Website",
+      "honeypotLabel": "Leave this field empty",
       "submit": "Create account",
       "submitting": "Creating your account…",
       "consent": "By creating an account, you agree to the use of your data to review your account and contact you about ABR, as described in the <privacyLink>privacy notice</privacyLink>.",
@@ -249,8 +249,8 @@
     "required": "This field is required.",
     "email": "Enter a valid email address.",
     "invalid": "Check this value.",
-    "tooShort": "This is too short.",
-    "tooLong": "This is too long."
+    "tooShort": "Minimum length: {{min}} characters.",
+    "tooLong": "Maximum length: {{max}} characters."
   },
   "passwordField": {
     "show": "Show password",
