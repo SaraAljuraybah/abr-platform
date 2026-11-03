@@ -192,21 +192,30 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 
 ### Hosted settings to verify
 
-- Supabase Auth, phone settings: **SMS confirmations on**, as
-  `[auth.sms] enable_confirmations = true` locally (SMS sign-up stays disabled). With SMS or email
-  autoconfirm on, a sign-up for an existing confirmed email returns `422 user_already_exists`,
-  which tells anyone with the publishable key that the account exists. Check: sign up twice with a
-  confirmed email; the second answer must be HTTP 200 with no identities (SCRUM-13).
-- Verify default privileges on the hosted development project once it is linked (ADR-0011 note).
-- `submit-interest` client address (SCRUM-34): confirm hosted Edge Functions receive
-  `cf-connecting-ip` set by Cloudflare. Check: send 6 requests, each with a different spoofed
-  `cf-connecting-ip` and `x-forwarded-for`; the 6th must still get 429. If the header can be
-  spoofed on hosted, switch `supabase/functions/_shared/client-ip.ts` to the right-most
-  `x-forwarded-for` entry only.
-- `submit-interest` secrets (SCRUM-34): `supabase secrets set INTEREST_IP_HASH_SECRET=...` (32+
-  random characters, different from local) and `ALLOWED_ORIGINS=...` (the Vercel production URL,
-  plus the team's preview pattern when decided; not tryabr.com). Without the secret the function
-  answers 500.
+Hosted development project **abr-dev** linked on 2026-11-03: all ten migrations pushed
+(`supabase migration list`: local and remote match), auth settings pushed with `supabase config
+push` (`[remotes.abr-dev]` in `config.toml`), `submit-interest` deployed (`verify_jwt = false`),
+placeholder universities seeded (no users).
+
+- Done: auth settings on abr-dev. Email confirmations on, phone sign-up off with SMS confirmations
+  on, secure password change on, passwords of 10+ characters with lower, upper and digits, site URL
+  `https://abr-platform.vercel.app`, redirect URLs for production, the `dev` preview and local
+  (`127.0.0.1` and `localhost` on 5173). Hosted email OTP length (8), email send interval (1 min),
+  TOTP MFA (on) and storage vector (off) keep their previous hosted values.
+- Done: default privileges (ADR-0011 note). Hosted grants ALL by default; the migrations' explicit
+  revokes hold (client roles have `SELECT` only, `anon` executes only `check_student_email`).
+- Open: second sign-up without enumeration (SCRUM-13). Settings are in place (email and SMS
+  confirmations on, so no autoconfirm). Behaviour check: sign up twice with a confirmed email; the
+  second answer must be HTTP 200 with no identities. Needs a real, confirmed account, so it is left
+  to the CTO.
+- Open: `submit-interest` client address (SCRUM-34). Testable once the secrets are set: send 6
+  requests, each with a different spoofed `cf-connecting-ip` and `x-forwarded-for`; the 6th must
+  still get 429. If the header can be spoofed on hosted, switch
+  `supabase/functions/_shared/client-ip.ts` to the right-most `x-forwarded-for` entry only.
+- Open: `submit-interest` secrets (SCRUM-34), set by the CTO: `INTEREST_IP_HASH_SECRET` (32+ random
+  bytes, different from local) and `ALLOWED_ORIGINS` (production and `dev` preview URLs). Until
+  then the function answers 500 (verified).
+- Production project: repeat all of the above when it exists.
 
 ### Pending CEO decisions
 

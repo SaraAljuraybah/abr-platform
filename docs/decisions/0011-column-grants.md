@@ -19,7 +19,7 @@ privileges depends on the platform version and on who owns the object:
 - Functions are executable by `PUBLIC` (and therefore `anon`) unless revoked.
 
 Defaults that vary between environments cannot be relied on in either direction.
-Verify default privileges on the hosted development project when it is linked (SCRUM-12); hosted and older projects may still grant ALL.
+The hosted development project does grant ALL by default (verified 2026-11-03; see the note below).
 
 In PostgreSQL, **a column-level `REVOKE` has no effect while a table-level grant exists.** A pattern
 such as `revoke update (status, published_at, owner_id) on projects from authenticated` therefore
@@ -66,9 +66,23 @@ table created in a migration unless it is granted explicitly (`profiles` now gra
 The migrations still revoke function `EXECUTE` from `PUBLIC` explicitly, so they do not depend on
 the local function default either.
 
-**Hosted development project: not yet verified.** It is not linked (no project ref in
-`supabase/.temp`), and linking needs the CTO's credentials. When it is linked, run these in the SQL
-editor and record the output here:
+**Hosted development project (abr-dev), observed 2026-11-03** after `supabase db push` of all ten
+migrations, with `supabase db query --linked`:
+
+| Objects created by | Tables (`r`)                                              | Functions (`f`)                                    | Sequences (`S`) |
+| ------------------ | --------------------------------------------------------- | -------------------------------------------------- | --------------- |
+| `postgres`         | `anon`, `authenticated`, `service_role`: ALL (`arwdDxtm`) | `anon`, `authenticated`, `service_role`: `EXECUTE` | `rwU` for all   |
+| `supabase_admin`   | `anon`, `authenticated`, `service_role`: ALL (`arwdDxtm`) | `anon`, `authenticated`, `service_role`: `EXECUTE` | `rwU` for all   |
+
+Hosted is the worst case: every table a migration creates would be fully writable by `anon` and
+`authenticated`, and every function executable, without the explicit `revoke all`. Because every
+migration revokes and re-grants, the client roles actually hold only table-level `SELECT`
+(`anon`: `universities`; `authenticated`: `audit_events`, `mentor_profiles`,
+`organization_profiles`, `profiles`, `student_profiles`, `universities`,
+`university_email_domains`, `university_requests`), and `anon` can execute only
+`check_student_email(uuid, text)`. No `public` table has RLS off, and neither client role has
+`USAGE` on `private`. The rule in this ADR is therefore required on hosted, not just good
+practice. Queries used:
 
 ```sql
 -- Default privileges per creating role in schema public.
