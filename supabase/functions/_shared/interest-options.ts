@@ -5,10 +5,59 @@
  * Values are stable codes; labels live in src/locales under forms.interest.options.
  * Plain TypeScript with no imports, so Deno and Vite can both load it.
  */
-/** University codes for this form, by group (not public.universities, which is for sign-up). */
+/**
+ * University codes for this form, by group (not public.universities, which is for sign-up).
+ * Codes are stable: never rename one. The form sorts each group by its label in the reader's
+ * language, so the order here does not matter for display.
+ */
 export const INTEREST_UNIVERSITY_GROUPS = {
-  public: ['king_saud', 'imam', 'pnu', 'ksau_hs', 'seu'],
-  private: ['psu', 'alfaisal', 'yamamah', 'dau', 'reu', 'maarefa', 'aou'],
+  public: [
+    'king_saud',
+    'kau',
+    'kfupm',
+    'imam',
+    'uqu',
+    'iu',
+    'kfu',
+    'kku',
+    'qu',
+    'taibah',
+    'tu',
+    'uoh',
+    'jazan',
+    'ju',
+    'ut',
+    'bu',
+    'nu',
+    'nbu',
+    'pnu',
+    'iau',
+    'psau',
+    'su',
+    'mu',
+    'seu',
+    'ksau_hs',
+    'uj',
+    'ub',
+    'uhb',
+    'kaust',
+  ],
+  private: [
+    'psu',
+    'alfaisal',
+    'yamamah',
+    'dau',
+    'reu',
+    'maarefa',
+    'aou',
+    'effat',
+    'dah',
+    'ubt',
+    'pmu',
+    'pmu_madinah',
+    'fbsu',
+    'mustaqbal',
+  ],
 } as const;
 
 /** The option that reveals a required free-text field. */

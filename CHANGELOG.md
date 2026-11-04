@@ -131,6 +131,10 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   launch"). The footer and every form link to it; consent links now open `/privacy` in the same tab
   (was https://tryabr.com/privacy in a new tab). `/register` redirects to `/forms/interest`
   (`vercel.json` and the client router).
+- Interest form universities across Saudi Arabia (SCRUM-34): 29 public and 14 private universities
+  (migration `20261104121025_interest_universities_ksa`), existing codes unchanged. The form sorts
+  each group alphabetically in the reader's language; the two groups and "Other (write it)" last
+  stay.
 - Phase 1 launch mode: build-time flag `VITE_AUTH_ENABLED` (`true` by default; `false` for
   production at tryabr.com, `true` for the dev preview). With `false`, `/sign-in`, `/sign-up` and
   `/forms/request-access` show a "Coming soon" page in the form layout (with links to the interest

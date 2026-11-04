@@ -225,7 +225,7 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
     },
   );
 
-  it('university: public and private groups, Other last', async () => {
+  it('university: public and private groups, each alphabetical, Other last', async () => {
     await renderForm();
     const select = field(f.university);
     const groups = Array.from(select.querySelectorAll('optgroup'));
@@ -233,8 +233,12 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
       f.universityGroups.public,
       f.universityGroups.private,
     ]);
+    // Every code in the group, sorted by its label in this language.
+    const collator = new Intl.Collator(language);
     const labels = (codes: readonly string[]) =>
-      codes.map((code) => o.university_code[code as keyof typeof o.university_code]);
+      codes
+        .map((code) => o.university_code[code as keyof typeof o.university_code])
+        .sort((a, b) => collator.compare(a, b));
     expect(
       within(groups[0] as HTMLElement)
         .getAllByRole('option')
@@ -246,6 +250,15 @@ describe.each(['en', 'ar'] as const)('interest form (%s)', (language) => {
         .map((x) => x.textContent),
     ).toEqual(labels(INTEREST_UNIVERSITY_GROUPS.private));
     expect(optionTexts(select).at(-1)).toBe(o.university_code.other);
+    if (language === 'en') {
+      const publicLabels = within(groups[0] as HTMLElement)
+        .getAllByRole('option')
+        .map((x) => x.textContent);
+      expect(publicLabels[0]).toBe('Al-Baha University');
+      expect(publicLabels.at(-1)).toBe('University of Tabuk');
+    }
+    expect(INTEREST_UNIVERSITY_GROUPS.public).toHaveLength(29);
+    expect(INTEREST_UNIVERSITY_GROUPS.private).toHaveLength(14);
   });
 
   it('field of study: the tech list, Other last', async () => {

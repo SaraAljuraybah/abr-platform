@@ -4,7 +4,7 @@
 
 begin;
 
-select plan(88);
+select plan(90);
 
 set constraints all immediate;
 
@@ -263,6 +263,19 @@ select throws_ok(
   'a malformed consent version is refused'
 );
 reset role;
+
+-- New universities (2026-11-04): accepted; old codes still accepted.
+set local role service_role;
+select lives_ok(
+  $$ select public.submit_interest(pg_temp.student('{"email": "kaust@student.test", "university_code": "kaust"}')) $$,
+  'a student at a newly listed university (kaust) is saved'
+);
+select lives_ok(
+  $$ select public.submit_interest(pg_temp.student('{"email": "pmu@student.test", "university_code": "pmu_madinah"}')) $$,
+  'a student at a newly listed private university (pmu_madinah) is saved'
+);
+reset role;
+delete from public.interest_signups where email in ('kaust@student.test', 'pmu@student.test');
 
 -- CHECK constraints reject anything outside the option lists ---------------------
 

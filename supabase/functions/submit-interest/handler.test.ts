@@ -103,6 +103,13 @@ describe('submit-interest: validation', () => {
     expect(deps.submit).toHaveBeenCalledTimes(1);
   });
 
+  it.each(['kaust', 'uqu', 'pmu_madinah', 'mustaqbal', 'king_saud'])(
+    'accepts the listed university %s',
+    (code) => {
+      expect(validateInterest({ ...student, university_code: code })?.university_code).toBe(code);
+    },
+  );
+
   it('stores the version of the consent text the form shows', () => {
     expect(INTEREST_CONSENT_VERSION).toBe('2026-11-v2');
     expect(validateInterest(mentor)?.consent_version).toBe('2026-11-v2');

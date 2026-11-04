@@ -133,6 +133,10 @@ export function InterestForm() {
   const fieldError = (message: string | undefined) => validationMessage(t, message);
   const items = (key: InterestOptionKey, values: readonly string[] = INTEREST_OPTIONS[key]) =>
     optionItems(t, `${OPTIONS_PREFIX}.${key}`, values);
+  // Universities in each group, alphabetical by their label in the reader's language.
+  const collator = new Intl.Collator(language);
+  const universities = (codes: readonly string[]) =>
+    items('university_code', codes).sort((a, b) => collator.compare(a.label, b.label));
 
   const onSubmit = handleSubmit(async (values) => {
     submit.reset();
@@ -260,10 +264,10 @@ export function InterestForm() {
           >
             {placeholder}
             <optgroup label={t('forms.interest.universityGroups.public')}>
-              {optionList(items('university_code', INTEREST_UNIVERSITY_GROUPS.public))}
+              {optionList(universities(INTEREST_UNIVERSITY_GROUPS.public))}
             </optgroup>
             <optgroup label={t('forms.interest.universityGroups.private')}>
-              {optionList(items('university_code', INTEREST_UNIVERSITY_GROUPS.private))}
+              {optionList(universities(INTEREST_UNIVERSITY_GROUPS.private))}
             </optgroup>
             {optionList(items('university_code', [OTHER]))}
           </SelectField>
