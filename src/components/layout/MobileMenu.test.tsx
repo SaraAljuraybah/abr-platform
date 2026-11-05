@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { describe, expect, it } from 'vitest';
 import { AuthContext, type AuthState } from '@/features/auth/auth-context';
-import { routes } from '@/routes/routes';
+import { routes } from '@/test/routes';
 
 const signedOut: AuthState = {
   status: 'ready',

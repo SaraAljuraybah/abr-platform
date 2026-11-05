@@ -7,7 +7,7 @@ import { AuthProvider } from '@/features/auth/AuthProvider';
 import { changeLanguage, type Language } from '@/lib/i18n';
 import ar from '@/locales/ar.json';
 import en from '@/locales/en.json';
-import { routes } from '@/routes/routes';
+import { routes } from '@/test/routes';
 import { axeViolations } from '@/test/axe';
 
 const USER_ID = '00000000-0000-0000-0000-00000000000a';

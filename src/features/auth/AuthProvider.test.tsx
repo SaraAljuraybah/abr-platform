@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { routes } from '@/routes/routes';
+import { routes } from '@/test/routes';
 import { type AuthState, useAuth } from './auth-context';
 import { AuthProvider } from './AuthProvider';
 

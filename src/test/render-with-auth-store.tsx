@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 import { createMemoryRouter, type InitialEntry, RouterProvider } from 'react-router';
 import type { AuthState } from '@/features/auth/auth-context';
-import { routes } from '@/routes/routes';
+import { routes } from '@/test/routes';
 import { authStore } from './auth-store';
 import { MutableAuth } from './MutableAuth';
 import { signedOut } from './render-route';

@@ -4,7 +4,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, describe, expect, it } from 'vitest';
 import { AuthContext, type AuthState } from '@/features/auth/auth-context';
 import { changeLanguage, type Language } from '@/lib/i18n';
-import { routes } from '@/routes/routes';
+import { routes } from '@/test/routes';
 
 const session = { user: { id: '00000000-0000-0000-0000-000000000001' } } as unknown as Session;
 const signedOut: AuthState = {

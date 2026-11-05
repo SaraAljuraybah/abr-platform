@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { AuthContext, type AuthState } from '@/features/auth/auth-context';
-import { routes } from '@/routes/routes';
+import { routes } from '@/test/routes';
 
 export const signedOut: AuthState = {
   status: 'ready',

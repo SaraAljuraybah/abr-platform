@@ -45,6 +45,25 @@ export default defineConfig(
     },
   },
   {
+    // Tests take the route table from src/test/routes.ts, which preloads the lazy routes, so a
+    // findBy never waits on code-splitting.
+    files: ['src/**/*.test.{ts,tsx}', 'src/test/**/*.{ts,tsx}'],
+    ignores: ['src/test/routes.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@/routes/routes',
+              message: "Import routes from '@/test/routes' in tests (it preloads the lazy routes).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*.{js,mjs}'],
     extends: [js.configs.recommended],
     languageOptions: { ecmaVersion: 2023, globals: globals.node },

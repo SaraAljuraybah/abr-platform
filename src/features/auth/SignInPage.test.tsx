@@ -9,7 +9,7 @@ import { AuthContext, type AuthState } from '@/features/auth/auth-context';
 import { changeLanguage, type Language } from '@/lib/i18n';
 import ar from '@/locales/ar.json';
 import en from '@/locales/en.json';
-import { routes } from '@/routes/routes';
+import { routes } from '@/test/routes';
 import { axeViolations } from '@/test/axe';
 import { signedOut } from '@/test/render-route';
 

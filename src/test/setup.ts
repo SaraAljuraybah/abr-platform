@@ -26,8 +26,8 @@ if (typeof document !== 'undefined') {
   }
 }
 
-// Lazy routes (sign-in, sign-up) can take over the default 1 s to load on a busy machine with
-// the local Supabase stack running; findBy* waits up to 5 s instead.
+// Lazy routes are preloaded before each file's tests (src/test/routes.ts), so findBy* never waits
+// on code-splitting. 5 s stays as a ceiling for real async work (axe, retries), not a wait budget.
 configure({ asyncUtilTimeout: 5_000 });
 
 afterEach(() => {
