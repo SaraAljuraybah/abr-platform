@@ -651,9 +651,9 @@
     "options": {
       "academicLevel": {
         "undergraduate": "طالب بكالوريوس",
-        "final_year": "سنة التخرج",
+        "final_year": "طالب في السنة الأخيرة",
         "recent_graduate": "حديث التخرج",
-        "postgraduate": "دراسات عليا"
+        "postgraduate": "طالب دراسات عليا"
       },
       "interest": {
         "fintech": "التقنية المالية",

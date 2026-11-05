@@ -160,8 +160,12 @@ docs/             definition-of-done.md, permissions.md, decisions/ (ADRs)
 | **abr-dev**  | `rrlnuldywzmktqynomta` | Preview and testing (the `dev` preview) |
 | **abr-prod** | `atckrssxksvurzlxxnhj` | Production, **real data** (tryabr.com)  |
 
-- The repository stays linked to **abr-dev**. Every command for prod passes
-  `--project-ref atckrssxksvurzlxxnhj` explicitly; never re-link the default to prod.
+- The repository stays linked to **abr-dev**. Prod commands that accept `--project-ref` pass
+  `--project-ref atckrssxksvurzlxxnhj` explicitly. `supabase db push` does not take it: it pushes
+  to the linked project, so a prod push is link to prod → push → re-link to abr-dev at once:
+  `npx supabase link --project-ref atckrssxksvurzlxxnhj`, `npx supabase db push --dry-run`,
+  `npx supabase db push`, `npx supabase link --project-ref rrlnuldywzmktqynomta`. Never leave the
+  link on prod.
 - The CTO runs every prod command that needs the database password (link, `db push`); Claude gives
   the exact commands and reviews the output, and never handles the prod password.
 - Migrations reach abr-prod **before** `dev` is merged into `main`, so production code never runs
