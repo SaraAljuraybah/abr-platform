@@ -227,3 +227,17 @@ export function useAuthCallback() {
     },
   });
 }
+
+/**
+ * Signs out on this device. The caller navigates away first, so the guards do not bounce the
+ * user to /sign-in. The query cache is cleared, so no profile data survives in memory.
+ * supabase-js removes the local session even when the network call fails.
+ */
+export function useSignOut() {
+  const queryClient = useQueryClient();
+  return useCallback(async () => {
+    const { error } = await supabase.auth.signOut({ scope: 'local' });
+    if (error) console.error('Sign-out failed', { code: error.code, status: error.status });
+    queryClient.clear();
+  }, [queryClient]);
+}

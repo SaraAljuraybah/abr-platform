@@ -123,7 +123,9 @@ describe('AuthProvider profile', () => {
       onboarded: false,
     });
     expect(mock.from).toHaveBeenCalledWith('profiles');
-    expect(mock.select).toHaveBeenCalledWith('role, verification_status, onboarding_completed');
+    expect(mock.select).toHaveBeenCalledWith(
+      'role, verification_status, onboarding_completed, full_name',
+    );
     expect(mock.eq).toHaveBeenCalledWith('id', USER_ID);
   });
 

@@ -666,5 +666,60 @@
         "other": "Other"
       }
     }
+  },
+  "status": {
+    "unverified": "Email not confirmed",
+    "pending": "Pending review",
+    "verified": "Verified",
+    "rejected": "Changes needed",
+    "suspended": "Suspended"
+  },
+  "shell": {
+    "nav": "App navigation",
+    "homeLink": "ABR dashboard",
+    "dashboard": "Dashboard",
+    "accountMenu": "Account menu",
+    "myProfile": "My profile",
+    "signOut": "Sign out"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome, {{firstName}}",
+    "welcomeNoName": "Welcome",
+    "loading": "Loading your dashboard…",
+    "error": "We couldn't load your dashboard. Please try again.",
+    "retry": "Try again",
+    "retrying": "Loading…",
+    "createProject": "Create project",
+    "opensInNewTab": "(opens in a new tab)",
+    "next": {
+      "title": "What's next",
+      "none": {
+        "title": "Add your graduation project",
+        "body": "Create a draft, add your files, then submit it for review. Organizations see it once it's published."
+      }
+    },
+    "profile": {
+      "title": "Your profile",
+      "edit": "Edit profile",
+      "notSet": "Not added yet",
+      "skills": "Skills",
+      "interests": "Interests",
+      "github": "GitHub"
+    },
+    "projects": {
+      "title": "Your projects",
+      "empty": "You haven't added a project yet."
+    },
+    "other": {
+      "title": "Your dashboard",
+      "body": "Your dashboard is coming next. We'll let you know when your account is reviewed."
+    }
+  },
+  "comingNext": {
+    "profile": "My profile",
+    "newProject": "Create project",
+    "body": "This page is coming next.",
+    "backToDashboard": "Back to dashboard"
   }
 }

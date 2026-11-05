@@ -4,6 +4,7 @@ import { FormLayout } from '@/components/layout/FormLayout';
 import { formRoutes, legacyFormRedirects } from '@/features/forms/registry';
 import { LandingPage } from '@/features/landing';
 import { isAuthEnabled } from '@/lib/features';
+import { ComingNextPage } from '@/pages/ComingNextPage';
 import { ComingSoonPage } from '@/pages/ComingSoonPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
@@ -15,9 +16,9 @@ import { RequireRole } from './guards/RequireRole';
 
 /**
  * Guard nesting (UX only; the database is the authority):
- *   /onboarding → RequireAuth
- *   /app        → RequireAuth → RequireOnboarding
- *   /admin      → RequireAuth → RequireOnboarding → RequireRole(allow: 'admin')
+ *   /onboarding → RequireAuth (public AppLayout)
+ *   /app, /app/profile, /app/projects/new → RequireAuth → RequireOnboarding (AppShellLayout)
+ *   /admin      → RequireAuth → RequireOnboarding → RequireRole(allow: 'admin') (AppShellLayout)
  * RequireOnboarding redirects to /onboarding and RequireRole to /app, so neither can loop.
  * With VITE_AUTH_ENABLED=false (phase 1 launch mode) RequireAuthEnabled sends all three to
  * /sign-in, which then shows the "Coming soon" page instead of the form.
@@ -100,10 +101,37 @@ export const routes: RouteObject[] = [
                   Component: (await import('@/features/onboarding/OnboardingPage')).OnboardingPage,
                 }),
               },
+            ],
+          },
+        ],
+      },
+      { path: '*', element: <NotFoundPage /> },
+    ],
+  },
+  {
+    // Signed-in pages: the app shell (SCRUM-16) inside the same guards.
+    element: <RequireAuthEnabled />,
+    children: [
+      {
+        element: <RequireAuth />,
+        children: [
+          {
+            element: <RequireOnboarding />,
+            children: [
               {
-                element: <RequireOnboarding />,
+                // Lazy: the shell's account menu pulls in the Supabase client.
+                lazy: async () => ({
+                  Component: (await import('@/components/layout/AppShellLayout')).AppShellLayout,
+                }),
                 children: [
-                  { path: 'app', element: <PlaceholderPage page="app" /> },
+                  {
+                    path: 'app',
+                    lazy: async () => ({
+                      Component: (await import('@/features/dashboard/DashboardPage')).DashboardPage,
+                    }),
+                  },
+                  { path: 'app/profile', element: <ComingNextPage page="profile" /> },
+                  { path: 'app/projects/new', element: <ComingNextPage page="newProject" /> },
                   {
                     element: <RequireRole allow="admin" />,
                     children: [{ path: 'admin', element: <PlaceholderPage page="admin" /> }],
@@ -114,7 +142,6 @@ export const routes: RouteObject[] = [
           },
         ],
       },
-      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ];

@@ -5,6 +5,8 @@ export interface OwnProfile {
   role: AppRole;
   verificationStatus: VerificationStatus;
   onboarded: boolean;
+  /** For the account menu; null until the user sets one. */
+  fullName: string | null;
 }
 
 export const ownProfileKey = (userId: string | undefined) => ['profile', 'own', userId] as const;
@@ -24,7 +26,7 @@ export function useOwnProfile(userId: string | undefined) {
       const { supabase } = await import('@/lib/supabase');
       const { data, error } = await supabase
         .from('profiles')
-        .select('role, verification_status, onboarding_completed')
+        .select('role, verification_status, onboarding_completed, full_name')
         .eq('id', userId ?? '')
         .maybeSingle();
       if (error) throw error;
@@ -33,6 +35,7 @@ export function useOwnProfile(userId: string | undefined) {
         role: data.role,
         verificationStatus: data.verification_status,
         onboarded: data.onboarding_completed,
+        fullName: data.full_name,
       };
     },
   });
