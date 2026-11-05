@@ -56,6 +56,9 @@ export function toAuthFailure(error: unknown): AuthFailure {
   return new AuthFailure('unexpected');
 }
 
+/** Where confirmation links (sign-up and resend) land. Must be in the Auth redirect allow-list. */
+export const confirmationRedirectUrl = () => `${window.location.origin}/auth/confirmed`;
+
 export function useSignIn() {
   return useMutation<null, AuthFailure, SignInValues>({
     mutationFn: async ({ email, password }) => {
@@ -74,7 +77,11 @@ export function useResendConfirmation() {
   return useMutation<null, AuthFailure, { email: string }>({
     mutationFn: async ({ email }) => {
       try {
-        const { error } = await supabase.auth.resend({ type: 'signup', email });
+        const { error } = await supabase.auth.resend({
+          type: 'signup',
+          email,
+          options: { emailRedirectTo: confirmationRedirectUrl() },
+        });
         if (error) throw error;
         return null;
       } catch (error) {
@@ -130,7 +137,7 @@ export function useSignUp() {
           password: values.password,
           options: {
             data: signUpMetadata(values),
-            emailRedirectTo: `${window.location.origin}/auth/confirmed`,
+            emailRedirectTo: confirmationRedirectUrl(),
           },
         });
         if (error && !(isAuthApiError(error) && error.code === 'user_already_exists')) throw error;
@@ -196,4 +203,27 @@ export function useCheckStudentEmail() {
         }),
     [queryClient],
   );
+}
+
+/**
+ * The confirmation link (implicit flow) lands on /auth/confirmed#access_token=… or, when it failed,
+ * #error=…&error_code=otp_expired. supabase-js reads the URL once, when the client is created
+ * (detectSessionInUrl), and initialize() returns that same result. Awaiting it means the link has
+ * been processed, so the page may then clean the address bar. Resolves to whether a session exists
+ * (from the link or from earlier).
+ */
+export function useAuthCallback() {
+  return useQuery({
+    queryKey: ['auth-callback'],
+    staleTime: Infinity,
+    gcTime: 0,
+    retry: false,
+    queryFn: async (): Promise<{ hasSession: boolean }> => {
+      const { error } = await supabase.auth.initialize();
+      // Expired or already used: the page shows the error state. Technical detail stays here.
+      if (error) console.error('Confirmation link failed', { code: error.code, name: error.name });
+      const { data } = await supabase.auth.getSession();
+      return { hasSession: data.session !== null };
+    },
+  });
 }

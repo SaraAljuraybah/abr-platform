@@ -8,8 +8,20 @@ import { axeViolations } from '@/test/axe';
 import { renderRoute } from '@/test/render-route';
 
 const session = { user: { id: '00000000-0000-0000-0000-000000000001' } } as unknown as Session;
-const signedOut: AuthState = { status: 'ready', session: null, role: null, onboarded: false };
-const signedIn: AuthState = { status: 'ready', session, role: null, onboarded: false };
+const signedOut: AuthState = {
+  status: 'ready',
+  session: null,
+  role: null,
+  verificationStatus: null,
+  onboarded: false,
+};
+const signedIn: AuthState = {
+  status: 'ready',
+  session,
+  role: null,
+  verificationStatus: null,
+  onboarded: false,
+};
 
 // A full-page axe scan in jsdom takes several seconds, more when cold or under load.
 const AXE_TIMEOUT = 60_000;

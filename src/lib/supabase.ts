@@ -15,6 +15,10 @@ export const supabase = createClient<Database>(
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
+      // Implicit flow on purpose: the confirmation link carries the session itself, so it works
+      // when a student opens the email on another device. PKCE needs the code verifier stored in
+      // the browser that signed up, and fails anywhere else.
+      flowType: 'implicit',
     },
   },
 );

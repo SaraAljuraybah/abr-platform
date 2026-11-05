@@ -5,7 +5,13 @@ import { describe, expect, it } from 'vitest';
 import { AuthContext, type AuthState } from '@/features/auth/auth-context';
 import { routes } from '@/routes/routes';
 
-const signedOut: AuthState = { status: 'ready', session: null, role: null, onboarded: false };
+const signedOut: AuthState = {
+  status: 'ready',
+  session: null,
+  role: null,
+  verificationStatus: null,
+  onboarded: false,
+};
 
 async function setup() {
   const user = userEvent.setup();

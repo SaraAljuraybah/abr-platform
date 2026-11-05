@@ -590,7 +590,15 @@ describe('sign-up redirects', () => {
     const router = createMemoryRouter(routes, { initialEntries: ['/sign-up'] });
     render(
       <QueryClientProvider client={new QueryClient()}>
-        <AuthContext value={{ status: 'ready', session, role: 'student', onboarded: true }}>
+        <AuthContext
+          value={{
+            status: 'ready',
+            session,
+            role: 'student',
+            verificationStatus: 'verified',
+            onboarded: true,
+          }}
+        >
           <RouterProvider router={router} />
         </AuthContext>
       </QueryClientProvider>,

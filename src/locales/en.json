@@ -191,9 +191,7 @@
       "app": "Dashboard",
       "admin": "Admin",
       "forgotPassword": "Reset your password",
-      "requestAccess": "Request access",
-      "checkEmail": "Check your email",
-      "authConfirmed": "Email confirmed"
+      "requestAccess": "Request access"
     }
   },
   "auth": {
@@ -221,7 +219,8 @@
     "resend": {
       "action": "Resend link",
       "sending": "Sending…",
-      "sent": "A new link is on its way."
+      "sent": "A new link is on its way.",
+      "cooldown": "Resend link ({{time}})"
     },
     "signUp": {
       "title": "Create your account",
@@ -273,6 +272,25 @@
       "submitting": "Creating your account…",
       "consent": "By creating an account, you agree to the use of your data to review your account and contact you about ABR, as described in the <privacyLink>privacy notice</privacyLink>.",
       "haveAccount": "Already have an account?",
+      "signIn": "Sign in"
+    },
+    "checkEmail": {
+      "title": "Check your email",
+      "bodyWithEmail": "We sent a confirmation link to <email>{{email}}</email>. Open it to activate your account.",
+      "body": "We sent a confirmation link to your email. Open it to activate your account.",
+      "tip": "Didn't get it? Check your spam folder, or resend the link.",
+      "wrongEmail": "Wrong email?",
+      "signUpAgain": "Sign up again",
+      "alreadyConfirmed": "Already confirmed?",
+      "signIn": "Sign in"
+    },
+    "confirmed": {
+      "verifying": "Confirming your email…",
+      "title": "Your email is confirmed",
+      "student": "Your student account is verified. Let's set up your profile.",
+      "reviewed": "Next, complete your profile so our team can review it.",
+      "continue": "Continue",
+      "failed": "This link has expired or was already used.",
       "signIn": "Sign in"
     }
   },

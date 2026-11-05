@@ -17,7 +17,13 @@ const auth = vi.hoisted(() => ({ signInWithPassword: vi.fn(), resend: vi.fn() })
 vi.mock('@/lib/supabase', () => ({ supabase: { auth } }));
 
 const session = { user: { id: '00000000-0000-0000-0000-000000000001' } } as unknown as Session;
-const signedIn: AuthState = { status: 'ready', session, role: 'student', onboarded: true };
+const signedIn: AuthState = {
+  status: 'ready',
+  session,
+  role: 'student',
+  verificationStatus: 'verified',
+  onboarded: true,
+};
 const copy = { en, ar } as const;
 const AXE_TIMEOUT = 60_000;
 
@@ -231,7 +237,11 @@ describe.each(['en', 'ar'] as const)('sign-in page (%s)', (language) => {
     expect(await screen.findByText(expected)).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: t.auth.resend.action }));
-    expect(auth.resend).toHaveBeenCalledWith({ type: 'signup', email: 'new@uni.example' });
+    expect(auth.resend).toHaveBeenCalledWith({
+      type: 'signup',
+      email: 'new@uni.example',
+      options: { emailRedirectTo: `${window.location.origin}/auth/confirmed` },
+    });
     expect(await screen.findByRole('status')).toHaveTextContent(t.auth.resend.sent);
   });
 

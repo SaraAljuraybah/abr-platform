@@ -6,11 +6,35 @@ import { renderRoute } from '@/test/render-route';
 
 const session = { user: { id: '00000000-0000-0000-0000-000000000001' } } as unknown as Session;
 
-const signedOut: AuthState = { status: 'ready', session: null, role: null, onboarded: false };
+const signedOut: AuthState = {
+  status: 'ready',
+  session: null,
+  role: null,
+  verificationStatus: null,
+  onboarded: false,
+};
 // Signed in, but no profile yet: role and onboarding unknown.
-const signedInNoProfile: AuthState = { status: 'ready', session, role: null, onboarded: false };
-const onboardedStudent: AuthState = { status: 'ready', session, role: 'student', onboarded: true };
-const onboardedAdmin: AuthState = { status: 'ready', session, role: 'admin', onboarded: true };
+const signedInNoProfile: AuthState = {
+  status: 'ready',
+  session,
+  role: null,
+  verificationStatus: null,
+  onboarded: false,
+};
+const onboardedStudent: AuthState = {
+  status: 'ready',
+  session,
+  role: 'student',
+  verificationStatus: 'verified',
+  onboarded: true,
+};
+const onboardedAdmin: AuthState = {
+  status: 'ready',
+  session,
+  role: 'admin',
+  verificationStatus: 'verified',
+  onboarded: true,
+};
 
 function renderAt(path: string, auth: AuthState) {
   return renderRoute(path, auth).router;

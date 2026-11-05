@@ -57,22 +57,22 @@ export const routes: RouteObject[] = [
       // Forms system (SCRUM-34): /forms/<slug>, including request access (SCRUM-14).
       ...formRoutes,
       ...legacyFormRedirects,
-      // Placeholders until page 3 (check email, confirmed).
       {
         path: 'check-email',
-        element: (
-          <AuthOnly>
-            <PlaceholderPage page="checkEmail" className={inCard} />
-          </AuthOnly>
-        ),
+        lazy: async () => ({
+          Component: isAuthEnabled()
+            ? (await import('@/features/auth/CheckEmailPage')).CheckEmailPage
+            : ComingSoonPage,
+        }),
       },
       {
+        // emailRedirectTo of sign-up and resend. Allowed by additional_redirect_urls.
         path: 'auth/confirmed',
-        element: (
-          <AuthOnly>
-            <PlaceholderPage page="authConfirmed" className={inCard} />
-          </AuthOnly>
-        ),
+        lazy: async () => ({
+          Component: isAuthEnabled()
+            ? (await import('@/features/auth/AuthConfirmedPage')).AuthConfirmedPage
+            : ComingSoonPage,
+        }),
       },
     ],
   },

@@ -13,7 +13,13 @@ import { renderRoute, signedOut } from '@/test/render-route';
 // the other route and landing tests; the cases below check both values side by side.
 
 const session = { user: { id: '00000000-0000-0000-0000-000000000001' } } as unknown as Session;
-const signedIn: AuthState = { status: 'ready', session, role: 'admin', onboarded: true };
+const signedIn: AuthState = {
+  status: 'ready',
+  session,
+  role: 'admin',
+  verificationStatus: 'verified',
+  onboarded: true,
+};
 const copy = { en, ar } as const;
 const AXE_TIMEOUT = 60_000;
 const ROLES = [
@@ -155,14 +161,14 @@ describe.each(['en', 'ar'] as const)('VITE_AUTH_ENABLED=true (%s)', (language) =
   });
 
   it.each([
-    ['/forgot-password', 'forgotPassword'],
-    ['/check-email', 'checkEmail'],
-    ['/auth/confirmed', 'authConfirmed'],
-  ] as const)('%s keeps its own page', async (path, page) => {
-    await renderAt(path, language);
-    expect(
-      screen.getByRole('heading', { level: 1, name: t.placeholder.pages[page] }),
-    ).toBeInTheDocument();
+    ['/forgot-password', () => t.placeholder.pages.forgotPassword],
+    ['/check-email', () => t.auth.checkEmail.title],
+    // Signed out, no link in the URL: the expired-link state.
+    ['/auth/confirmed', () => t.auth.confirmed.failed],
+  ] as const)('%s keeps its own page', async (path, title) => {
+    await changeLanguage(language);
+    renderRoute(path);
+    expect(await screen.findByRole('heading', { level: 1, name: title() })).toBeInTheDocument();
     expect(screen.queryByText(t.comingSoon.body)).toBeNull();
   });
 

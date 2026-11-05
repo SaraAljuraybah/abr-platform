@@ -7,8 +7,20 @@ import { changeLanguage, type Language } from '@/lib/i18n';
 import { routes } from '@/routes/routes';
 
 const session = { user: { id: '00000000-0000-0000-0000-000000000001' } } as unknown as Session;
-const signedOut: AuthState = { status: 'ready', session: null, role: null, onboarded: false };
-const signedIn: AuthState = { status: 'ready', session, role: null, onboarded: false };
+const signedOut: AuthState = {
+  status: 'ready',
+  session: null,
+  role: null,
+  verificationStatus: null,
+  onboarded: false,
+};
+const signedIn: AuthState = {
+  status: 'ready',
+  session,
+  role: null,
+  verificationStatus: null,
+  onboarded: false,
+};
 
 async function renderLanding(language: Language, auth: AuthState = signedOut) {
   await changeLanguage(language);

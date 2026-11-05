@@ -8,6 +8,7 @@ export const signedOut: AuthState = {
   status: 'ready',
   session: null,
   role: null,
+  verificationStatus: null,
   onboarded: false,
 };
 
