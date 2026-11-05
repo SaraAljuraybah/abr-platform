@@ -60,7 +60,7 @@ describe('route guards (UX only)', () => {
     async (path) => {
       const router = renderAt(path, signedInNoProfile);
       expect(
-        await screen.findByRole('heading', { level: 1, name: 'Onboarding' }),
+        await screen.findByRole('heading', { level: 1, name: 'Set up your profile' }),
       ).toBeInTheDocument();
       expect(router.state.location.pathname).toBe('/onboarding');
       expect(router.state.historyAction).toBe('REPLACE');
@@ -71,9 +71,19 @@ describe('route guards (UX only)', () => {
   it('lets a signed-in user without a profile stay on /onboarding', async () => {
     const router = renderAt('/onboarding', signedInNoProfile);
     expect(
-      await screen.findByRole('heading', { level: 1, name: 'Onboarding' }),
+      await screen.findByRole('heading', { level: 1, name: 'Set up your profile' }),
     ).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/onboarding');
+  });
+
+  it.each([
+    ['student', onboardedStudent],
+    ['admin', onboardedAdmin],
+  ])('sends an onboarded %s from /onboarding to /app', async (_role, auth) => {
+    const router = renderAt('/onboarding', auth);
+    expect(await screen.findByRole('heading', { level: 1, name: 'Dashboard' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/app');
+    expect(router.state.historyAction).toBe('REPLACE');
   });
 
   it('lets an onboarded user into /app', async () => {

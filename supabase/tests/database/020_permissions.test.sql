@@ -143,7 +143,7 @@ select is(
   'the name change is stored'
 );
 select lives_ok(
-  $$ update public.student_profiles set major = 'Computer Science', skills = '{SQL,React}'
+  $$ update public.student_profiles set major = 'cs', skills = '{SQL,React}'
      where user_id = 'cccccccc-0000-4000-8000-00000000000a' $$,
   'a student can edit their own student profile fields'
 );

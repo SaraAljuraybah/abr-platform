@@ -238,6 +238,7 @@ export type Database = {
           full_name: string | null
           id: string
           onboarding_completed: boolean
+          onboarding_step: number
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
           verification_status: Database["public"]["Enums"]["verification_status"]
@@ -249,6 +250,7 @@ export type Database = {
           full_name?: string | null
           id: string
           onboarding_completed?: boolean
+          onboarding_step?: number
           role: Database["public"]["Enums"]["user_role"]
           updated_at?: string
           verification_status: Database["public"]["Enums"]["verification_status"]
@@ -260,6 +262,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           onboarding_completed?: boolean
+          onboarding_step?: number
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
@@ -271,8 +274,10 @@ export type Database = {
           academic_level: string | null
           created_at: string
           github_url: string | null
+          graduation_year: string | null
           interests: string[]
           major: string | null
+          major_other: string | null
           skills: string[]
           university_id: string
           updated_at: string
@@ -282,8 +287,10 @@ export type Database = {
           academic_level?: string | null
           created_at?: string
           github_url?: string | null
+          graduation_year?: string | null
           interests?: string[]
           major?: string | null
+          major_other?: string | null
           skills?: string[]
           university_id: string
           updated_at?: string
@@ -293,8 +300,10 @@ export type Database = {
           academic_level?: string | null
           created_at?: string
           github_url?: string | null
+          graduation_year?: string | null
           interests?: string[]
           major?: string | null
+          major_other?: string | null
           skills?: string[]
           university_id?: string
           updated_at?: string

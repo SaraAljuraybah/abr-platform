@@ -94,7 +94,12 @@ export const routes: RouteObject[] = [
           {
             element: <RequireAuth />,
             children: [
-              { path: 'onboarding', element: <PlaceholderPage page="onboarding" /> },
+              {
+                path: 'onboarding',
+                lazy: async () => ({
+                  Component: (await import('@/features/onboarding/OnboardingPage')).OnboardingPage,
+                }),
+              },
               {
                 element: <RequireOnboarding />,
                 children: [

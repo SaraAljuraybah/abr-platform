@@ -187,7 +187,6 @@
     "pages": {
       "signIn": "Sign in",
       "signUp": "Create an account",
-      "onboarding": "Onboarding",
       "app": "Dashboard",
       "admin": "Admin",
       "forgotPassword": "Reset your password",
@@ -462,7 +461,8 @@
     "email": "Enter a valid email address.",
     "invalid": "Check this value.",
     "tooShort": "Minimum length: {{min}} characters.",
-    "tooLong": "Maximum length: {{max}} characters."
+    "tooLong": "Maximum length: {{max}} characters.",
+    "githubUrl": "Enter your GitHub profile address, like https://github.com/username."
   },
   "passwordField": {
     "show": "Show password",
@@ -577,6 +577,94 @@
     "changes": {
       "title": "Changes to this notice",
       "body": "When we change this notice, we update the date above. If a change affects how we use data you already gave us, we will tell you before it applies."
+    }
+  },
+  "stepper": {
+    "position": "Step {{current}} of {{total}}",
+    "completed": "(completed)"
+  },
+  "toast": {
+    "region": "Notifications",
+    "close": "Close"
+  },
+  "chips": {
+    "placeholder": "Type and press Enter",
+    "full": "Limit reached",
+    "count": "{{count}} of {{max}} added.",
+    "suggestions": "Suggestions",
+    "add": "Add {{chip}}",
+    "remove": "Remove {{chip}}",
+    "added": "{{chip}} added.",
+    "removed": "{{chip}} removed."
+  },
+  "onboarding": {
+    "title": "Set up your profile",
+    "intro": "Four short steps. Your progress is saved after each one.",
+    "comingNext": "Profile setup for organizations and mentors is coming next. You don't need to do anything for now.",
+    "stepperLabel": "Profile setup progress",
+    "steps": {
+      "about": "About you",
+      "studies": "Your studies",
+      "skills": "Skills & interests",
+      "links": "Links"
+    },
+    "select": "Select…",
+    "next": "Next",
+    "back": "Back",
+    "finish": "Finish setup",
+    "saving": "Saving…",
+    "retry": "Try again",
+    "done": "Your profile is ready.",
+    "errors": {
+      "network": "We couldn't reach the server. Check your connection and try again.",
+      "unexpected": "We couldn't save this step. Please try again.",
+      "load": "We couldn't load your profile. Please try again."
+    },
+    "about": {
+      "intro": "How you'll appear to organizations and mentors.",
+      "fullName": "Full name",
+      "bio": "Short bio (optional)",
+      "bioHint": "A sentence or two about what you build or want to build.",
+      "university": "University",
+      "universityHint": "Verified with your university email at sign-up, so it can't be changed here.",
+      "universityUnknown": "Not available"
+    },
+    "studies": {
+      "intro": "What you study and where you are in your degree.",
+      "major": "Field of study",
+      "majorOther": "Your field of study",
+      "academicLevel": "Academic level",
+      "graduationYear": "Graduation year (or expected)"
+    },
+    "skills": {
+      "intro": "Helps organizations and mentors find you.",
+      "skills": "Skills (optional)",
+      "skillsHint": "Up to 20, each up to 40 characters.",
+      "interests": "Interests (optional)",
+      "interestsHint": "Pick any that apply."
+    },
+    "links": {
+      "intro": "Show your work. You can add more links later.",
+      "github": "GitHub profile (optional)",
+      "githubHint": "Format: https://github.com/username"
+    },
+    "options": {
+      "academicLevel": {
+        "undergraduate": "Undergraduate",
+        "final_year": "Final year",
+        "recent_graduate": "Recent graduate",
+        "postgraduate": "Postgraduate"
+      },
+      "interest": {
+        "fintech": "Fintech",
+        "health_tech": "Health tech",
+        "education": "Education",
+        "smart_cities": "Smart cities",
+        "ecommerce": "E-commerce",
+        "sustainability": "Sustainability",
+        "gaming": "Gaming",
+        "other": "Other"
+      }
     }
   }
 }

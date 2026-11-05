@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useLocation } from 'react-router';
 import { AuthActions } from '@/components/AuthActions';
 import { LanguageSwitch } from '@/components/LanguageSwitch';
+import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { Logo } from './Logo';
 import { MobileMenu } from './MobileMenu';
@@ -74,6 +75,7 @@ export function AppLayout() {
       </main>
 
       <SiteFooter showSections={isLanding} />
+      <Toaster />
     </div>
   );
 }

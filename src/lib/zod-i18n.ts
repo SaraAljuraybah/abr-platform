@@ -10,6 +10,7 @@ const VALIDATION_KEYS: readonly ValidationKey[] = [
   'validation.invalid',
   'validation.tooShort',
   'validation.tooLong',
+  'validation.githubUrl',
 ];
 
 export function isValidationKey(value: unknown): value is ValidationKey {

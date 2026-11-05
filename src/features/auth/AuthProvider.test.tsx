@@ -174,7 +174,7 @@ describe('AuthProvider + route guards (real profile)', () => {
     profileRow({ role: 'student', verification_status: 'verified', onboarding_completed: false });
     const router = renderAt('/app');
     expect(
-      await screen.findByRole('heading', { level: 1, name: 'Onboarding' }),
+      await screen.findByRole('heading', { level: 1, name: 'Set up your profile' }),
     ).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/onboarding');
   });
