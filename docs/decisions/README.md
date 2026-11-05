@@ -17,6 +17,7 @@ from the ABR Product & Technology Plan v2.0, Appendix B, and are to be written d
 | 0010 | pgTAP for authorization tests | To write |
 | [0011](0011-column-grants.md) | Revoke table privileges, then grant columns | Accepted |
 | 0012 | i18next for internationalisation | Accepted — to write |
+| [0013](0013-profiles-visible-between-verified-users.md) | Profiles are visible only between verified users (D-15) | Accepted |
 
 ## Format
 

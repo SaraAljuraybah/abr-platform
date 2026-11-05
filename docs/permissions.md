@@ -5,44 +5,46 @@ changes access updates this file in the same pull request (Definition of Done it
 is the authority; this file documents it.
 
 **Legend:** `—` no access · `✓` allowed · `own` own rows only · `RPC` only through the named
-function · `cols` only the listed columns · `vis` rows whose owner is verified and not an admin.
+function · `cols` only the listed columns · `vis` rows whose owner is verified and not an admin,
+readable **only by a verified viewer** (D-15).
 
 **Roles:** `anon` (signed out) · `student` · `organization` · `mentor` · `admin` (all `authenticated`;
 the app role comes from `profiles.role`). An admin is `role = 'admin'` **and** `verified`; a
 suspended admin has no admin rights.
 
-**Visibility rule (profiles and role profiles):** your own row, plus rows whose owner is
-`verified` and **not an admin**, plus everything for an admin. Admin profiles are never visible to
-non-admins. Unverified, pending, rejected and suspended users are visible only to themselves and
-admins.
+**Visibility rule (profiles and role profiles; D-15, [ADR-0013](decisions/0013-profiles-visible-between-verified-users.md)):**
+your own row; everything for an admin; and, **only when you are verified yourself**
+(`is_verified()`), rows whose owner is `verified` and **not an admin**. Admin profiles are never
+visible to non-admins. Unverified, pending, rejected and suspended users are visible only to
+themselves and admins, **and see no one else's profile**.
 
 ## Tables (SCRUM-12)
 
 No client role has `INSERT`, `DELETE` or `TRUNCATE` on any table. Rows are created by
 `private.handle_new_user()` (sign-up) or by the RPCs below.
 
-| Table                      | Operation          | anon        | student / organization / mentor                                                          | admin                                   | Enforced by                                                          |
-| -------------------------- | ------------------ | ----------- | ---------------------------------------------------------------------------------------- | --------------------------------------- | -------------------------------------------------------------------- |
-| `profiles`                 | select             | —           | own + vis                                                                                | ✓                                       | grant select; policy `profiles_select`                               |
-|                            | update             | —           | own, cols `full_name, bio, avatar_path, onboarding_completed`                            | same as others                          | column grant; policy `profiles_update_own`; trigger `profiles_guard` |
-|                            | role / status / id | —           | never (status via RPC only)                                                              | via RPC only                            | no column grant; guard trigger (`ABR_PROTECTED_COLUMN`)              |
-| `student_profiles`         | select             | —           | own + vis                                                                                | ✓                                       | policy `student_profiles_select`                                     |
-|                            | update             | —           | own, cols `major, academic_level, skills, interests, github_url` (never `university_id`) | same as others                          | column grant; guard trigger                                          |
-| `organization_profiles`    | select             | —           | own + vis                                                                                | ✓                                       | policy `organization_profiles_select`                                |
-|                            | update             | —           | own, cols `organization_name, description, website, support_types, logo_path`            | same as others                          | column grant; guard trigger                                          |
-| `mentor_profiles`          | select             | —           | own + vis                                                                                | ✓                                       | policy `mentor_profiles_select`                                      |
-|                            | update             | —           | own, cols `job_title, company, expertise, years_of_experience, professional_summary`     | same as others                          | column grant; guard trigger                                          |
-| `universities`             | select             | active rows | active rows                                                                              | all rows                                | policies `universities_select_active`, `universities_select_admin`   |
-|                            | write              | —           | —                                                                                        | — (admin RPC later)                     | no grant                                                             |
-| `university_email_domains` | select             | —           | — (0 rows; use `check_student_email`)                                                    | ✓                                       | no anon grant; admin-only policy                                     |
-| `university_requests`      | select             | —           | —                                                                                        | ✓                                       | admin-only policy (inserts: Edge Function, later)                    |
-| `verification_reviews`     | select             | —           | own (as subject), every column **except `reviewer_id`**                                  | ✓ (not `reviewer_id`; admin RPC later)  | column grant; policy `verification_reviews_select`                   |
-|                            | write              | —           | —                                                                                        | RPC                                     | append-only triggers (`ABR_APPEND_ONLY`), even for the owner         |
-| `audit_events`             | select             | —           | —                                                                                        | ✓                                       | admin-only policy                                                    |
-|                            | write              | —           | —                                                                                        | —                                       | written only by `private.log_event()`; append-only triggers          |
-| `private.contact_details`  | any                | —           | RPC (`get_my_contact`, `update_my_contact`), own row only                                | RPC, own row                            | schema `private` not exposed; no grants at all                       |
-| `interest_signups`         | any                | —           | —                                                                                        | — (aggregates via `get_interest_stats`) | RLS on, no grants, no policies; written only by `submit_interest()`  |
-| `private.rate_limits`      | any                | —           | —                                                                                        | —                                       | schema `private` not exposed; no grants; only `consume_rate_limit()` |
+| Table                      | Operation          | anon        | student / organization / mentor                                                                                        | admin                                   | Enforced by                                                                                                  |
+| -------------------------- | ------------------ | ----------- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `profiles`                 | select             | —           | own + vis                                                                                                              | ✓                                       | grant select; policy `profiles_select`                                                                       |
+|                            | update             | —           | own, cols `full_name, bio, avatar_path, onboarding_completed, onboarding_step`                                         | same as others                          | column grant; policy `profiles_update_own`; triggers `profiles_guard`, `profiles_guard_onboarding_completed` |
+|                            | role / status / id | —           | never (status via RPC only)                                                                                            | via RPC only                            | no column grant; guard trigger (`ABR_PROTECTED_COLUMN`)                                                      |
+| `student_profiles`         | select             | —           | own + vis                                                                                                              | ✓                                       | policy `student_profiles_select`                                                                             |
+|                            | update             | —           | own, cols `major, major_other, academic_level, graduation_year, skills, interests, github_url` (never `university_id`) | same as others                          | column grant; guard trigger                                                                                  |
+| `organization_profiles`    | select             | —           | own + vis                                                                                                              | ✓                                       | policy `organization_profiles_select`                                                                        |
+|                            | update             | —           | own, cols `organization_name, description, website, support_types, logo_path`                                          | same as others                          | column grant; guard trigger                                                                                  |
+| `mentor_profiles`          | select             | —           | own + vis                                                                                                              | ✓                                       | policy `mentor_profiles_select`                                                                              |
+|                            | update             | —           | own, cols `job_title, company, expertise, years_of_experience, professional_summary`                                   | same as others                          | column grant; guard trigger                                                                                  |
+| `universities`             | select             | active rows | active rows                                                                                                            | all rows                                | policies `universities_select_active`, `universities_select_admin`                                           |
+|                            | write              | —           | —                                                                                                                      | — (admin RPC later)                     | no grant                                                                                                     |
+| `university_email_domains` | select             | —           | — (0 rows; use `check_student_email`)                                                                                  | ✓                                       | no anon grant; admin-only policy                                                                             |
+| `university_requests`      | select             | —           | —                                                                                                                      | ✓                                       | admin-only policy (inserts: Edge Function, later)                                                            |
+| `verification_reviews`     | select             | —           | own (as subject), every column **except `reviewer_id`**                                                                | ✓ (not `reviewer_id`; admin RPC later)  | column grant; policy `verification_reviews_select`                                                           |
+|                            | write              | —           | —                                                                                                                      | RPC                                     | append-only triggers (`ABR_APPEND_ONLY`), even for the owner                                                 |
+| `audit_events`             | select             | —           | —                                                                                                                      | ✓                                       | admin-only policy                                                                                            |
+|                            | write              | —           | —                                                                                                                      | —                                       | written only by `private.log_event()`; append-only triggers                                                  |
+| `private.contact_details`  | any                | —           | RPC (`get_my_contact`, `update_my_contact`), own row only                                                              | RPC, own row                            | schema `private` not exposed; no grants at all                                                               |
+| `interest_signups`         | any                | —           | —                                                                                                                      | — (aggregates via `get_interest_stats`) | RLS on, no grants, no policies; written only by `submit_interest()`                                          |
+| `private.rate_limits`      | any                | —           | —                                                                                                                      | —                                       | schema `private` not exposed; no grants; only `consume_rate_limit()`                                         |
 
 `service_role` (secret key, server-side only) additionally has `SELECT` on `profiles` so
 `scripts/provision-admin.mjs` can verify a new admin.
@@ -98,4 +100,6 @@ grant it explicitly. Error codes: `42501` not allowed · `22023` invalid input �
 - `audit_events` and `verification_reviews` are append-only for everyone, the owner included.
 
 These invariants are enforced by `supabase/tests/database/000_schema_guard.test.sql`; the
-behaviour is covered by `010_signup`, `020_permissions`, `030_verification` and `040_interest`.
+behaviour is covered by `010_signup`, `020_permissions`, `030_verification`, `040_interest`,
+`050_onboarding` (student onboarding writes and the completion trigger) and `060_profile_visibility`
+(D-15).
