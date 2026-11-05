@@ -269,6 +269,108 @@ export type Database = {
         }
         Relationships: []
       }
+      project_members: {
+        Row: {
+          created_at: string
+          member_role: string
+          project_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          member_role: string
+          project_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          member_role?: string
+          project_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          academic_year: string | null
+          created_at: string
+          description: string | null
+          id: string
+          owner_id: string
+          published_at: string | null
+          sectors: string[]
+          status: Database["public"]["Enums"]["project_status"]
+          submitted_at: string | null
+          summary: string | null
+          title: string
+          track: string | null
+          university_id: string
+          updated_at: string
+        }
+        Insert: {
+          academic_year?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          owner_id: string
+          published_at?: string | null
+          sectors?: string[]
+          status?: Database["public"]["Enums"]["project_status"]
+          submitted_at?: string | null
+          summary?: string | null
+          title: string
+          track?: string | null
+          university_id: string
+          updated_at?: string
+        }
+        Update: {
+          academic_year?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          owner_id?: string
+          published_at?: string | null
+          sectors?: string[]
+          status?: Database["public"]["Enums"]["project_status"]
+          submitted_at?: string | null
+          summary?: string | null
+          title?: string
+          track?: string | null
+          university_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_university_id_fkey"
+            columns: ["university_id"]
+            isOneToOne: false
+            referencedRelation: "universities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_profiles: {
         Row: {
           academic_level: string | null
@@ -469,10 +571,12 @@ export type Database = {
         }
         Returns: boolean
       }
+      create_project: { Args: { p_title: string }; Returns: string }
       current_app_role: {
         Args: never
         Returns: Database["public"]["Enums"]["user_role"]
       }
+      delete_project: { Args: { p_project_id: string }; Returns: undefined }
       get_interest_stats: {
         Args: never
         Returns: {
