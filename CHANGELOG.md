@@ -178,6 +178,24 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   `private.contact_details`, and completing student onboarding requires it
   (`ABR_ONBOARDING_INCOMPLETE`). A student who passed step 1 before this resumes there.
 
+- Project details, team, needs, image, document and links (SCRUM-27 with SCRUM-18, migration
+  `20261106090424_project_details_and_media`): new owner-editable columns `stage`, `team_size`
+  (1–10), `looking_for_members`, `wanted_specializations` (only while looking for members),
+  `needs`, `image_path`, `document_path` (inside the project's own folder), `video_url`
+  (YouTube, Vimeo, Loom), `repo_url` (GitHub, GitLab) and `demo_url` (https). Private buckets
+  `project-images` (JPG/PNG/WebP, 2 MB) and `project-documents` (PDF, 10 MB), created by the
+  migration. `storage.objects` policies: read follows `projects_select` (owner, admin, or
+  published with a verified viewer and a verified owner, D-15); write needs the project's
+  verified owner, an editable status and a well-formed name in the project's folder. Files are
+  served through 5-minute signed URLs. pgTAP `090_project_details_and_media`.
+- The project edit page in five sections (Basics, Stage & team, Needs, Media, Links) with one
+  Save; uploads save at once, with progress and clear errors. Images are re-encoded in the
+  browser (WebP, or JPEG), which removes EXIF data such as GPS location, and scaled to at most
+  1600 px; documents keep their original name as object metadata. Replacing a file removes the
+  old one; deleting a draft clears the paths, removes the folder's files, then deletes the
+  project. A branded default image (gradient, track icon, first letter) when none is uploaded;
+  the dashboard shows it next to the title. The privacy policy lists project data.
+
 ### Handoff to SCRUM-13 (sign-up UI)
 
 - The client must call `check_student_email(university_id, email)` before signing a student up.
@@ -384,3 +402,6 @@ Open points in the Terms and Conditions (`/terms`), shown only in development bu
 - Admin RPCs: manage universities and domains, read `reviewer_id`.
 - Unsubscribe link and mechanism required in every marketing email (SCRUM-37).
 - Organization and mentor onboarding (later) must also require a phone number.
+- Clean up orphaned project files: an old file whose removal failed after a replace, and the
+  folders of deleted accounts (scheduled job with the secret key; files are private and
+  unreachable meanwhile).
