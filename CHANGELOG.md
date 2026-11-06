@@ -161,6 +161,23 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   next" continues the draft and "Your projects" lists it with its status. New shared `Dialog`
   component (Radix).
 
+- Sign-up consents (SCRUM-38, migration `20261106080425_signup_consent_and_phone`): `/sign-up`
+  has two required checkboxes, "I agree to the Terms and Conditions." and "I agree to the Privacy
+  Policy.", whose links open `/terms` and `/privacy` in a new tab. The form sends
+  `terms_version` and `privacy_version` (`src/features/legal/versions.ts`), and the sign-up
+  trigger refuses a student, organization or mentor account unless both equal
+  `private.current_legal_versions()` (`ABR_CONSENT_REQUIRED`). The versions and acceptance times
+  are stored on `profiles` (never client-writable) and audited as `user.consented`. Admins,
+  provisioned with the secret key, are exempt. Current versions: `2026-11-v1` for both.
+- Terms and Conditions at `/terms` (SCRUM-38), English and Arabic, in the site layout and public
+  in both launch modes; footer link "Terms". Draft pending legal review (see "Before public
+  launch").
+- Student mobile number (SCRUM-38): onboarding step 1 asks for a Saudi mobile number (05XXXXXXXX
+  or +9665XXXXXXXX, saved as +9665XXXXXXXX) and whether to share it with organizations after
+  accepting their request (off by default). It is saved through `update_my_contact` into
+  `private.contact_details`, and completing student onboarding requires it
+  (`ABR_ONBOARDING_INCOMPLETE`). A student who passed step 1 before this resumes there.
+
 ### Handoff to SCRUM-13 (sign-up UI)
 
 - The client must call `check_student_email(university_id, email)` before signing a student up.
@@ -232,6 +249,10 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   `registry pulls this run: N (cache hit|miss)` notice. Both jobs run on `ubuntu-24.04` (pinned
   before `ubuntu-latest` moves to Ubuntu 26 on 19 Oct 2026); the Database job timeout is 30 min.
 
+- `/privacy` is titled "Privacy Policy" / «سياسة الخصوصية» (heading, browser tab and footer link),
+  matching the sign-up checkbox, and states the consent records and the students' mobile number.
+  `PRIVACY_LAST_UPDATED` is `2026-11-06` (SCRUM-38).
+
 ### Removed
 
 - The "Internal build. Only the platform foundation is available." notice, from every route
@@ -294,7 +315,22 @@ builds hide them, so they are tracked here:
   requires").
 - Legal review: retention of the security log and review records.
 - Set `PRIVACY_LAST_UPDATED` (`src/features/privacy/notice.ts`) to the launch date; it is
-  `2026-11-04` until the CTO gives the date.
+  `2026-11-06` (the SCRUM-38 commit date) until the CTO gives the date.
+
+Open points in the Terms and Conditions (`/terms`), shown only in development builds:
+
+- Legal review of the whole text.
+- The company's legal name and commercial registration number.
+- Legal review: the 18+ rule and students under 18.
+- Legal review: university rules on ownership of graduation projects.
+- Legal review: the scope of the display licence.
+- Legal review: limitation of liability and any cap.
+- Legal review: notice period before changes apply.
+- Legal review: governing law and competent courts (city).
+- Set `TERMS_LAST_UPDATED` (`src/features/terms/terms.ts`) and `PRIVACY_LAST_UPDATED` to the
+  launch date; both are `2026-11-06` for now. A text change that needs new consent also bumps
+  the version in `src/features/legal/versions.ts` and in a new migration replacing
+  `private.current_legal_versions()`.
 
 ### CTO decisions (2026-11-03)
 
@@ -347,3 +383,4 @@ builds hide them, so they are tracked here:
 - Block or re-validate a student's auth email change to a domain that is not allowlisted.
 - Admin RPCs: manage universities and domains, read `reviewer_id`.
 - Unsubscribe link and mechanism required in every marketing email (SCRUM-37).
+- Organization and mentor onboarding (later) must also require a phone number.
