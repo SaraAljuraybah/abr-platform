@@ -144,6 +144,22 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   `/forms/interest?role=…`, and the FAQ on unlisted universities points to "Other" in the interest
   form. UX only, not access control. Tests cover both values. `/forgot-password`, `/check-email`
   and `/auth/confirmed` also show "Coming soon" in this mode (SCRUM-36).
+- Projects (SCRUM-18, migration `20261105223146_projects`): tables `projects` and
+  `project_members` (one owner per project). Clients read with RLS and update only `title`,
+  `summary`, `description`, `track`, `sectors` and `academic_year`; `status`, `owner_id`,
+  `university_id`, `submitted_at` and `published_at` have no grant and a guard trigger. The owner
+  edits only while verified and while the project is `draft` or `changes_requested`. Published
+  projects are visible to verified users while the owner is verified (D-15). RPCs
+  `create_project(title)` (verified, onboarded students; one project per student in V1,
+  `ABR_PROJECT_LIMIT`; university set server-side) and `delete_project(id)` (owner, draft only),
+  both audited. pgTAP `070_projects`.
+- Project pages (SCRUM-18), English and Arabic, students only: `/app/projects/new` (a title, then
+  "Create draft"; a student who has a project goes straight to it) and `/app/projects/:id/edit`
+  (title, summary and description with counters, track, up to 5 sectors, academic year; explicit
+  Save with a "Saved" indicator; unsaved-changes warning on leave; "Delete draft" behind a
+  confirmation dialog; read-only outside draft and changes requested). The dashboard's "What's
+  next" continues the draft and "Your projects" lists it with its status. New shared `Dialog`
+  component (Radix).
 
 ### Handoff to SCRUM-13 (sign-up UI)
 
