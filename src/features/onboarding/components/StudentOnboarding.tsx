@@ -23,7 +23,11 @@ export function StudentOnboarding({ userId, data }: { userId: string; data: Onbo
   const { t } = useTranslation();
   const navigate = useNavigate();
   const save = useSaveStep(userId);
-  const [index, setIndex] = useState(() => Math.min(data.completedSteps, LAST));
+  // SCRUM-38: a student who got past step 1 before the phone was required starts there again,
+  // so finishing never fails on the server's phone rule.
+  const [index, setIndex] = useState(() =>
+    data.values.phone ? Math.min(data.completedSteps, LAST) : 0,
+  );
   const [progress, setProgress] = useState(data.completedSteps);
   // Read by the resolver at submit time, after this render's effects have run.
   const stepRef = useRef(index);
@@ -63,7 +67,7 @@ export function StudentOnboarding({ userId, data }: { userId: string; data: Onbo
   const onSubmit = form.handleSubmit(() => {
     const nextProgress = Math.max(progress, index + 1);
     save.mutate(
-      { step, progress: nextProgress, values: form.getValues(), finish },
+      { step, progress: nextProgress, values: form.getValues(), finish, contact: data.contact },
       {
         onSuccess: () => {
           setProgress(nextProgress);

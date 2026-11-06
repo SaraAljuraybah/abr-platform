@@ -4,7 +4,12 @@ import { ownProfileKey, type OwnProfile } from '@/features/auth/profile-api';
 import { type Language } from '@/lib/i18n';
 import { supabase } from '@/lib/supabase';
 import type { Database } from '@/types/database';
-import { GITHUB_URL_PATTERN, normalizeGithubUrl, type OnboardingStep } from './options';
+import {
+  GITHUB_URL_PATTERN,
+  normalizeGithubUrl,
+  normalizeSaudiMobile,
+  type OnboardingStep,
+} from './options';
 import { type OnboardingValues } from './schemas';
 
 export interface OnboardingData {
@@ -12,6 +17,11 @@ export interface OnboardingData {
   completedSteps: number;
   universityName: string | null;
   values: OnboardingValues;
+  /**
+   * The contact fields onboarding does not edit. update_my_contact() writes all of them, so they
+   * are sent back unchanged and never cleared.
+   */
+  contact: { linkedinUrl: string | null; shareLinkedin: boolean };
 }
 
 export const onboardingKey = (userId: string) => ['onboarding', userId] as const;
@@ -39,7 +49,7 @@ export function useOnboardingData(userId: string, language: Language) {
     staleTime: Infinity,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      const [profile, student] = await Promise.all([
+      const [profile, student, contact] = await Promise.all([
         supabase
           .from('profiles')
           .select('full_name, bio, onboarding_step')
@@ -52,16 +62,25 @@ export function useOnboardingData(userId: string, language: Language) {
           )
           .eq('user_id', userId)
           .single(),
+        // Schema private is not exposed: the phone comes only through this RPC (own row).
+        supabase.rpc('get_my_contact'),
       ]);
       if (profile.error) throw profile.error;
       if (student.error) throw student.error;
-      return { profile: profile.data, student: student.data };
+      if (contact.error) throw contact.error;
+      return { profile: profile.data, student: student.data, contact: contact.data[0] ?? null };
     },
-    select: ({ profile, student }): OnboardingData => ({
+    select: ({ profile, student, contact }): OnboardingData => ({
       completedSteps: profile.onboarding_step,
       universityName: universityName(student.universities, language),
+      contact: {
+        linkedinUrl: contact?.linkedin_url ?? null,
+        shareLinkedin: contact?.share_linkedin ?? false,
+      },
       values: {
         fullName: profile.full_name ?? '',
+        phone: contact?.phone ?? '',
+        sharePhone: contact?.share_phone ?? false,
         bio: profile.bio ?? '',
         major: student.major ?? '',
         majorOther: student.major_other ?? '',
@@ -130,6 +149,7 @@ interface SaveStepInput {
   values: OnboardingValues;
   /** The last step also marks onboarding complete. */
   finish: boolean;
+  contact: OnboardingData['contact'];
 }
 
 /**
@@ -139,8 +159,20 @@ interface SaveStepInput {
 export function useSaveStep(userId: string) {
   const queryClient = useQueryClient();
   return useMutation<null, SaveFailure, SaveStepInput>({
-    mutationFn: async ({ step, progress: completed, values, finish }) => {
+    mutationFn: async ({ step, progress: completed, values, finish, contact }) => {
       try {
+        if (step === 'about') {
+          // The phone goes to private.contact_details through the RPC, never to a public table.
+          const phone = normalizeSaudiMobile(values.phone);
+          if (!phone) throw new Error('phone not validated');
+          const { error } = await supabase.rpc('update_my_contact', {
+            p_phone: phone,
+            p_linkedin_url: contact.linkedinUrl ?? '',
+            p_share_phone: values.sharePhone,
+            p_share_linkedin: contact.shareLinkedin,
+          });
+          if (error) throw error;
+        }
         const columns = stepColumns(step, values);
         if (columns.student) {
           const { data, error } = await supabase

@@ -6,8 +6,43 @@ import {
   GITHUB_URL_PATTERN,
   INTERESTS,
   normalizeGithubUrl,
+  normalizeSaudiMobile,
   ONBOARDING_LIMITS,
 } from './options';
+
+describe('Saudi mobile number', () => {
+  it.each([
+    ['0501234567', '+966501234567'],
+    ['+966501234567', '+966501234567'],
+    ['  050 123 4567 ', '+966501234567'],
+    ['050-123-4567', '+966501234567'],
+    ['+966 (50) 123 4567', '+966501234567'],
+    ['٠٥٠١٢٣٤٥٦٧', '+966501234567'],
+    ['+٩٦٦٥٠١٢٣٤٥٦٧', '+966501234567'],
+    ['۰۵۵۱۲۳۴۵۶۷', '+966551234567'],
+  ])('accepts %j as %s', (raw, normalized) => {
+    expect(normalizeSaudiMobile(raw)).toBe(normalized);
+  });
+
+  it.each([
+    '',
+    '501234567', // no leading 0
+    '0412345678', // landline-style, not 05
+    '050123456', // one digit short
+    '05012345678', // one digit long
+    '966501234567', // no +
+    '00966501234567',
+    '+966401234567',
+    '+971501234567', // another country
+    '05O1234567', // a letter O
+  ])('refuses %j', (raw) => {
+    expect(normalizeSaudiMobile(raw)).toBeNull();
+  });
+
+  it('the normalised form passes the database phone CHECK (E.164)', () => {
+    expect(normalizeSaudiMobile('0501234567')).toMatch(/^\+[1-9][0-9]{7,14}$/);
+  });
+});
 
 // Every migration in apply order: a later migration replaces a CHECK, so the last one wins.
 const directory = new URL('../../../supabase/migrations/', import.meta.url);

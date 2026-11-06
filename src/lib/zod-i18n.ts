@@ -11,6 +11,7 @@ const VALIDATION_KEYS: readonly ValidationKey[] = [
   'validation.tooShort',
   'validation.tooLong',
   'validation.githubUrl',
+  'validation.saudiMobile',
 ];
 
 export function isValidationKey(value: unknown): value is ValidationKey {

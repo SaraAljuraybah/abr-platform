@@ -7,6 +7,7 @@ import {
   GRADUATION_YEARS,
   INTERESTS,
   normalizeGithubUrl,
+  normalizeSaudiMobile,
   ONBOARDING_LIMITS,
   type OnboardingStep,
 } from './options';
@@ -17,6 +18,9 @@ import {
  */
 export interface OnboardingValues {
   fullName: string;
+  /** As typed; saved normalised to +9665XXXXXXXX (normalizeSaudiMobile). */
+  phone: string;
+  sharePhone: boolean;
   bio: string;
   major: string;
   majorOther: string;
@@ -31,6 +35,13 @@ const L = ONBOARDING_LIMITS;
 
 const about = z.object({
   fullName: z.string().trim().min(L.fullName.min).max(L.fullName.max),
+  // SCRUM-38: required for students; the server requires a phone to complete onboarding.
+  phone: z
+    .string()
+    .trim()
+    .min(1)
+    .refine((value) => normalizeSaudiMobile(value) !== null, { message: 'validation.saudiMobile' }),
+  sharePhone: z.boolean(),
   bio: z.string().trim().max(L.bio.max),
 });
 
@@ -77,6 +88,8 @@ export const stepSchemas = { about, studies, skills, links } satisfies Record<
 
 export const emptyOnboarding: OnboardingValues = {
   fullName: '',
+  phone: '',
+  sharePhone: false,
   bio: '',
   major: '',
   majorOther: '',

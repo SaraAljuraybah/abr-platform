@@ -56,5 +56,20 @@ export function normalizeGithubUrl(raw: string): string {
   return /^(www\.)?github\.com\//i.test(value) ? `https://${value}` : value;
 }
 
+/**
+ * A Saudi mobile number as stored (E.164, +9665XXXXXXXX), or null. Accepts 05XXXXXXXX or
+ * +9665XXXXXXXX, with spaces, dashes or brackets, and Arabic-Indic or Persian digits as typed on
+ * an Arabic keyboard. The database only checks E.164; this is the form's rule (SCRUM-38).
+ */
+export function normalizeSaudiMobile(raw: string): string | null {
+  const value = raw
+    .replace(/[٠-٩]/g, (digit) => String(digit.charCodeAt(0) - 0x0660))
+    .replace(/[۰-۹]/g, (digit) => String(digit.charCodeAt(0) - 0x06f0))
+    .replace(/[\s\-()]/g, '');
+  const local = /^05(\d{8})$/.exec(value);
+  if (local) return `+9665${local[1] ?? ''}`;
+  return /^\+9665\d{8}$/.test(value) ? value : null;
+}
+
 export const ONBOARDING_STEPS = ['about', 'studies', 'skills', 'links'] as const;
 export type OnboardingStep = (typeof ONBOARDING_STEPS)[number];

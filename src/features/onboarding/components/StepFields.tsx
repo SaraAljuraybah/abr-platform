@@ -2,6 +2,7 @@ import { OTHER } from '@shared/interest-options';
 import { GraduationCap } from 'lucide-react';
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { CheckboxField } from '@/components/ui/checkbox-group';
 import { ChipInput, ToggleChips } from '@/components/ui/chip-input';
 import { CharacterCount } from '@/components/ui/field-number';
 import { SelectField } from '@/components/ui/select-field';
@@ -45,6 +46,18 @@ export function AboutStep({ form, universityName }: { form: Form; universityName
         details={<CharacterCount value={fullName.length} max={L.fullName.max} />}
         {...form.register('fullName')}
       />
+      <TextField
+        label={t('onboarding.about.phone')}
+        hint={t('onboarding.about.phoneHint')}
+        type="tel"
+        inputMode="tel"
+        autoComplete="tel"
+        dir="ltr"
+        placeholder="05XXXXXXXX"
+        error={fieldError('phone')}
+        {...form.register('phone')}
+      />
+      <CheckboxField label={t('onboarding.about.sharePhone')} {...form.register('sharePhone')} />
       <TextareaField
         label={t('onboarding.about.bio')}
         hint={t('onboarding.about.bioHint')}

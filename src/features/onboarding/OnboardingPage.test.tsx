@@ -25,6 +25,9 @@ const db = vi.hoisted(() => ({
   updates: [] as { table: string; patch: Row }[],
   /** Makes the next update fail: an error, or matching no rows (what RLS does). */
   failNextUpdate: null as null | 'error' | 'noRows',
+  /** The caller's private.contact_details row, behind get_my_contact / update_my_contact. */
+  contact: null as Row | null,
+  rpcs: [] as { name: string; args: Row | undefined }[],
 }));
 
 vi.mock('@/lib/supabase', () => {
@@ -62,13 +65,41 @@ vi.mock('@/lib/supabase', () => {
           }),
         }),
       }),
+      rpc: (name: string, args?: Row) => {
+        db.rpcs.push({ name, args });
+        if (name === 'get_my_contact') {
+          return Promise.resolve({ data: db.contact ? [db.contact] : [], error: null });
+        }
+        db.contact = {
+          ...db.contact,
+          phone: args?.p_phone,
+          // update_my_contact turns an empty string into null.
+          linkedin_url: args?.p_linkedin_url === '' ? null : args?.p_linkedin_url,
+          share_phone: args?.p_share_phone,
+          share_linkedin: args?.p_share_linkedin,
+        };
+        return Promise.resolve({ data: null, error: null });
+      },
     },
   };
 });
 
-function seed(profile: Row = {}, student: Row = {}) {
+const PHONE = '+966501234567';
+const updateContactCalls = () => db.rpcs.filter((call) => call.name === 'update_my_contact');
+
+/** A saved phone by default (step 1 done); the phone tests pass contact { phone: null }. */
+function seed(profile: Row = {}, student: Row = {}, contact: Row = {}) {
   db.updates = [];
   db.failNextUpdate = null;
+  db.rpcs = [];
+  db.contact = {
+    contact_email: 'sara@ksu.edu.sa',
+    phone: PHONE,
+    share_phone: false,
+    linkedin_url: null,
+    share_linkedin: false,
+    ...contact,
+  };
   db.profiles.set(USER_ID, {
     role: 'student',
     verification_status: 'verified',
@@ -146,6 +177,7 @@ describe.each(['en', 'ar'] as const)('student onboarding (%s)', (language) => {
 
   it('step 1: prefilled name, read-only university, validation, then saves name, bio and step', async () => {
     const user = userEvent.setup();
+    seed({}, {}, { phone: null });
     await load();
     await stepHeading(t, 'about');
 
@@ -171,10 +203,38 @@ describe.each(['en', 'ar'] as const)('student onboarding (%s)', (language) => {
     await user.type(name, '  Sara A. ');
     await user.type(screen.getByLabelText(t.onboarding.about.bio), 'I build tools.');
     expect(screen.getByText('14/1000')).toBeInTheDocument();
+
+    // The mobile number is required, Saudi, left-to-right; sharing is off until ticked.
+    const phone = screen.getByLabelText(t.onboarding.about.phone);
+    expect(phone).toHaveAttribute('dir', 'ltr');
+    expect(phone).toHaveAttribute('type', 'tel');
+    expect(phone).toHaveAccessibleDescription(
+      expect.stringContaining(t.onboarding.about.phoneHint),
+    );
+    await next(user, t);
+    await expectError(phone, t.validation.required);
+    await user.type(phone, '0412345678');
+    await next(user, t);
+    await expectError(phone, t.validation.saudiMobile);
+    expect(updateContactCalls()).toEqual([]);
+    expect(db.updates).toEqual([]);
+
+    await user.clear(phone);
+    // Arabic-Indic digits with spaces, as typed on an Arabic keyboard.
+    await user.type(phone, '٠٥٠ ١٢٣ ٤٥٦٧');
+    const share = screen.getByRole('checkbox', { name: t.onboarding.about.sharePhone });
+    expect(share).not.toBeChecked();
+    await user.click(share);
     await next(user, t);
 
     const heading = await stepHeading(t, 'studies');
     expect(heading).toHaveFocus();
+    expect(updateContactCalls()).toEqual([
+      {
+        name: 'update_my_contact',
+        args: { p_phone: PHONE, p_linkedin_url: '', p_share_phone: true, p_share_linkedin: false },
+      },
+    ]);
     expect(db.updates).toEqual([
       {
         table: 'profiles',
@@ -390,6 +450,39 @@ describe('resume, Back and failures', () => {
       expect(db.profiles.get(USER_ID)?.onboarding_step).toBe(0);
     },
   );
+
+  it('step 1 keeps the saved phone and never clears a saved LinkedIn link', async () => {
+    const user = userEvent.setup();
+    seed(
+      {},
+      {},
+      { linkedin_url: 'https://www.linkedin.com/in/sara', share_linkedin: true, share_phone: true },
+    );
+    await load();
+    await stepHeading(en, 'about');
+    expect(screen.getByLabelText(en.onboarding.about.phone)).toHaveValue(PHONE);
+    expect(screen.getByRole('checkbox', { name: en.onboarding.about.sharePhone })).toBeChecked();
+    await next(user, en);
+    await stepHeading(en, 'studies');
+    expect(updateContactCalls()).toEqual([
+      {
+        name: 'update_my_contact',
+        args: {
+          p_phone: PHONE,
+          p_linkedin_url: 'https://www.linkedin.com/in/sara',
+          p_share_phone: true,
+          p_share_linkedin: true,
+        },
+      },
+    ]);
+  });
+
+  it('a student past step 1 without a phone (older accounts) resumes at step 1', async () => {
+    seed({ onboarding_step: 2 }, {}, { phone: null });
+    await load();
+    await stepHeading(en, 'about');
+    expect(screen.getByLabelText(en.onboarding.about.phone)).toHaveValue('');
+  });
 
   it.each(['organization', 'mentor'])('a %s sees that their setup comes next', async (role) => {
     seed({ role, verification_status: 'pending' });
