@@ -88,6 +88,13 @@ export const routes: RouteObject[] = [
           Component: (await import('@/features/privacy/PrivacyPage')).PrivacyPage,
         }),
       },
+      {
+        // Public in both launch modes, like /privacy (SCRUM-38).
+        path: 'terms',
+        lazy: async () => ({
+          Component: (await import('@/features/terms/TermsPage')).TermsPage,
+        }),
+      },
       // Short link for campaigns; vercel.json redirects it too (before the SPA loads).
       { path: 'register', element: <Navigate to="/forms/interest" replace /> },
       {

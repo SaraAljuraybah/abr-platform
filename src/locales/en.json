@@ -19,13 +19,14 @@
     "goToDashboard": "Go to dashboard",
     "registerInterest": "Register your interest",
     "howItWorks": "How it works",
-    "privacy": "Privacy",
+    "privacy": "Privacy Policy",
     "sections": {
       "howItWorks": "How it works",
       "whoItsFor": "Who it's for",
       "trust": "Trust & privacy",
       "faq": "FAQ"
-    }
+    },
+    "terms": "Terms"
   },
   "comingSoon": {
     "title": "Coming soon",
@@ -269,9 +270,11 @@
       "mentorNotice": "Mentor workflows open after the pilot. You can register now, and we'll review your profile.",
       "submit": "Create account",
       "submitting": "Creating your account…",
-      "consent": "By creating an account, you agree to the use of your data to review your account and contact you about ABR, as described in the <privacyLink>privacy notice</privacyLink>.",
       "haveAccount": "Already have an account?",
-      "signIn": "Sign in"
+      "signIn": "Sign in",
+      "acceptTerms": "I agree to the <termsLink>Terms and Conditions</termsLink>.",
+      "acceptPrivacy": "I agree to the <privacyLink>Privacy Policy</privacyLink>.",
+      "consentRequired": "Please accept to continue."
     },
     "checkEmail": {
       "title": "Check your email",
@@ -462,7 +465,8 @@
     "invalid": "Check this value.",
     "tooShort": "Minimum length: {{min}} characters.",
     "tooLong": "Maximum length: {{max}} characters.",
-    "githubUrl": "Enter your GitHub profile address, like https://github.com/username."
+    "githubUrl": "Enter your GitHub profile address, like https://github.com/username.",
+    "saudiMobile": "Enter a Saudi mobile number, for example 05XXXXXXXX."
   },
   "passwordField": {
     "show": "Show password",
@@ -470,7 +474,7 @@
   },
   "privacy": {
     "eyebrow": "Your data at ABR",
-    "title": "Privacy, clearly.",
+    "title": "Privacy Policy",
     "updated": "Last updated: {{date}}",
     "todoLabel": "TODO (development builds only):",
     "todo": {
@@ -496,6 +500,7 @@
           "organization": "Organizations: your organization's name.",
           "profile": "Profile details you choose to add. For everyone: a short bio and a photo. Students: major, academic level, skills, interests and a GitHub link. Organizations: a description, website, the kinds of support you offer and a logo. Mentors: job title, company, expertise, years of experience and a professional summary.",
           "verification": "Your verification status. If the ABR team reviews your account, we keep the decision, the reason given and a copy of the profile as you submitted it.",
+          "consent": "The versions of the terms and conditions and of this privacy policy that you agreed to, and when you agreed.",
           "universityRequest": "If you ask us to add a university: its name, its email domain and your email."
         }
       },
@@ -510,7 +515,7 @@
       },
       "contact": {
         "title": "Contact details",
-        "body": "Your contact email (your sign-up email unless you change it) and, if you add them, a phone number and a LinkedIn link, with your choice of whether to share each of them."
+        "body": "Your contact email (your sign-up email unless you change it). Students give a mobile number when they set up their profile; others may add one. You may also add a LinkedIn link. For each of these, you choose whether to share it."
       },
       "security": {
         "title": "Security records",
@@ -577,7 +582,103 @@
     "changes": {
       "title": "Changes to this notice",
       "body": "When we change this notice, we update the date above. If a change affects how we use data you already gave us, we will tell you before it applies."
+    },
+    "metaTitle": "Privacy Policy · ABR"
+  },
+  "terms": {
+    "metaTitle": "Terms and Conditions · ABR",
+    "eyebrow": "Legal",
+    "title": "Terms and Conditions",
+    "updated": "Last updated: {{date}}",
+    "intro": "By creating an account, you agree to these terms and to our privacy policy.",
+    "todoLabel": "TODO (development builds only):",
+    "who": {
+      "title": "Who we are",
+      "body": "ABR (\"ABR\", \"we\", \"us\") is a platform that connects university students' graduation projects with organizations and mentors. These terms apply to tryabr.com and to your use of the ABR platform."
+    },
+    "eligibility": {
+      "title": "Who can use ABR",
+      "items": {
+        "age": "You must be 18 or over.",
+        "students": "Students: you must study at, or have recently graduated from, a participating university. We verify students through their university email address.",
+        "others": "Organizations and mentors: the ABR team reviews each account before it can use the platform. We may ask for more information, and we may decline an account."
+      }
+    },
+    "account": {
+      "title": "Your account",
+      "items": {
+        "accurate": "Give accurate, current information and keep it up to date.",
+        "one": "One account per person. Do not create an account for someone else or pretend to be someone else.",
+        "password": "Keep your password secret. You are responsible for what happens under your account. Tell us at once if you think someone else has used it."
+      }
+    },
+    "use": {
+      "title": "Acceptable use",
+      "intro": "You must not:",
+      "items": {
+        "falseInfo": "give false information or impersonate a person or organization;",
+        "scraping": "scrape, copy in bulk or collect data from the platform by automated means;",
+        "contactDetails": "share, publish or sell another member's contact details, or use them for anything other than the purpose of the connection they were shared for;",
+        "harassment": "harass, threaten or spam other members, or send them unsolicited advertising;",
+        "content": "upload content that is unlawful, or that you do not have the right to share;",
+        "security": "try to get around our security, or to access accounts or data that are not yours."
+      }
+    },
+    "projects": {
+      "title": "Your projects",
+      "items": {
+        "ownership": "Students keep ownership of their projects and everything they upload. You confirm that you have the right to share what you post, including your teammates' agreement and any rules your university sets for graduation projects.",
+        "licence": "You give ABR a non-exclusive, free licence to host your project and show it to verified members on the platform while it is published. The licence ends when you unpublish or delete the project. Copies we must keep by law, or that remain for a limited time in backups, are the only exception.",
+        "noRights": "Seeing a project on ABR gives no right to use, copy, develop or commercialise it. Any such use needs a separate agreement with the student and their team."
+      }
+    },
+    "connections": {
+      "title": "Connections and contact details",
+      "items": {
+        "private": "Contact details are private. They are shared only after you accept a request, and only the details you chose to share. Every access is logged.",
+        "purpose": "If you receive someone's contact details through an accepted connection, use them only for that connection."
+      }
+    },
+    "suspension": {
+      "title": "Suspension and closing your account",
+      "items": {
+        "suspend": "We may suspend or close an account that breaks these terms, gives false information or puts other members at risk. Where we can, we tell you why.",
+        "close": "You can close your account at any time by writing to us."
+      }
+    },
+    "liability": {
+      "title": "Disclaimers and limitation of liability",
+      "items": {
+        "asIs": "ABR is provided as it is. We do not guarantee that it will always be available or free of errors.",
+        "endorsement": "Verifying an account is not an endorsement. ABR is not a party to any arrangement between members, such as an internship, job, sponsorship or mentoring, and does not guarantee its outcome.",
+        "limit": "To the extent the law allows, ABR is not liable for indirect losses, or for losses caused by other members' actions or content."
+      }
+    },
+    "changes": {
+      "title": "Changes to these terms",
+      "body": "When we change these terms, we update the date above. If a change affects your rights, we tell you before it applies, and we may ask you to accept the new version to keep using ABR."
+    },
+    "law": {
+      "title": "Governing law",
+      "body": "These terms are governed by the laws of the Kingdom of Saudi Arabia. Any dispute is settled by the competent courts in the Kingdom."
+    },
+    "contact": {
+      "title": "Contact",
+      "body": "For any question about these terms, write to <email>try0abr@gmail.com</email>."
+    },
+    "todo": {
+      "legalReview": "Legal review of these terms before public launch.",
+      "legalName": "Add the company's legal name and commercial registration number.",
+      "age": "Legal review: the 18+ rule and students under 18.",
+      "universityIp": "Legal review: university rules on ownership of graduation projects.",
+      "licence": "Legal review: the scope of the display licence.",
+      "liability": "Legal review: limitation of liability and any cap.",
+      "changesNotice": "Legal review: notice period before changes apply.",
+      "law": "Legal review: governing law and competent courts (city)."
     }
+  },
+  "legal": {
+    "opensInNewTab": "(opens in a new tab)"
   },
   "stepper": {
     "position": "Step {{current}} of {{total}}",
@@ -627,7 +728,10 @@
       "bioHint": "A sentence or two about what you build or want to build.",
       "university": "University",
       "universityHint": "Verified with your university email at sign-up, so it can't be changed here.",
-      "universityUnknown": "Not available"
+      "universityUnknown": "Not available",
+      "phone": "Mobile number",
+      "phoneHint": "Shared only with organizations whose request you accept.",
+      "sharePhone": "Share my mobile number with organizations after I accept their request."
     },
     "studies": {
       "intro": "What you study and where you are in your degree.",

@@ -10,6 +10,7 @@ import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthContext, type AuthState } from '@/features/auth/auth-context';
+import { PRIVACY_VERSION, TERMS_VERSION } from '@/features/legal/versions';
 import { changeLanguage, type Language } from '@/lib/i18n';
 import ar from '@/locales/ar.json';
 import en from '@/locales/en.json';
@@ -87,12 +88,25 @@ async function renderSignUp(path = '/sign-up', auth: AuthState = signedOut) {
 // Label text includes the decorative number badge ("01"); the accessible name does not.
 const field = (label: string) =>
   screen.getByLabelText(label, { normalizer: (text) => text.replace(/^\d{2}/, '').trim() });
+// The numbered fields only: the consent checkboxes are checked separately.
 const fieldLabels = () =>
-  Array.from(document.querySelectorAll('form label'))
+  Array.from(document.querySelectorAll<HTMLLabelElement>('form label'))
+    .filter((label) => label.control?.getAttribute('type') !== 'checkbox')
     .map((label) => label.textContent)
     .filter(
       (text) => text !== en.forms.common.honeypotLabel && text !== ar.forms.common.honeypotLabel,
     );
+
+const CONSENTS = ['acceptTerms', 'acceptPrivacy'] as const;
+const consentBox = (name: (typeof CONSENTS)[number]) => {
+  const box = document.querySelector<HTMLInputElement>(`input[name="${name}"]`);
+  if (!box) throw new Error(`${name} checkbox not found`);
+  return box;
+};
+async function acceptConsents(user: ReturnType<typeof userEvent.setup>) {
+  for (const name of CONSENTS) await user.click(consentBox(name));
+}
+const VERSIONS = { terms_version: TERMS_VERSION, privacy_version: PRIVACY_VERSION };
 
 async function waitForUniversities() {
   await waitFor(() => {
@@ -110,6 +124,7 @@ async function fillStudent(
   await user.selectOptions(field(t.auth.signUp.university), university);
   await enter(user, field(t.auth.signUp.universityEmail), email);
   await enter(user, field(t.auth.signUp.password), password);
+  await acceptConsents(user);
 }
 
 // No delay between keystrokes: each one re-renders the whole form, which is slow in jsdom.
@@ -187,10 +202,57 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
       '/sign-in',
     );
 
-    // The consent line and the link under the form open the internal notice, in the same tab.
+    // The link under the form opens the policy in the same tab; the consent box's link (below)
+    // opens a new tab.
     const privacy = Array.from(document.querySelectorAll('main a[href="/privacy"]'));
     expect(privacy).toHaveLength(2);
-    for (const link of privacy) expect(link).not.toHaveAttribute('target');
+    expect(privacy.filter((link) => !link.hasAttribute('target'))).toHaveLength(1);
+  });
+
+  it('two required consents, each with its policy link opening in a new tab', async () => {
+    await renderSignUp();
+    const terms = consentBox('acceptTerms');
+    const privacy = consentBox('acceptPrivacy');
+    expect(terms).not.toBeChecked();
+    expect(privacy).not.toBeChecked();
+
+    const termsName = s.acceptTerms.replace(/<\/?termsLink>/g, '');
+    expect(terms.labels?.[0]?.textContent).toContain(termsName.replace('.', ''));
+    for (const [box, href, label] of [
+      [terms, '/terms', s.acceptTerms],
+      [privacy, '/privacy', s.acceptPrivacy],
+    ] as const) {
+      const link = within(box.labels?.[0] as HTMLElement).getByRole('link');
+      const text = /<(\w+)>(.*)<\/\1>/.exec(label)?.[2] ?? '';
+      expect(link).toHaveAttribute('href', href);
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      expect(link).toHaveAccessibleName(`${text} ${t.legal.opensInNewTab}`);
+    }
+    // The old one-line consent is gone.
+    expect(screen.queryByText(/privacy notice|توضيح الخصوصية/)).toBeNull();
+  });
+
+  it('both consents are required: "Please accept to continue.", no request', async () => {
+    const user = setupUser();
+    await renderSignUp();
+    await waitForUniversities();
+    await enter(user, field(s.fullName), 'Sara Test');
+    await user.selectOptions(field(s.university), KSU);
+    await enter(user, field(s.universityEmail), 'sara@ksu.edu.sa');
+    await enter(user, field(s.password), GOOD_PASSWORD);
+    await submit(user, t);
+    expect(await screen.findAllByText(s.consentRequired)).toHaveLength(2);
+    expect(consentBox('acceptTerms')).toHaveAccessibleDescription(s.consentRequired);
+    expect(consentBox('acceptTerms')).toHaveAttribute('aria-invalid', 'true');
+
+    await user.click(consentBox('acceptTerms'));
+    await submit(user, t);
+    await waitFor(() => {
+      expect(screen.getAllByText(s.consentRequired)).toHaveLength(1);
+    });
+    expect(consentBox('acceptPrivacy')).toHaveAccessibleDescription(s.consentRequired);
+    expect(supabase.auth.signUp).not.toHaveBeenCalled();
   });
 
   it('organization (?role=organization): fields and work-email hint', async () => {
@@ -346,7 +408,7 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
     expect(supabase.auth.signUp).not.toHaveBeenCalled();
   });
 
-  it('student with a matching email signs up with exactly role, full_name and university_id', async () => {
+  it('student with a matching email signs up with exactly role, full_name, university_id and the consent versions', async () => {
     const user = setupUser();
     const router = await renderSignUp();
     await fillStudent(user, t, { email: '  Sara@KSU.edu.sa ' });
@@ -359,7 +421,7 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
       email: 'Sara@KSU.edu.sa',
       password: GOOD_PASSWORD,
       options: {
-        data: { role: 'student', full_name: 'Sara Test', university_id: KSU },
+        data: { role: 'student', full_name: 'Sara Test', university_id: KSU, ...VERSIONS },
         emailRedirectTo: `${window.location.origin}/auth/confirmed`,
       },
     });
@@ -374,6 +436,7 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
     await enter(user, field(s.yourFullName), 'Org Owner');
     await enter(user, field(s.workEmail), 'hello@acme.example');
     await enter(user, field(s.password), GOOD_PASSWORD);
+    await acceptConsents(user);
     await submit(user, t);
     await waitFor(() => {
       expect(router.state.location.pathname).toBe('/check-email');
@@ -386,7 +449,13 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
     });
     const data = (supabase.auth.signUp.mock.calls[0]?.[0] as { options: { data: object } }).options
       .data;
-    expect(Object.keys(data).sort()).toEqual(['full_name', 'organization_name', 'role']);
+    expect(Object.keys(data).sort()).toEqual([
+      'full_name',
+      'organization_name',
+      'privacy_version',
+      'role',
+      'terms_version',
+    ]);
   });
 
   it('organization name follows the database limits (2–150) with a counter', async () => {
@@ -409,13 +478,14 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
     await enter(user, field(s.fullName), 'Mona Mentor');
     await enter(user, field(s.email), 'mona@example.test');
     await enter(user, field(s.password), GOOD_PASSWORD);
+    await acceptConsents(user);
     await submit(user, t);
     await waitFor(() => {
       expect(router.state.location.pathname).toBe('/check-email');
     });
     const data = (supabase.auth.signUp.mock.calls[0]?.[0] as { options: { data: object } }).options
       .data;
-    expect(data).toEqual({ role: 'mentor', full_name: 'Mona Mentor' });
+    expect(data).toEqual({ role: 'mentor', full_name: 'Mona Mentor', ...VERSIONS });
   });
 
   it('?role=admin still sends role=student', async () => {

@@ -5,13 +5,14 @@ import { Trans, useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { Callout } from '@/components/ui/callout';
+import { CheckboxField } from '@/components/ui/checkbox-group';
 import { CharacterCount, NumberedLabel } from '@/components/ui/field-number';
 import { PasswordField } from '@/components/ui/password-field';
 import { SelectField } from '@/components/ui/select-field';
 import { TextField } from '@/components/ui/text-field';
 import { FormShell } from '@/features/forms/components/FormShell';
-import { PrivacyLink } from '@/features/forms/components/PrivacyLink';
 import { RoleCards } from '@/features/forms/components/RoleCards';
+import { LegalLink } from '@/features/legal/LegalLink';
 import { linkClass } from '@/features/forms/styles';
 import { useDirection } from '@/hooks/useDirection';
 import { validationMessage } from '@/lib/zod-i18n';
@@ -80,6 +81,8 @@ export function SignUpForm() {
       universityId: '',
       email: '',
       password: '',
+      acceptTerms: false,
+      acceptPrivacy: false,
       website: '',
     },
   });
@@ -306,11 +309,6 @@ export function SignUpForm() {
       submitLabel={t('auth.signUp.submit')}
       submittingLabel={t('auth.signUp.submitting')}
       submitting={isSubmitting}
-      afterSubmit={
-        <p className="text-sm text-muted-foreground">
-          <Trans i18nKey="auth.signUp.consent" components={{ privacyLink: <PrivacyLink /> }} />
-        </p>
-      }
       footer={
         <p className="mt-6 text-center text-sm text-muted-foreground">
           {t('auth.signUp.haveAccount')}{' '}
@@ -346,6 +344,30 @@ export function SignUpForm() {
       <div aria-hidden="true" className="-mb-2 border-t border-border" />
 
       {fields.map((key, index) => renderField(key, index + 1))}
+
+      {/* SCRUM-38: two separate, required consents; the links open in a new tab. */}
+      <div className="flex flex-col gap-3">
+        <CheckboxField
+          label={
+            <Trans
+              i18nKey="auth.signUp.acceptTerms"
+              components={{ termsLink: <LegalLink to="/terms" /> }}
+            />
+          }
+          error={errors.acceptTerms ? t('auth.signUp.consentRequired') : undefined}
+          {...register('acceptTerms')}
+        />
+        <CheckboxField
+          label={
+            <Trans
+              i18nKey="auth.signUp.acceptPrivacy"
+              components={{ privacyLink: <LegalLink to="/privacy" /> }}
+            />
+          }
+          error={errors.acceptPrivacy ? t('auth.signUp.consentRequired') : undefined}
+          {...register('acceptPrivacy')}
+        />
+      </div>
     </FormShell>
   );
 }

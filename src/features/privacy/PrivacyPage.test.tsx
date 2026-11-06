@@ -30,6 +30,11 @@ describe.each(['en', 'ar'] as const)('/privacy (%s)', (language) => {
     await renderAt('/privacy', language);
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(p.title);
+    // Named "Privacy Policy" like the sign-up checkbox (SCRUM-38), in the tab title too.
+    expect(p.title).toBe(t.nav.privacy);
+    await waitFor(() => {
+      expect(document.title).toBe(p.metaTitle);
+    });
     expect(
       screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent),
     ).toEqual([
@@ -63,6 +68,12 @@ describe.each(['en', 'ar'] as const)('/privacy (%s)', (language) => {
     expect(screen.getByText(p.retention.items.interest)).toBeInTheDocument();
     expect(screen.getByText(p.responsible.age)).toBeInTheDocument();
     expect(screen.getByText(p.collect.account.items.password)).toBeInTheDocument();
+  });
+
+  it("states what SCRUM-38 added: consent records and the students' mobile number", async () => {
+    await renderAt('/privacy', language);
+    expect(screen.getByText(p.collect.account.items.consent)).toBeInTheDocument();
+    expect(screen.getByText(p.collect.contact.body)).toBeInTheDocument();
   });
 
   it('development builds show the five open points', async () => {

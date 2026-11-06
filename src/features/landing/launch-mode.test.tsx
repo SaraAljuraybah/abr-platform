@@ -101,6 +101,15 @@ describe.each(['en', 'ar'] as const)('VITE_AUTH_ENABLED=false (%s)', (language) 
     ).toBeInTheDocument();
   });
 
+  it.each([
+    ['/terms', 'terms'],
+    ['/privacy', 'privacy'],
+  ] as const)('%s stays public in launch mode, with no account links', async (path, page) => {
+    await renderAt(path, language);
+    expect(screen.getByRole('heading', { level: 1, name: t[page].title })).toBeInTheDocument();
+    expect(accountLinks()).toEqual([]);
+  });
+
   it('landing: "Register your interest" everywhere, "How it works" on the bands, no account links', async () => {
     await renderAt('/', language);
     expect(accountLinks()).toEqual([]);

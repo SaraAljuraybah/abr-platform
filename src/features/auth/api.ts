@@ -6,6 +6,7 @@ import {
 } from '@supabase/supabase-js';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
+import { PRIVACY_VERSION, TERMS_VERSION } from '@/features/legal/versions';
 import { type Language } from '@/lib/i18n';
 import { supabase } from '@/lib/supabase';
 import type { SignInValues, SignUpValues } from './schemas';
@@ -110,9 +111,18 @@ export function toSignUpFailure(error: unknown): AuthFailure {
   return toAuthFailure(error);
 }
 
-/** Metadata read by private.handle_new_user(): exactly these keys, per role. */
+/**
+ * Metadata read by private.handle_new_user(): exactly these keys, per role. The consent versions
+ * are the ones this bundle shows; the trigger refuses anything but the current ones (SCRUM-38).
+ * The schema only lets values through once both boxes are ticked.
+ */
 export function signUpMetadata(values: SignUpValues) {
-  const common = { role: values.role, full_name: values.fullName };
+  const common = {
+    role: values.role,
+    full_name: values.fullName,
+    terms_version: TERMS_VERSION,
+    privacy_version: PRIVACY_VERSION,
+  };
   switch (values.role) {
     case 'student':
       return { ...common, university_id: values.universityId };

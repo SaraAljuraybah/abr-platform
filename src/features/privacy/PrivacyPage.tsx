@@ -1,11 +1,14 @@
-import type { ReactNode } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { linkClass } from '@/features/forms/styles';
+import { formatLegalDate } from '@/features/legal/format';
+import {
+  ContactEmail,
+  DevTodo,
+  LegalList as List,
+  LegalSection as Section,
+} from '@/features/legal/parts';
 import { useDirection } from '@/hooks/useDirection';
-import { DevTodo } from './DevTodo';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { PRIVACY_LAST_UPDATED } from './notice';
-
-const CONTACT_EMAIL = 'try0abr@gmail.com';
 
 const ACCOUNT = [
   'identity',
@@ -14,6 +17,7 @@ const ACCOUNT = [
   'organization',
   'profile',
   'verification',
+  'consent',
   'universityRequest',
 ] as const;
 const INTEREST = ['identity', 'answers', 'heardFrom', 'consent'] as const;
@@ -24,47 +28,16 @@ const PROCESSORS = ['supabase', 'vercel', 'email'] as const;
 const RETENTION = ['interest', 'accounts', 'security', 'rateLimit'] as const;
 const RIGHTS = ['know', 'access', 'correct', 'delete', 'withdraw'] as const;
 
-/** "Last updated" in the reader's language, Gregorian with Latin digits in both. */
-function formatDate(iso: string, language: 'en' | 'ar'): string {
-  return new Intl.DateTimeFormat(language === 'ar' ? 'ar-u-nu-latn' : 'en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(new Date(`${iso}T00:00:00Z`));
-}
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="mt-10 flex flex-col gap-3">
-      <h2 className="text-2xl">{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-function List({ items }: { items: string[] }) {
-  return (
-    <ul className="flex list-disc flex-col gap-2 ps-6 marker:text-primary">
-      {items.map((item) => (
-        <li key={item}>{item}</li>
-      ))}
-    </ul>
-  );
-}
-
 /**
- * /privacy: the privacy notice for what this platform actually stores (migrations and forms as of
- * the date below). One h1, a readable column, logical spacing so it mirrors in RTL.
+ * /privacy: the Privacy Policy for what this platform actually stores (migrations and forms as of
+ * the date below). One h1, a readable column, logical spacing so it mirrors in RTL. Its version
+ * for sign-up consent is PRIVACY_VERSION (src/features/legal/versions.ts).
  */
 export function PrivacyPage() {
   const { t } = useTranslation();
   const { language } = useDirection();
-  const email = (
-    <a href={`mailto:${CONTACT_EMAIL}`} dir="ltr" className={linkClass}>
-      {CONTACT_EMAIL}
-    </a>
-  );
+  useDocumentTitle(t('privacy.metaTitle'));
+  const email = <ContactEmail />;
 
   return (
     <div className="container-page py-12 lg:py-16">
@@ -72,17 +45,17 @@ export function PrivacyPage() {
         <p className="eyebrow text-pink-text">{t('privacy.eyebrow')}</p>
         <h1 className="mt-2 text-brand">{t('privacy.title')}</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          {t('privacy.updated', { date: formatDate(PRIVACY_LAST_UPDATED, language) })}
+          {t('privacy.updated', { date: formatLegalDate(PRIVACY_LAST_UPDATED, language) })}
         </p>
-        <DevTodo todo="legalReview" />
+        <DevTodo ns="privacy" todo="legalReview" />
 
         <Section title={t('privacy.responsible.title')}>
           <p>
             <Trans i18nKey="privacy.responsible.body" components={{ email }} />
           </p>
-          <DevTodo todo="legalName" />
+          <DevTodo ns="privacy" todo="legalName" />
           <p>{t('privacy.responsible.age')}</p>
-          <DevTodo todo="minors" />
+          <DevTodo ns="privacy" todo="minors" />
         </Section>
 
         <Section title={t('privacy.collect.title')}>
@@ -116,7 +89,7 @@ export function PrivacyPage() {
 
         <Section title={t('privacy.retention.title')}>
           <List items={RETENTION.map((key) => t(`privacy.retention.items.${key}`))} />
-          <DevTodo todo="securityRetention" />
+          <DevTodo ns="privacy" todo="securityRetention" />
         </Section>
 
         <Section title={t('privacy.rights.title')}>
@@ -125,7 +98,7 @@ export function PrivacyPage() {
           <p>
             <Trans i18nKey="privacy.rights.how" components={{ email }} />
           </p>
-          <DevTodo todo="replyTime" />
+          <DevTodo ns="privacy" todo="replyTime" />
           <p>{t('privacy.rights.complaint')}</p>
         </Section>
 

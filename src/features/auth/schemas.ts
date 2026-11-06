@@ -44,6 +44,9 @@ const base = z.object({
   email: z.string().trim().min(1).pipe(z.email()),
   // The checklist shows which rule is missing; the field error only says the rules are not met.
   password: z.string().min(1).refine(meetsPasswordRules),
+  // SCRUM-38: both boxes must be ticked. The server checks the versions the form sends.
+  acceptTerms: z.literal(true),
+  acceptPrivacy: z.literal(true),
 });
 
 export const signUpSchema = z.discriminatedUnion('role', [
@@ -68,6 +71,8 @@ export interface SignUpFormValues {
   universityId: string;
   email: string;
   password: string;
+  acceptTerms: boolean;
+  acceptPrivacy: boolean;
   /** Spam trap. Not in signUpSchema, so it is never part of the submitted values. */
   website: string;
 }

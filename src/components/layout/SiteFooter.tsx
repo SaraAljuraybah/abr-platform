@@ -4,6 +4,8 @@ import { LanguageSwitch } from '@/components/LanguageSwitch';
 import { Logo } from './Logo';
 import { SectionLinks } from './SectionLinks';
 
+const legalLink = 'rounded-sm text-sm font-semibold text-brand underline-offset-4 hover:underline';
+
 export function SiteFooter({ showSections }: { showSections: boolean }) {
   const { t } = useTranslation();
 
@@ -22,10 +24,10 @@ export function SiteFooter({ showSections }: { showSections: boolean }) {
           </nav>
         )}
         <div className="flex flex-wrap items-center gap-4">
-          <Link
-            to="/privacy"
-            className="rounded-sm text-sm font-semibold text-brand underline-offset-4 hover:underline"
-          >
+          <Link to="/terms" className={legalLink}>
+            {t('nav.terms')}
+          </Link>
+          <Link to="/privacy" className={legalLink}>
             {t('nav.privacy')}
           </Link>
           <LanguageSwitch />
