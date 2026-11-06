@@ -674,6 +674,14 @@
     "rejected": "Changes needed",
     "suspended": "Suspended"
   },
+  "projectStatus": {
+    "draft": "Draft",
+    "pending_review": "Pending review",
+    "changes_requested": "Changes requested",
+    "published": "Published",
+    "rejected": "Rejected",
+    "unpublished": "Unpublished"
+  },
   "shell": {
     "nav": "App navigation",
     "homeLink": "ABR dashboard",
@@ -697,6 +705,15 @@
       "none": {
         "title": "Add your graduation project",
         "body": "Create a draft, add your files, then submit it for review. Organizations see it once it's published."
+      },
+      "draft": {
+        "title": "Your draft is in progress",
+        "body": "Add a summary, a description and your track, then save. You can come back any time.",
+        "cta": "Continue your draft"
+      },
+      "project": {
+        "title": "Your project",
+        "cta": "Open your project"
       }
     },
     "profile": {
@@ -709,7 +726,8 @@
     },
     "projects": {
       "title": "Your projects",
-      "empty": "You haven't added a project yet."
+      "empty": "You haven't added a project yet.",
+      "error": "We couldn't load your projects. Please try again."
     },
     "other": {
       "title": "Your dashboard",
@@ -718,8 +736,89 @@
   },
   "comingNext": {
     "profile": "My profile",
-    "newProject": "Create project",
     "body": "This page is coming next.",
     "backToDashboard": "Back to dashboard"
+  },
+  "projects": {
+    "loading": "Loading your project…",
+    "loadError": "We couldn't load this project. Please try again.",
+    "retry": "Try again",
+    "retrying": "Loading…",
+    "backToDashboard": "Back to dashboard",
+    "notSet": "Not added yet",
+    "new": {
+      "title": "Create your project",
+      "intro": "Start with a title. You can add the details and change the title later.",
+      "submit": "Create draft",
+      "creating": "Creating…"
+    },
+    "edit": {
+      "title": "Edit your project",
+      "intro": "Only you and the ABR team can see your draft."
+    },
+    "readOnly": {
+      "title": "Your project",
+      "notice": "This project can't be edited in its current status."
+    },
+    "notFound": {
+      "title": "Project not found",
+      "body": "This project doesn't exist or you don't have access to it."
+    },
+    "fields": {
+      "title": "Project title",
+      "summary": "Summary",
+      "summaryHint": "One or two sentences that explain the project.",
+      "description": "Description",
+      "descriptionHint": "The problem, your solution and what you built.",
+      "track": "Track",
+      "trackPlaceholder": "Choose a track",
+      "sectors": "Sectors",
+      "sectorsHint": "Choose up to {{max}}.",
+      "academicYear": "Academic year",
+      "academicYearHint": "The year the project was or will be completed.",
+      "academicYearPlaceholder": "Choose a year"
+    },
+    "save": {
+      "button": "Save",
+      "saving": "Saving…",
+      "saved": "Saved"
+    },
+    "unsaved": {
+      "title": "Leave without saving?",
+      "body": "Your changes to this project haven't been saved.",
+      "stay": "Stay on this page",
+      "leave": "Leave without saving"
+    },
+    "delete": {
+      "button": "Delete draft",
+      "title": "Delete this draft?",
+      "body": "\"{{title}}\" will be deleted permanently. This can't be undone.",
+      "confirm": "Delete draft",
+      "cancel": "Cancel",
+      "deleting": "Deleting…",
+      "done": "Draft deleted."
+    },
+    "errors": {
+      "network": "We couldn't reach the server. Check your connection and try again.",
+      "limit": "You already have a project.",
+      "notAllowed": "Only verified students who have finished setting up their profile can create a project.",
+      "notEditable": "This project can't be changed any more.",
+      "notFound": "This project no longer exists.",
+      "unexpected": "Something went wrong. Please try again."
+    },
+    "options": {
+      "track": {
+        "ai": "AI & Machine Learning",
+        "web": "Web applications",
+        "mobile": "Mobile apps",
+        "cyber": "Cybersecurity",
+        "data": "Data & analytics",
+        "iot": "IoT & embedded systems",
+        "games": "Games",
+        "cloud": "Cloud & DevOps",
+        "robotics": "Robotics",
+        "other": "Other"
+      }
+    }
   }
 }

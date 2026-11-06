@@ -4,10 +4,11 @@ import { Callout } from '@/components/ui/callout';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatusChip } from '@/components/ui/status-chip';
 import { useAuth } from '@/features/auth/auth-context';
+import { useOwnProjects } from '@/features/projects/api';
 import { useDirection } from '@/hooks/useDirection';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
 import { firstName, useStudentDashboard } from './api';
-import { Card, ProfileCard, ProjectsCard, WhatsNextCard } from './components/cards';
+import { Card, ProfileCard, ProjectsCard, ProjectsError, WhatsNextCard } from './components/cards';
 import { useNextStep } from './next-step';
 
 const page = 'mx-auto w-full max-w-[1120px] px-4 py-10 sm:px-6 sm:py-12';
@@ -41,9 +42,11 @@ function StudentDashboardView({ userId }: { userId: string }) {
   const { t } = useTranslation();
   const { language } = useDirection();
   const query = useStudentDashboard(userId, language);
-  const next = useNextStep();
+  // One cached query behind both: "What's next" and "Your projects".
+  const next = useNextStep(userId);
+  const projects = useOwnProjects(userId);
 
-  if (query.isPending) return <DashboardSkeleton />;
+  if (query.isPending || projects.isPending) return <DashboardSkeleton />;
 
   if (query.isError) {
     return (
@@ -79,8 +82,17 @@ function StudentDashboardView({ userId }: { userId: string }) {
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <div className="flex flex-col gap-6">
-          <WhatsNextCard step={next.data} />
-          <ProjectsCard />
+          {projects.isError || !next.data ? (
+            <ProjectsError
+              retrying={projects.isRefetching}
+              onRetry={() => void projects.refetch()}
+            />
+          ) : (
+            <>
+              <WhatsNextCard step={next.data} />
+              <ProjectsCard projects={projects.data} />
+            </>
+          )}
         </div>
         <ProfileCard profile={query.data} />
       </div>

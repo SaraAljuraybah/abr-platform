@@ -17,7 +17,8 @@ import { RequireRole } from './guards/RequireRole';
 /**
  * Guard nesting (UX only; the database is the authority):
  *   /onboarding → RequireAuth (public AppLayout)
- *   /app, /app/profile, /app/projects/new → RequireAuth → RequireOnboarding (AppShellLayout)
+ *   /app, /app/profile → RequireAuth → RequireOnboarding (AppShellLayout)
+ *   /app/projects/new, /app/projects/:id/edit → … → RequireOnboarding → RequireRole(allow: 'student')
  *   /admin      → RequireAuth → RequireOnboarding → RequireRole(allow: 'admin') (AppShellLayout)
  * RequireOnboarding redirects to /onboarding and RequireRole to /app, so neither can loop.
  * With VITE_AUTH_ENABLED=false (phase 1 launch mode) RequireAuthEnabled sends all three to
@@ -131,7 +132,26 @@ export const routes: RouteObject[] = [
                     }),
                   },
                   { path: 'app/profile', element: <ComingNextPage page="profile" /> },
-                  { path: 'app/projects/new', element: <ComingNextPage page="newProject" /> },
+                  {
+                    // Projects (SCRUM-18): students only. RequireRole sends anyone else to /app.
+                    element: <RequireRole allow="student" />,
+                    children: [
+                      {
+                        path: 'app/projects/new',
+                        lazy: async () => ({
+                          Component: (await import('@/features/projects/NewProjectPage'))
+                            .NewProjectPage,
+                        }),
+                      },
+                      {
+                        path: 'app/projects/:id/edit',
+                        lazy: async () => ({
+                          Component: (await import('@/features/projects/EditProjectPage'))
+                            .EditProjectPage,
+                        }),
+                      },
+                    ],
+                  },
                   {
                     element: <RequireRole allow="admin" />,
                     children: [{ path: 'admin', element: <PlaceholderPage page="admin" /> }],

@@ -1,10 +1,14 @@
 import { OTHER } from '@shared/interest-options';
-import { ExternalLink, FolderPlus, Rocket } from 'lucide-react';
+import { ExternalLink, FilePen, FolderPlus, Rocket } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { Button } from '@/components/ui/button';
+import { Callout } from '@/components/ui/callout';
 import { EmptyState } from '@/components/ui/empty-state';
+import type { ProjectSummary } from '@/features/projects/api';
+import { ProjectStatusChip } from '@/features/projects/components/ProjectStatusChip';
+import { projectEditPath } from '@/features/projects/options';
 import { cn } from '@/lib/utils';
 import type { StudentDashboard } from '../api';
 import type { NextStep } from '../next-step';
@@ -63,12 +67,35 @@ export function WhatsNextCard({ step }: { step: NextStep }) {
         </div>
       );
       break;
-    // Pages 6–8 (SCRUM-17+) render these states.
     case 'draft':
+      body = (
+        <div className="flex flex-col items-start gap-3">
+          <FilePen aria-hidden="true" strokeWidth={1.75} className="size-6 text-primary" />
+          <h3 className="font-bold text-foreground">{t('dashboard.next.draft.title')}</h3>
+          <p className="text-muted-foreground">{t('dashboard.next.draft.body')}</p>
+          <Button asChild>
+            <Link to={projectEditPath(step.projectId)}>{t('dashboard.next.draft.cta')}</Link>
+          </Button>
+        </div>
+      );
+      break;
+    // Page 8 (submission and review) gives these states their own copy.
     case 'pending_review':
     case 'changes_requested':
     case 'published':
-      body = null;
+    case 'rejected':
+    case 'unpublished':
+      body = (
+        <div className="flex flex-col items-start gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <h3 className="font-bold text-foreground">{t('dashboard.next.project.title')}</h3>
+            <ProjectStatusChip status={step.kind} />
+          </div>
+          <Button asChild variant="outline">
+            <Link to={projectEditPath(step.projectId)}>{t('dashboard.next.project.cta')}</Link>
+          </Button>
+        </div>
+      );
       break;
     default: {
       const unreachable: never = step;
@@ -182,13 +209,54 @@ export function ProfileCard({ profile }: { profile: StudentDashboard }) {
   );
 }
 
-export function ProjectsCard() {
+export function ProjectsCard({ projects }: { projects: readonly ProjectSummary[] }) {
   const { t } = useTranslation();
   return (
     <Card id="your-projects" title={t('dashboard.projects.title')}>
-      <EmptyState icon={FolderPlus} action={<CreateProjectButton />}>
-        {t('dashboard.projects.empty')}
-      </EmptyState>
+      {projects.length === 0 ? (
+        <EmptyState icon={FolderPlus} action={<CreateProjectButton />}>
+          {t('dashboard.projects.empty')}
+        </EmptyState>
+      ) : (
+        <ul className="flex flex-col divide-y divide-border">
+          {projects.map((project) => (
+            <li
+              key={project.id}
+              className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+            >
+              <Link
+                to={projectEditPath(project.id)}
+                dir="auto"
+                className="min-w-0 rounded-sm font-semibold break-words text-primary underline-offset-4 hover:underline"
+              >
+                {project.title}
+              </Link>
+              <ProjectStatusChip status={project.status} />
+            </li>
+          ))}
+        </ul>
+      )}
     </Card>
+  );
+}
+
+/** Shown instead of both project cards when the projects cannot be loaded. */
+export function ProjectsError({ retrying, onRetry }: { retrying: boolean; onRetry: () => void }) {
+  const { t } = useTranslation();
+  return (
+    <Callout variant="error" live>
+      <p>{t('dashboard.projects.error')}</p>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="mt-3"
+        loading={retrying}
+        loadingText={t('dashboard.retrying')}
+        onClick={onRetry}
+      >
+        {t('dashboard.retry')}
+      </Button>
+    </Callout>
   );
 }

@@ -89,6 +89,8 @@ describe.each(['en', 'ar'] as const)('VITE_AUTH_ENABLED=false (%s)', (language) 
     ['/app/projects/new', signedOut],
     ['/app/profile', signedIn],
     ['/app/projects/new', signedIn],
+    ['/app/projects/p-1/edit', signedOut],
+    ['/app/projects/p-1/edit', signedIn],
   ] as const)('%s redirects to the coming-soon page', async (path, auth) => {
     const { router } = await renderAt(path, language, auth);
     await waitFor(() => {

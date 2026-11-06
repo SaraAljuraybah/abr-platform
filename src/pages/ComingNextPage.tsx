@@ -4,9 +4,9 @@ import { Link } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 
-export type ComingNextKey = 'profile' | 'newProject';
+export type ComingNextKey = 'profile';
 
-/** Signed-in pages that later stories deliver (/app/profile, /app/projects/new). */
+/** Signed-in pages that later stories deliver (/app/profile). */
 export function ComingNextPage({ page }: { page: ComingNextKey }) {
   const { t } = useTranslation();
   return (

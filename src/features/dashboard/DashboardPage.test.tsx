@@ -21,6 +21,9 @@ const fake = vi.hoisted(() => {
   return {
     profiles: new Map<string, Row>(),
     student_profiles: new Map<string, Row>(),
+    /** The student's own projects, newest first (what RLS and the owner filter return). */
+    projects: [] as Row[],
+    projectsFail: 0,
     signedIn: true,
     listener: null as null | ((event: string, session: unknown) => void),
     /** Reads of student_profiles fail this many times, or never resolve with 'hang'. */
@@ -49,9 +52,23 @@ vi.mock('@/lib/supabase', () => {
           return Promise.resolve({ error: null });
         },
       },
-      from: (name: 'profiles' | 'student_profiles') => ({
+      from: (name: 'profiles' | 'student_profiles' | 'projects') => ({
         select: () => ({
           eq: (_column: string, id: string) => {
+            if (name === 'projects') {
+              return {
+                order: () => {
+                  if (fake.projectsFail > 0) {
+                    fake.projectsFail -= 1;
+                    return Promise.resolve({
+                      data: null,
+                      error: { code: 'PGRST000', message: 'x' },
+                    });
+                  }
+                  return Promise.resolve({ data: fake.projects, error: null });
+                },
+              };
+            }
             const read = () => {
               if (name === 'student_profiles' && fake.studentFailures.value === 'hang') {
                 return new Promise(() => undefined);
@@ -74,6 +91,8 @@ vi.mock('@/lib/supabase', () => {
 function seed(profile: Row = {}, student: Row = {}) {
   fake.signedIn = true;
   fake.studentFailures.value = 0;
+  fake.projects = [];
+  fake.projectsFail = 0;
   fake.signOut.mockReset();
   fake.profiles.set(USER_ID, {
     role: 'student',
@@ -319,6 +338,65 @@ describe.each(['en', 'ar'] as const)('student dashboard (%s)', (language) => {
     );
   });
 
+  it('a draft: "What\'s next" continues it and "Your projects" lists it with its status', async () => {
+    fake.projects = [{ id: 'p-1', title: 'Campus Navigator', status: 'draft' }];
+    await load();
+    const next = await screen.findByRole('region', { name: t.dashboard.next.title });
+    expect(
+      within(next).getByRole('heading', { name: t.dashboard.next.draft.title }),
+    ).toBeInTheDocument();
+    expect(within(next).getByRole('link', { name: t.dashboard.next.draft.cta })).toHaveAttribute(
+      'href',
+      '/app/projects/p-1/edit',
+    );
+    expect(within(next).queryByRole('link', { name: t.dashboard.createProject })).toBeNull();
+
+    const card = screen.getByRole('region', { name: t.dashboard.projects.title });
+    const item = within(card).getByRole('listitem');
+    expect(within(item).getByRole('link', { name: 'Campus Navigator' })).toHaveAttribute(
+      'href',
+      '/app/projects/p-1/edit',
+    );
+    expect(within(item).getByText(t.projectStatus.draft)).toBeInTheDocument();
+    expect(within(card).queryByText(t.dashboard.projects.empty)).toBeNull();
+    expect(within(card).queryByRole('link', { name: t.dashboard.createProject })).toBeNull();
+  });
+
+  it('any later status gets the generic "Open your project" link with the chip', async () => {
+    fake.projects = [{ id: 'p-1', title: 'Campus Navigator', status: 'pending_review' }];
+    await load();
+    const next = await screen.findByRole('region', { name: t.dashboard.next.title });
+    expect(within(next).getByText(t.projectStatus.pending_review)).toBeInTheDocument();
+    expect(within(next).getByRole('link', { name: t.dashboard.next.project.cta })).toHaveAttribute(
+      'href',
+      '/app/projects/p-1/edit',
+    );
+  });
+
+  it('projects that fail to load show an error with a retry', async () => {
+    const user = userEvent.setup();
+    fake.projectsFail = 1;
+    await load();
+    expect(await screen.findByRole('alert')).toHaveTextContent(t.dashboard.projects.error);
+    // The profile still shows.
+    expect(screen.getByRole('region', { name: t.dashboard.profile.title })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: t.dashboard.retry }));
+    expect(
+      await screen.findByRole('region', { name: t.dashboard.projects.title }),
+    ).toBeInTheDocument();
+  });
+
+  it(
+    'axe: the dashboard with a draft has no violations',
+    async () => {
+      fake.projects = [{ id: 'p-1', title: 'Campus Navigator', status: 'draft' }];
+      await load();
+      await screen.findByRole('region', { name: t.dashboard.projects.title });
+      expect(await axeViolations()).toEqual([]);
+    },
+    AXE_TIMEOUT,
+  );
+
   it('shows a loading state with a heading while the profile loads', async () => {
     fake.studentFailures.value = 'hang';
     await load();
@@ -392,12 +470,11 @@ describe.each(['en', 'ar'] as const)('other roles on /app (%s)', (language) => {
 });
 
 describe('placeholders and guards', () => {
-  it.each([
-    ['/app/profile', en.comingNext.profile],
-    ['/app/projects/new', en.comingNext.newProject],
-  ])('%s shows its coming-next page with a way back', async (path, title) => {
-    await load(path);
-    expect(await screen.findByRole('heading', { level: 1, name: title })).toBeInTheDocument();
+  it('/app/profile shows its coming-next page with a way back', async () => {
+    await load('/app/profile');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: en.comingNext.profile }),
+    ).toBeInTheDocument();
     expect(screen.getByText(en.comingNext.body)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: en.comingNext.backToDashboard })).toHaveAttribute(
       'href',
@@ -405,7 +482,18 @@ describe('placeholders and guards', () => {
     );
   });
 
-  it.each(['/app/profile', '/app/projects/new'])(
+  it.each(['/app/projects/new', '/app/projects/p-1/edit'])(
+    'an organization is sent from %s to /app (students only; UX guard)',
+    async (path) => {
+      seed({ role: 'organization', verification_status: 'verified' });
+      const router = await load(path);
+      await waitFor(() => {
+        expect(router.state.location.pathname).toBe('/app');
+      });
+    },
+  );
+
+  it.each(['/app/profile', '/app/projects/new', '/app/projects/p-1/edit'])(
     'a student who is not onboarded is sent from %s to /onboarding',
     async (path) => {
       seed({ onboarding_completed: false });
