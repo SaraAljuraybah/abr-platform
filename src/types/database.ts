@@ -239,7 +239,11 @@ export type Database = {
           id: string
           onboarding_completed: boolean
           onboarding_step: number
+          privacy_accepted_at: string | null
+          privacy_version: string | null
           role: Database["public"]["Enums"]["user_role"]
+          terms_accepted_at: string | null
+          terms_version: string | null
           updated_at: string
           verification_status: Database["public"]["Enums"]["verification_status"]
         }
@@ -251,7 +255,11 @@ export type Database = {
           id: string
           onboarding_completed?: boolean
           onboarding_step?: number
+          privacy_accepted_at?: string | null
+          privacy_version?: string | null
           role: Database["public"]["Enums"]["user_role"]
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string
           verification_status: Database["public"]["Enums"]["verification_status"]
         }
@@ -263,7 +271,11 @@ export type Database = {
           id?: string
           onboarding_completed?: boolean
           onboarding_step?: number
+          privacy_accepted_at?: string | null
+          privacy_version?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
         }

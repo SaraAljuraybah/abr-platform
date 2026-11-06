@@ -3,7 +3,7 @@
 
 begin;
 
-select plan(32);
+select plan(33);
 
 set constraints all immediate;
 
@@ -25,7 +25,11 @@ begin
   )
   values (
     '00000000-0000-0000-0000-000000000000', p_id, 'authenticated', 'authenticated', p_email, '',
-    now(), '{}'::jsonb, p_user_meta, now(), now()
+    now(), '{}'::jsonb, coalesce(p_user_meta, '{}'::jsonb) || (
+      -- SCRUM-38: every sign-up carries the current Terms and Privacy Policy versions.
+      select jsonb_build_object('terms_version', v.terms_version, 'privacy_version', v.privacy_version)
+      from private.current_legal_versions() v
+    ), now(), now()
   );
   return p_id;
 end;
@@ -170,6 +174,11 @@ select throws_ok(
      where id = 'dddddddd-0000-4000-8000-00000000000a' $$,
   '23514', null,
   'onboarding_step above 4 is refused'
+);
+-- SCRUM-38: the phone, through the contact RPC (never a public table).
+select lives_ok(
+  $$ select public.update_my_contact('+966501234567', '', false, false) $$,
+  'step 1: a student saves their mobile number through update_my_contact'
 );
 select lives_ok(
   $$ update public.profiles set onboarding_completed = true, onboarding_step = 4

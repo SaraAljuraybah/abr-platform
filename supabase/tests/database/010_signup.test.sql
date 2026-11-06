@@ -41,7 +41,11 @@ begin
   )
   values (
     '00000000-0000-0000-0000-000000000000', p_id, 'authenticated', 'authenticated', p_email, '',
-    case when p_confirmed then now() end, p_app_meta, p_user_meta, now(), now()
+    case when p_confirmed then now() end, p_app_meta, coalesce(p_user_meta, '{}'::jsonb) || (
+      -- SCRUM-38: every sign-up carries the current Terms and Privacy Policy versions.
+      select jsonb_build_object('terms_version', v.terms_version, 'privacy_version', v.privacy_version)
+      from private.current_legal_versions() v
+    ), now(), now()
   );
   return p_id;
 end;
