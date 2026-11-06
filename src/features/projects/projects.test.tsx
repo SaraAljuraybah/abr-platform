@@ -14,6 +14,11 @@ const USER_ID = '00000000-0000-0000-0000-00000000000a';
 const OTHER_ID = '00000000-0000-0000-0000-00000000000b';
 const copy = { en, ar } as const;
 const AXE_TIMEOUT = 60_000;
+/**
+ * For waits that span a navigation or a refetch (RPC, then route, then query). The 1 s default is
+ * too short when the whole suite runs in parallel (SCRUM-38 CI run: one timeout at ~74 s total).
+ */
+const SLOW = { timeout: 5_000 };
 
 /**
  * An in-memory stand-in for the tables and RPCs behind the same supabase-js calls the app makes.
@@ -166,12 +171,12 @@ async function load(path: string) {
       </AuthProvider>
     </QueryClientProvider>,
   );
-  await screen.findByRole('heading', { level: 1 });
+  await screen.findByRole('heading', { level: 1 }, SLOW);
   // The loading skeleton has a (hidden) h1 too: wait until the page itself is there.
   const loading = [en.projects.loading, ar.projects.loading];
   await waitFor(() => {
     expect(screen.queryByText((text) => loading.includes(text))).toBeNull();
-  });
+  }, SLOW);
   return router;
 }
 
@@ -213,11 +218,13 @@ describe.each(['en', 'ar'] as const)('create a project (%s)', (language) => {
     await user.click(screen.getByRole('button', { name: t.projects.new.submit }));
 
     expect(
-      await screen.findByRole('heading', { level: 1, name: t.projects.edit.title }),
+      await screen.findByRole('heading', { level: 1, name: t.projects.edit.title }, SLOW),
     ).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/app/projects/p-new/edit');
     expect(db.rpcs).toEqual([{ name: 'create_project', args: { p_title: 'Campus Navigator' } }]);
-    expect(await screen.findByLabelText(t.projects.fields.title)).toHaveValue('Campus Navigator');
+    expect(await screen.findByLabelText(t.projects.fields.title, {}, SLOW)).toHaveValue(
+      'Campus Navigator',
+    );
     expect(screen.getByText(t.projectStatus.draft)).toBeInTheDocument();
   });
 
@@ -241,7 +248,7 @@ describe.each(['en', 'ar'] as const)('create a project (%s)', (language) => {
     const router = await load('/app/projects/new');
     await waitFor(() => {
       expect(router.state.location.pathname).toBe('/app/projects/p-1/edit');
-    });
+    }, SLOW);
     expect(db.rpcs).toEqual([]);
   });
 
@@ -255,7 +262,7 @@ describe.each(['en', 'ar'] as const)('create a project (%s)', (language) => {
     await user.click(screen.getByRole('button', { name: t.projects.new.submit }));
     await waitFor(() => {
       expect(router.state.location.pathname).toBe('/app/projects/p-1/edit');
-    });
+    }, SLOW);
   });
 
   it('a refusal for who may create is explained in plain language', async () => {
@@ -418,11 +425,11 @@ describe.each(['en', 'ar'] as const)('edit a draft (%s)', (language) => {
     await user.click(within(dialog).getByRole('button', { name: t.projects.delete.confirm }));
     await waitFor(() => {
       expect(router.state.location.pathname).toBe('/app');
-    });
+    }, SLOW);
     expect(db.rpcs).toEqual([{ name: 'delete_project', args: { p_project_id: 'p-1' } }]);
-    expect(await screen.findByText(t.projects.delete.done)).toBeInTheDocument();
+    expect(await screen.findByText(t.projects.delete.done, {}, SLOW)).toBeInTheDocument();
     expect(
-      await screen.findByRole('region', { name: t.dashboard.projects.title }),
+      await screen.findByRole('region', { name: t.dashboard.projects.title }, SLOW),
     ).toHaveTextContent(t.dashboard.projects.empty);
   });
 
@@ -446,7 +453,7 @@ describe.each(['en', 'ar'] as const)('edit a draft (%s)', (language) => {
     await user.type(screen.getByLabelText(t.projects.fields.summary), ' More.');
     await user.click(screen.getByRole('button', { name: t.projects.save.button }));
     // The page reloads the project and shows it read-only.
-    expect(await screen.findByText(t.projects.readOnly.notice)).toBeInTheDocument();
+    expect(await screen.findByText(t.projects.readOnly.notice, {}, SLOW)).toBeInTheDocument();
     expect(screen.queryByText(t.projects.save.saved)).toBeNull();
   });
 
