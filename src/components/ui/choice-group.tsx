@@ -17,6 +17,8 @@ interface ChoiceGroupProps {
   layout?: 'pills' | 'list';
   /** Receives the first option, so form libraries can focus the group on an error. */
   ref?: Ref<HTMLButtonElement>;
+  /** Announced as required (default). Pass false for an optional choice. */
+  required?: boolean;
 }
 
 /**
@@ -34,6 +36,7 @@ export function ChoiceGroup({
   name,
   layout = 'pills',
   ref,
+  required = true,
 }: ChoiceGroupProps) {
   const list = layout === 'list';
   const id = useId();
@@ -48,7 +51,7 @@ export function ChoiceGroup({
       <RadioGroup.Root
         aria-labelledby={labelId}
         aria-describedby={error ? errorId : undefined}
-        aria-required="true"
+        aria-required={required || undefined}
         dir={dir}
         orientation={list ? 'vertical' : undefined}
         name={name}

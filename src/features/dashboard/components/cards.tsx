@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Callout } from '@/components/ui/callout';
 import { EmptyState } from '@/components/ui/empty-state';
 import type { ProjectSummary } from '@/features/projects/api';
+import { ProjectImage } from '@/features/projects/components/ProjectImage';
 import { ProjectStatusChip } from '@/features/projects/components/ProjectStatusChip';
 import { projectEditPath } from '@/features/projects/options';
 import { cn } from '@/lib/utils';
@@ -224,13 +225,16 @@ export function ProjectsCard({ projects }: { projects: readonly ProjectSummary[]
               key={project.id}
               className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
             >
-              <Link
-                to={projectEditPath(project.id)}
-                dir="auto"
-                className="min-w-0 rounded-sm font-semibold break-words text-primary underline-offset-4 hover:underline"
-              >
-                {project.title}
-              </Link>
+              <span className="flex min-w-0 items-center gap-3">
+                <ProjectImage project={project} />
+                <Link
+                  to={projectEditPath(project.id)}
+                  dir="auto"
+                  className="min-w-0 rounded-sm font-semibold break-words text-primary underline-offset-4 hover:underline"
+                >
+                  {project.title}
+                </Link>
+              </span>
               <ProjectStatusChip status={project.status} />
             </li>
           ))}

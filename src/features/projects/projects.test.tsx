@@ -67,6 +67,15 @@ vi.mock('@/lib/supabase', () => {
 
   return {
     supabase: {
+      // SCRUM-27: no files in these tests; deleting a draft lists and removes its folder.
+      storage: {
+        from: () => ({
+          list: () => Promise.resolve({ data: [], error: null }),
+          remove: () => Promise.resolve({ data: [], error: null }),
+          createSignedUrl: () => Promise.resolve({ data: null, error: { message: 'no file' } }),
+          info: () => Promise.resolve({ data: null, error: { message: 'no file' } }),
+        }),
+      },
       auth: {
         getSession: () => Promise.resolve({ data: { session }, error: null }),
         onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => undefined } } }),
@@ -104,6 +113,16 @@ vi.mock('@/lib/supabase', () => {
             track: null,
             sectors: [],
             academic_year: null,
+            stage: null,
+            team_size: 1,
+            looking_for_members: false,
+            wanted_specializations: [],
+            needs: [],
+            image_path: null,
+            document_path: null,
+            video_url: null,
+            repo_url: null,
+            demo_url: null,
           });
           return Promise.resolve({ data: 'p-new', error: null });
         }
@@ -128,6 +147,16 @@ function project(row: Row = {}): Row {
     track: 'mobile',
     sectors: ['education'],
     academic_year: '2026',
+    stage: null,
+    team_size: 1,
+    looking_for_members: false,
+    wanted_specializations: [],
+    needs: [],
+    image_path: null,
+    document_path: null,
+    video_url: null,
+    repo_url: null,
+    demo_url: null,
     ...row,
   };
 }
@@ -324,6 +353,15 @@ describe.each(['en', 'ar'] as const)('edit a draft (%s)', (language) => {
         // In the order the sectors are listed on the page.
         sectors: ['fintech', 'education'],
         academic_year: '2027_or_later',
+        // SCRUM-27 sections, unchanged here; never image_path or document_path (they save alone).
+        stage: null,
+        team_size: 1,
+        looking_for_members: false,
+        wanted_specializations: [],
+        needs: [],
+        video_url: null,
+        repo_url: null,
+        demo_url: null,
       },
     ]);
     // A new change hides "Saved" again.

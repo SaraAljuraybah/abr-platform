@@ -466,7 +466,10 @@
     "tooShort": "الحد الأدنى للأحرف: {{min}}",
     "tooLong": "الحد الأقصى للأحرف: {{max}}",
     "githubUrl": "أدخل رابط ملفك على GitHub، مثل https://github.com/username.",
-    "saudiMobile": "أدخل رقم جوال سعوديًا، مثل 05XXXXXXXX."
+    "saudiMobile": "أدخل رقم جوال سعوديًا، مثل 05XXXXXXXX.",
+    "videoUrl": "أدخل رابطًا من YouTube أو Vimeo أو Loom يبدأ بـ https://.",
+    "repoUrl": "أدخل رابط GitHub أو GitLab يبدأ بـ https://.",
+    "demoUrl": "أدخل رابطًا يبدأ بـ https://."
   },
   "passwordField": {
     "show": "إظهار كلمة المرور",
@@ -499,6 +502,7 @@
           "university": "للطلاب: جامعتك، ونتحقق من أن بريدك تابع لها.",
           "organization": "للجهات: اسم الجهة.",
           "profile": "بيانات الملف التعريفي التي تختار إضافتها. للجميع: نبذة قصيرة وصورة. للطلاب: التخصص، والمستوى الدراسي، والمهارات، والاهتمامات، ورابط GitHub. للجهات: وصف الجهة، وموقعها الإلكتروني، وأنواع الدعم التي تقدّمها، وشعارها. للمرشدين: المسمى الوظيفي، وجهة العمل، ومجال الخبرة، وسنوات الخبرة، وملخص مهني.",
+          "project": "للطلاب: مشروعك وتفاصيله وصورته ومستنده وروابطه، وتُزال بيانات الموقع من الصور.",
           "verification": "حالة التحقق من حسابك. وإذا راجع فريق عَبْر حسابك، نحتفظ بالقرار وسببه ونسخة من الملف كما أرسلته.",
           "consent": "نسختا الشروط والأحكام وسياسة الخصوصية هذه اللتان وافقت عليهما، ووقت موافقتك.",
           "universityRequest": "إذا طلبت إضافة جامعة: اسمها، ونطاق بريدها، وبريدك."
@@ -880,7 +884,21 @@
       "sectorsHint": "اختر حتى {{max}}.",
       "academicYear": "السنة الأكاديمية",
       "academicYearHint": "السنة التي أُنجز فيها المشروع أو سيُنجز فيها.",
-      "academicYearPlaceholder": "اختر السنة"
+      "academicYearPlaceholder": "اختر السنة",
+      "stage": "مرحلة المشروع",
+      "teamSize": "عدد أعضاء الفريق",
+      "teamSizeHint": "يشمل ذلك أنت",
+      "lookingForMembers": "هل تبحث عن أعضاء؟",
+      "wantedSpecializations": "التخصصات المطلوبة",
+      "wantedSpecializationsHint": "اختر حتى {{max}}.",
+      "needs": "ما الذي يحتاجه المشروع؟",
+      "needsHint": "يمكن اختيار أكثر من خيار",
+      "videoUrl": "فيديو العرض",
+      "videoUrlHint": "رابط من YouTube أو Vimeo أو Loom يبدأ بـ https://",
+      "repoUrl": "مستودع الشيفرة",
+      "repoUrlHint": "رابط GitHub أو GitLab، مثل https://github.com/team/project",
+      "demoUrl": "العرض المباشر",
+      "demoUrlHint": "أي رابط يبدأ بـ https://"
     },
     "save": {
       "button": "حفظ",
@@ -922,7 +940,78 @@
         "cloud": "الحوسبة السحابية وDevOps",
         "robotics": "الروبوتات",
         "other": "أخرى"
+      },
+      "stage": {
+        "idea": "فكرة",
+        "prototype": "نموذج أولي (Prototype)",
+        "mvp": "منتج أولي (MVP)",
+        "revenue": "يحقق إيرادات",
+        "startup": "شركة ناشئة"
+      },
+      "specialization": {
+        "design": "التصميم",
+        "business": "إدارة الأعمال",
+        "marketing": "التسويق",
+        "other": "أخرى"
+      },
+      "need": {
+        "funding": "تمويل",
+        "investor": "مستثمر",
+        "mentor": "مرشد",
+        "legal_advisor": "مستشار قانوني",
+        "financial_advisor": "مستشار مالي",
+        "workspace": "مساحات عمل",
+        "marketing": "تسويق",
+        "design": "تصميم",
+        "programming": "برمجة",
+        "manufacturing": "تصنيع",
+        "tech_partner": "شريك تقني"
       }
-    }
+    },
+    "sections": {
+      "basics": "الأساسيات",
+      "stageTeam": "المرحلة والفريق",
+      "needs": "الاحتياجات",
+      "media": "الوسائط",
+      "mediaIntro": "تُحفظ الملفات فور رفعها.",
+      "links": "الروابط"
+    },
+    "media": {
+      "image": "صورة المشروع (شعار أو ملصق)",
+      "imageHint": "JPG أو PNG أو WebP، حتى 2 ميغابايت",
+      "imageAlt": "صورة مشروع {{title}}",
+      "uploadImage": "رفع صورة",
+      "replaceImage": "استبدال الصورة",
+      "removeImage": "إزالة الصورة",
+      "uploadingImage": "جارٍ رفع الصورة",
+      "imageUploaded": "تم رفع الصورة.",
+      "imageRemoved": "تمت إزالة الصورة.",
+      "document": "مستند المشروع (تقرير أو عرض تقديمي أو عرض للمستثمرين) - اختياري",
+      "documentHint": "PDF، حتى 10 ميغابايت",
+      "documentFallbackName": "مستند المشروع (PDF)",
+      "uploadDocument": "رفع مستند",
+      "replaceDocument": "استبدال المستند",
+      "removeDocument": "إزالة المستند",
+      "uploadingDocument": "جارٍ رفع المستند",
+      "documentUploaded": "تم رفع المستند.",
+      "documentRemoved": "تمت إزالة المستند.",
+      "uploading": "جارٍ الرفع… {{percent}}%",
+      "open": "فتح",
+      "sizeKb": "{{value}} كيلوبايت",
+      "sizeMb": "{{value}} ميغابايت",
+      "errors": {
+        "wrongTypeImage": "اختر صورة بصيغة JPG أو PNG أو WebP.",
+        "wrongTypeDocument": "اختر ملف PDF.",
+        "tooLargeImage": "حجم الصورة أكبر من 2 ميغابايت.",
+        "tooLargeDocument": "حجم الملف أكبر من 10 ميغابايت.",
+        "network": "تعذّر الرفع بسبب الاتصال. حاول مجددًا."
+      }
+    },
+    "yes": "نعم",
+    "no": "لا"
+  },
+  "numberStepper": {
+    "decrease": "إنقاص {{label}}",
+    "increase": "زيادة {{label}}"
   }
 }

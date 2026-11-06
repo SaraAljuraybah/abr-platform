@@ -466,7 +466,10 @@
     "tooShort": "Minimum length: {{min}} characters.",
     "tooLong": "Maximum length: {{max}} characters.",
     "githubUrl": "Enter your GitHub profile address, like https://github.com/username.",
-    "saudiMobile": "Enter a Saudi mobile number, for example 05XXXXXXXX."
+    "saudiMobile": "Enter a Saudi mobile number, for example 05XXXXXXXX.",
+    "videoUrl": "Enter a YouTube, Vimeo or Loom link starting with https://.",
+    "repoUrl": "Enter a GitHub or GitLab link starting with https://.",
+    "demoUrl": "Enter a link starting with https://."
   },
   "passwordField": {
     "show": "Show password",
@@ -499,6 +502,7 @@
           "university": "Students: your university. We check that your email belongs to it.",
           "organization": "Organizations: your organization's name.",
           "profile": "Profile details you choose to add. For everyone: a short bio and a photo. Students: major, academic level, skills, interests and a GitHub link. Organizations: a description, website, the kinds of support you offer and a logo. Mentors: job title, company, expertise, years of experience and a professional summary.",
+          "project": "Students: your project, its details, image, document and links. Location data is removed from images.",
           "verification": "Your verification status. If the ABR team reviews your account, we keep the decision, the reason given and a copy of the profile as you submitted it.",
           "consent": "The versions of the terms and conditions and of this privacy policy that you agreed to, and when you agreed.",
           "universityRequest": "If you ask us to add a university: its name, its email domain and your email."
@@ -880,7 +884,21 @@
       "sectorsHint": "Choose up to {{max}}.",
       "academicYear": "Academic year",
       "academicYearHint": "The year the project was or will be completed.",
-      "academicYearPlaceholder": "Choose a year"
+      "academicYearPlaceholder": "Choose a year",
+      "stage": "Project stage",
+      "teamSize": "Team size",
+      "teamSizeHint": "Including you",
+      "lookingForMembers": "Looking for team members?",
+      "wantedSpecializations": "Wanted specializations",
+      "wantedSpecializationsHint": "Choose up to {{max}}.",
+      "needs": "What does the project need?",
+      "needsHint": "Choose all that apply",
+      "videoUrl": "Demo video",
+      "videoUrlHint": "A YouTube, Vimeo or Loom link starting with https://",
+      "repoUrl": "Code repository",
+      "repoUrlHint": "A GitHub or GitLab link, like https://github.com/team/project",
+      "demoUrl": "Live demo",
+      "demoUrlHint": "Any link starting with https://"
     },
     "save": {
       "button": "Save",
@@ -922,7 +940,78 @@
         "cloud": "Cloud & DevOps",
         "robotics": "Robotics",
         "other": "Other"
+      },
+      "stage": {
+        "idea": "Idea",
+        "prototype": "Prototype",
+        "mvp": "MVP",
+        "revenue": "Generating revenue",
+        "startup": "Startup"
+      },
+      "specialization": {
+        "design": "Design",
+        "business": "Business",
+        "marketing": "Marketing",
+        "other": "Other"
+      },
+      "need": {
+        "funding": "Funding",
+        "investor": "Investor",
+        "mentor": "Mentor",
+        "legal_advisor": "Legal advisor",
+        "financial_advisor": "Financial advisor",
+        "workspace": "Workspace",
+        "marketing": "Marketing",
+        "design": "Design",
+        "programming": "Programming",
+        "manufacturing": "Manufacturing",
+        "tech_partner": "Technical partner"
       }
-    }
+    },
+    "sections": {
+      "basics": "Basics",
+      "stageTeam": "Stage & team",
+      "needs": "Needs",
+      "media": "Media",
+      "mediaIntro": "Files save as soon as they are uploaded.",
+      "links": "Links"
+    },
+    "media": {
+      "image": "Project image (logo or poster)",
+      "imageHint": "JPG, PNG or WebP, up to 2 MB",
+      "imageAlt": "Image for {{title}}",
+      "uploadImage": "Upload image",
+      "replaceImage": "Replace image",
+      "removeImage": "Remove image",
+      "uploadingImage": "Uploading the image",
+      "imageUploaded": "Image uploaded.",
+      "imageRemoved": "Image removed.",
+      "document": "Project document (report, presentation or pitch deck), optional",
+      "documentHint": "PDF, up to 10 MB",
+      "documentFallbackName": "Project document (PDF)",
+      "uploadDocument": "Upload document",
+      "replaceDocument": "Replace document",
+      "removeDocument": "Remove document",
+      "uploadingDocument": "Uploading the document",
+      "documentUploaded": "Document uploaded.",
+      "documentRemoved": "Document removed.",
+      "uploading": "Uploading… {{percent}}%",
+      "open": "Open",
+      "sizeKb": "{{value}} KB",
+      "sizeMb": "{{value}} MB",
+      "errors": {
+        "wrongTypeImage": "Choose a JPG, PNG or WebP image.",
+        "wrongTypeDocument": "Choose a PDF file.",
+        "tooLargeImage": "The image is larger than 2 MB.",
+        "tooLargeDocument": "The file is larger than 10 MB.",
+        "network": "The upload failed because of the connection. Try again."
+      }
+    },
+    "yes": "Yes",
+    "no": "No"
+  },
+  "numberStepper": {
+    "decrease": "Decrease {{label}}",
+    "increase": "Increase {{label}}"
   }
 }
