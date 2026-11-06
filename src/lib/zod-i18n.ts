@@ -12,6 +12,9 @@ const VALIDATION_KEYS: readonly ValidationKey[] = [
   'validation.tooLong',
   'validation.githubUrl',
   'validation.saudiMobile',
+  'validation.videoUrl',
+  'validation.repoUrl',
+  'validation.demoUrl',
 ];
 
 export function isValidationKey(value: unknown): value is ValidationKey {
