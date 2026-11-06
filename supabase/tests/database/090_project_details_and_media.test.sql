@@ -4,7 +4,7 @@
 
 begin;
 
-select plan(60);
+select plan(62);
 
 -- The sign-up trigger is deferred; fire it at each statement's end.
 set constraints all immediate;
@@ -325,6 +325,12 @@ reset role;
 select pg_temp.act_as('abababab-0000-4000-8000-00000000000e');
 select is(pg_temp.seen(pg_temp.name((select a from ids), 'document', 'pdf')), 1,
   'an admin reads a draft''s document');
+-- An admin can SEE the draft, so only the owner condition stops this write.
+select throws_ok(
+  $$ select pg_temp.put('project-images', pg_temp.name((select a from ids), 'image', 'jpg')) $$,
+  '42501', null, 'an admin cannot upload into a student''s project folder');
+select is(pg_temp.drop_object(pg_temp.name((select a from ids), 'document', 'pdf')), 0,
+  'an admin cannot delete a student''s file (0 rows)');
 reset role;
 
 set local role anon;
