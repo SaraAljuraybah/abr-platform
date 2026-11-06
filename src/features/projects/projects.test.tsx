@@ -246,14 +246,19 @@ describe.each(['en', 'ar'] as const)('create a project (%s)', (language) => {
     await user.type(screen.getByLabelText(t.projects.fields.title), '  Campus Navigator  ');
     await user.click(screen.getByRole('button', { name: t.projects.new.submit }));
 
-    expect(
-      await screen.findByRole('heading', { level: 1, name: t.projects.edit.title }, SLOW),
-    ).toBeInTheDocument();
-    expect(router.state.location.pathname).toBe('/app/projects/p-new/edit');
+    // Cheap waits first: since page 7 the edit page is large, and role queries with a name compute
+    // accessible names across the whole tree on every poll, which is slow under the full suite.
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/app/projects/p-new/edit');
+    }, SLOW);
     expect(db.rpcs).toEqual([{ name: 'create_project', args: { p_title: 'Campus Navigator' } }]);
-    expect(await screen.findByLabelText(t.projects.fields.title, {}, SLOW)).toHaveValue(
-      'Campus Navigator',
-    );
+    await waitFor(() => {
+      expect(document.querySelector<HTMLInputElement>('input[name="title"]')?.value).toBe(
+        'Campus Navigator',
+      );
+    }, SLOW);
+    expect(screen.getByText(t.projects.edit.title, { selector: 'h1' })).toBeInTheDocument();
+    expect(screen.getByLabelText(t.projects.fields.title)).toHaveValue('Campus Navigator');
     expect(screen.getByText(t.projectStatus.draft)).toBeInTheDocument();
   });
 
