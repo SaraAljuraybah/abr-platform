@@ -321,50 +321,80 @@ export type Database = {
         Row: {
           academic_year: string | null
           created_at: string
+          demo_url: string | null
           description: string | null
+          document_path: string | null
           id: string
+          image_path: string | null
+          looking_for_members: boolean
+          needs: string[]
           owner_id: string
           published_at: string | null
+          repo_url: string | null
           sectors: string[]
+          stage: string | null
           status: Database["public"]["Enums"]["project_status"]
           submitted_at: string | null
           summary: string | null
+          team_size: number
           title: string
           track: string | null
           university_id: string
           updated_at: string
+          video_url: string | null
+          wanted_specializations: string[]
         }
         Insert: {
           academic_year?: string | null
           created_at?: string
+          demo_url?: string | null
           description?: string | null
+          document_path?: string | null
           id?: string
+          image_path?: string | null
+          looking_for_members?: boolean
+          needs?: string[]
           owner_id: string
           published_at?: string | null
+          repo_url?: string | null
           sectors?: string[]
+          stage?: string | null
           status?: Database["public"]["Enums"]["project_status"]
           submitted_at?: string | null
           summary?: string | null
+          team_size?: number
           title: string
           track?: string | null
           university_id: string
           updated_at?: string
+          video_url?: string | null
+          wanted_specializations?: string[]
         }
         Update: {
           academic_year?: string | null
           created_at?: string
+          demo_url?: string | null
           description?: string | null
+          document_path?: string | null
           id?: string
+          image_path?: string | null
+          looking_for_members?: boolean
+          needs?: string[]
           owner_id?: string
           published_at?: string | null
+          repo_url?: string | null
           sectors?: string[]
+          stage?: string | null
           status?: Database["public"]["Enums"]["project_status"]
           submitted_at?: string | null
           summary?: string | null
+          team_size?: number
           title?: string
           track?: string | null
           university_id?: string
           updated_at?: string
+          video_url?: string | null
+          wanted_specializations?: string[]
         }
         Relationships: [
           {
