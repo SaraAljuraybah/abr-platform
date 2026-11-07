@@ -1,12 +1,17 @@
-import { initials } from '@/lib/initials';
+import { initials, initialsFromEmail } from '@/lib/initials';
 import { cn } from '@/lib/utils';
 
-/** Initials in a circle. Decorative: the name next to it (or the button's name) says who it is. */
+/**
+ * Initials in a circle. Decorative: the name next to it (or the button's name) says who it is.
+ * With no name, the email's initials ("ops.team@…" → "OT"); with neither, "?".
+ */
 export function Avatar({
   name,
+  email,
   className,
 }: {
   name: string | null | undefined;
+  email?: string | null;
   className?: string;
 }) {
   return (
@@ -17,7 +22,7 @@ export function Avatar({
         className,
       )}
     >
-      {initials(name)}
+      {name?.trim() ? initials(name) : initialsFromEmail(email)}
     </span>
   );
 }

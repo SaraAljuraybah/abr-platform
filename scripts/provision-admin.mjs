@@ -4,7 +4,7 @@
 //
 // Usage (the key comes from your shell or a secret manager, never from a committed file):
 //   SUPABASE_URL=https://<ref>.supabase.co SUPABASE_SECRET_KEY="$ABR_SECRET_KEY" \
-//     node scripts/provision-admin.mjs admin@example.com [--redirect-to https://<site>/reset-password]
+//     node scripts/provision-admin.mjs admin@example.com [--name "Full Name"] //       [--redirect-to https://<site>/reset-password]
 //
 // The account gets a random password that is never shown. The script prints one single-use
 // recovery link; the new admin opens it to set their own password.
@@ -12,6 +12,10 @@
 // --redirect-to (SCRUM-13, page 4): where the link lands, normally that site's /reset-password
 // (for abr-dev, the dev preview). It must be in the project's Auth redirect allow-list, or Auth
 // falls back to the Site URL. Without it, the link lands on the project's Site URL.
+//
+// --name (SCRUM-20): the admin's full name (1–120 characters), shown in the account menu. It goes
+// into user_metadata.full_name, which the sign-up trigger copies to the profile. Without it the
+// avatar shows initials from the email address.
 
 import { randomBytes } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
@@ -29,16 +33,23 @@ const url = process.env.SUPABASE_URL;
 const secretKey = process.env.SUPABASE_SECRET_KEY;
 
 /**
- * `<email> [--redirect-to <url>]`, in any order.
+ * `<email> [--name <full name>] [--redirect-to <url>]`, in any order.
  * @param {string[]} argv
- * @returns {{ address: string | undefined, redirectTo: string | undefined }}
+ * @returns {{ address: string | undefined, name: string | undefined, redirectTo: string | undefined }}
  */
 function parseArgs(argv) {
   let address;
+  let name;
   let redirectTo;
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === '--redirect-to') {
+    if (arg === '--name') {
+      name = argv[i + 1];
+      i += 1;
+      if (name === undefined) fail('--name needs a value.');
+    } else if (arg?.startsWith('--name=')) {
+      name = arg.slice('--name='.length);
+    } else if (arg === '--redirect-to') {
       redirectTo = argv[i + 1];
       i += 1;
       if (!redirectTo) fail('--redirect-to needs a URL.');
@@ -50,10 +61,10 @@ function parseArgs(argv) {
       address = arg;
     }
   }
-  return { address: address?.trim().toLowerCase(), redirectTo };
+  return { address: address?.trim().toLowerCase(), name: name?.trim(), redirectTo };
 }
 
-const { address: email, redirectTo } = parseArgs(process.argv.slice(2));
+const { address: email, name: fullName, redirectTo } = parseArgs(process.argv.slice(2));
 
 if (!url || !secretKey)
   fail('SUPABASE_URL and SUPABASE_SECRET_KEY must be set in the environment.');
@@ -75,6 +86,10 @@ if (redirectTo !== undefined) {
 if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
   fail('Pass the admin email address as the first argument.');
 }
+// The same limit as profiles.full_name (the trigger would cut it at 120 characters).
+if (fullName !== undefined && (fullName.length < 1 || [...fullName].length > 120)) {
+  fail('--name must be 1 to 120 characters.');
+}
 
 const supabase = createClient(url, secretKey, {
   auth: { autoRefreshToken: false, persistSession: false },
@@ -85,6 +100,7 @@ const { data: created, error: createError } = await supabase.auth.admin.createUs
   email_confirm: true,
   password: randomBytes(32).toString('base64url'),
   app_metadata: { abr_role: 'admin' },
+  ...(fullName ? { user_metadata: { full_name: fullName } } : {}),
 });
 if (createError || !created.user) {
   fail(`could not create the user: ${createError?.message ?? 'no user returned'}`);
@@ -95,11 +111,16 @@ const userId = created.user.id;
 // remove the account rather than leave a half-provisioned user behind.
 const { data: profile, error: profileError } = await supabase
   .from('profiles')
-  .select('role, verification_status, onboarding_completed')
+  .select('role, verification_status, onboarding_completed, full_name')
   .eq('id', userId)
   .maybeSingle();
 
-if (profileError || profile?.role !== 'admin' || profile.verification_status !== 'verified') {
+if (
+  profileError ||
+  profile?.role !== 'admin' ||
+  profile.verification_status !== 'verified' ||
+  (fullName !== undefined && profile.full_name !== fullName)
+) {
   await supabase.auth.admin.deleteUser(userId);
   fail(
     `the profile is not a verified admin (${profileError?.message ?? JSON.stringify(profile)}). ` +
@@ -119,7 +140,7 @@ if (linkError || !link.properties?.action_link) {
 }
 
 console.log(`Project: ${parsed.origin}`);
-console.log(`Admin provisioned: ${email} (${userId})`);
+console.log(`Admin provisioned: ${email} (${userId})${fullName ? `, name: ${fullName}` : ''}`);
 console.log(
   `The link opens: ${redirectTo ?? "the project's Site URL (pass --redirect-to <site>/reset-password for the reset page)"}`,
 );

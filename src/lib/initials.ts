@@ -9,3 +9,17 @@ export function initials(name: string | null | undefined): string {
     .map((word) => Array.from(word)[0]?.toLocaleUpperCase() ?? '')
     .join('');
 }
+
+/**
+ * From an email's local part, for an account with no name yet: "ops.team@abr.sa" → "OT",
+ * "admin@abr.sa" → "A". Dots, underscores, hyphens and plus signs separate the words; digits are
+ * skipped when a letter follows. No email → "?".
+ */
+export function initialsFromEmail(email: string | null | undefined): string {
+  const local = (email ?? '').split('@')[0] ?? '';
+  const words = local
+    .split(/[._+-]+/)
+    .map((word) => word.replace(/^[^\p{L}]+(?=\p{L})/u, ''))
+    .filter(Boolean);
+  return initials(words.join(' '));
+}

@@ -12,10 +12,17 @@ const itemClass =
 /**
  * The signed-in account menu (Radix DropdownMenu): Enter, Space or the arrow keys open it, arrows
  * move, Escape closes it and returns focus to the button. dir follows the language, so it opens
- * at the end side and arrows follow the reading direction. No portal: the menu stays inside the
+ * at the end side and arrows follow the reading direction. Without a name (provisioned admins), the
+ * avatar shows initials from the email address instead of "?". No portal: the menu stays inside the
  * header landmark.
  */
-export function AccountMenu({ name }: { name: string | null }) {
+export function AccountMenu({
+  name,
+  email = null,
+}: {
+  name: string | null;
+  email?: string | null;
+}) {
   const { t } = useTranslation();
   const { direction } = useDirection();
   const navigate = useNavigate();
@@ -27,7 +34,7 @@ export function AccountMenu({ name }: { name: string | null }) {
         aria-label={t('shell.accountMenu')}
         className="inline-flex h-10 items-center gap-2 rounded-full ps-1 pe-2 text-sm font-semibold text-foreground hover:bg-accent data-[state=open]:bg-accent"
       >
-        <Avatar name={name} />
+        <Avatar name={name} email={email} />
         {name && <span className="hidden max-w-40 truncate sm:inline">{name}</span>}
         <ChevronDown
           aria-hidden="true"
