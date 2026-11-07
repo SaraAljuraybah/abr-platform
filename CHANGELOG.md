@@ -311,6 +311,15 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   matching the sign-up checkbox, and states the consent records and the students' mobile number.
   `PRIVACY_LAST_UPDATED` is `2026-11-06` (SCRUM-38).
 
+### Fixed
+
+- The built site crashed on load (blank page on the Vercel preview, "Cannot set properties of
+  undefined (setting 'Activity')"), while dev and the tests were green. The custom
+  `manualChunks` vendor split made `vendor-react` and `vendor` import each other. The split is
+  removed (Rollup splits on its own; entry chunk about 607 kB, 191 kB gzip, warning limit 650 kB).
+  Guard: `build.manifest` plus `scripts/check-chunk-cycles.mjs` (`npm run check:chunks`, in
+  `npm run ci` after the build) fails on any static import cycle between chunks.
+
 ### Removed
 
 - The "Internal build. Only the platform foundation is available." notice, from every route
