@@ -3,7 +3,7 @@
 
 begin;
 
-select plan(52);
+select plan(53);
 
 set constraints all immediate;
 
@@ -126,6 +126,8 @@ select pg_temp.new_user('efefefef-0000-4000-8000-000000000011', 'x@abr.test',
   '{"full_name": "Admin X"}', '{"abr_role": "admin"}');
 select pg_temp.new_user('efefefef-0000-4000-8000-000000000012', 's@abr.test',
   '{"full_name": "Admin S"}', '{"abr_role": "admin"}');
+-- N: an admin provisioned without a name (as scripts/provision-admin.mjs does).
+select pg_temp.new_user('efefefef-0000-4000-8000-000000000013', 'n@abr.test', '{}', '{"abr_role": "admin"}');
 select pg_temp.onboard('efefefef-0000-4000-8000-00000000000a');
 select pg_temp.onboard('efefefef-0000-4000-8000-00000000000b');
 select pg_temp.onboard('efefefef-0000-4000-8000-00000000000c');
@@ -302,10 +304,14 @@ reset role;
 
 -- rejected -------------------------------------------------------------------------------------------
 
-select is(pg_temp.review('efefefef-0000-4000-8000-000000000011', (select c from ids), 'rejected', 'Not a graduation project.'),
-  'ok', 'an admin rejects');
+select is(pg_temp.review('efefefef-0000-4000-8000-000000000013', (select c from ids), 'rejected', 'Not a graduation project.'),
+  'ok', 'an admin (provisioned without a name) rejects');
 select is((select status::text from public.projects where id = (select c from ids)), 'rejected',
   'rejected: the status follows');
+select pg_temp.act_as('efefefef-0000-4000-8000-000000000011');
+select is((select reviewer_name from public.admin_project_reviews((select c from ids))), 'n@abr.test',
+  'a reviewer without a name is shown to admins by their contact email');
+reset role;
 select pg_temp.act_as('efefefef-0000-4000-8000-00000000000c');
 with changed as (
   update public.projects set title = 'Edited' where id = (select c from ids) returning 1
