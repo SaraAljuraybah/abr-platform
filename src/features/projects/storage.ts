@@ -323,6 +323,26 @@ export async function signedUrl(kind: ProjectFileKind, name: string, download?: 
 }
 export const SIGNED_URL_SECONDS = 300;
 
+/**
+ * Signed URLs for several files in ONE request (the directory signs a page of cards at once).
+ * Keyed by object name; a file the caller may not read (or that is gone) is simply missing.
+ */
+export async function signedUrls(
+  kind: ProjectFileKind,
+  names: readonly string[],
+): Promise<Record<string, string>> {
+  if (names.length === 0) return {};
+  const { data, error } = await supabase.storage
+    .from(PROJECT_FILES[kind].bucket)
+    .createSignedUrls([...names], SIGNED_URL_SECONDS);
+  if (error) throw error;
+  const urls: Record<string, string> = {};
+  for (const item of data) {
+    if (!item.error && item.path && item.signedUrl) urls[item.path] = item.signedUrl;
+  }
+  return urls;
+}
+
 /** Size and original name of a stored document. */
 export async function objectInfo(kind: ProjectFileKind, name: string) {
   const { data, error } = await supabase.storage.from(PROJECT_FILES[kind].bucket).info(name);
