@@ -322,16 +322,18 @@ describe('sign-in messages follow the language', () => {
 });
 
 describe('sign-in redirects', () => {
+  // A student for the /app cases: /app sends an admin on to /admin, and on a slow runner the
+  // assertion would only ever see /admin (a race, not a redirect bug).
   it.each([
-    ['/sign-in', '/app'],
-    ['/sign-in?next=%2F%2Fevil.com', '/app'],
-    ['/sign-in?next=https%3A%2F%2Fevil.com', '/app'],
-    ['/sign-in?next=%2Fadmin', '/admin'],
-  ])('after success at %s goes to %s', async (path, expected) => {
+    ['/sign-in', '/app', 'student'],
+    ['/sign-in?next=%2F%2Fevil.com', '/app', 'student'],
+    ['/sign-in?next=https%3A%2F%2Fevil.com', '/app', 'student'],
+    ['/sign-in?next=%2Fadmin', '/admin', 'admin'],
+  ] as const)('after success at %s goes to %s', async (path, expected, role) => {
     const user = userEvent.setup();
     auth.signInWithPassword.mockImplementation(() => {
       act(() => {
-        authStore.set({ ...signedIn, role: 'admin' });
+        authStore.set({ ...signedIn, role });
       });
       return Promise.resolve({ data: {}, error: null });
     });
