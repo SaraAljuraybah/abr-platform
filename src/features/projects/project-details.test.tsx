@@ -616,7 +616,8 @@ describe.each(['en', 'ar'] as const)('media (%s)', (language) => {
         expect(frame).toHaveAttribute('data-testid', 'project-image-frame');
         expect(frame?.className).not.toMatch(/(^|\s)p-\d/);
         // Behind it: the same picture, cover, blurred and hidden from assistive technology.
-        const backdrop = within(frame as HTMLElement).getByTestId('project-image-backdrop');
+        if (!(frame instanceof HTMLElement)) throw new Error('no frame');
+        const backdrop = within(frame).getByTestId('project-image-backdrop');
         expect(backdrop).toHaveAttribute('src', img.getAttribute('src'));
         expect(backdrop).toHaveAttribute('aria-hidden', 'true');
         expect(backdrop).toHaveClass('object-cover', 'blur-[24px]', 'scale-115');

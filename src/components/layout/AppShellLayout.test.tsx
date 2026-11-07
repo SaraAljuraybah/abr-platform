@@ -39,8 +39,14 @@ const auth = (role: AuthState['role']): AuthState => ({
 async function header(role: AuthState['role'] = 'student') {
   renderRoute('/app/profile', auth(role));
   const banner = await screen.findByRole('banner');
-  const row = banner.firstElementChild as HTMLElement;
+  const row = must(banner.firstElementChild);
   return { banner, row };
+}
+
+/** An element that must exist (the test fails clearly if it does not). */
+function must(element: Element | null | undefined): HTMLElement {
+  if (!(element instanceof HTMLElement)) throw new Error('missing element');
+  return element;
 }
 
 afterEach(async () => {
@@ -63,13 +69,13 @@ describe.each(['en', 'ar'] as const)('app shell header (%s)', (language) => {
     expect(middle).toHaveAccessibleName(t.shell.nav);
     expect(middle).toHaveClass('justify-self-center', 'hidden', 'md:flex');
     expect(
-      within(middle as HTMLElement)
+      within(must(middle))
         .getAllByRole('link')
         .map((link) => link.textContent),
     ).toEqual([t.shell.dashboard, t.shell.explore]);
     expect(end).toHaveClass('justify-self-end');
     expect(
-      within(end as HTMLElement).getByRole('button', { name: t.shell.accountMenu }),
+      within(must(end)).getByRole('button', { name: t.shell.accountMenu }),
     ).toBeInTheDocument();
     // The grid follows the document direction: Arabic mirrors it with no extra classes.
     expect(document.documentElement).toHaveAttribute('dir', language === 'ar' ? 'rtl' : 'ltr');
@@ -78,7 +84,7 @@ describe.each(['en', 'ar'] as const)('app shell header (%s)', (language) => {
   it('an admin gets Admin and Explore projects in the centre', async () => {
     await changeLanguage(language);
     const { row } = await header('admin');
-    const nav = row.children[1] as HTMLElement;
+    const nav = must(row.children[1]);
     expect(
       within(nav)
         .getAllByRole('link')
@@ -89,7 +95,7 @@ describe.each(['en', 'ar'] as const)('app shell header (%s)', (language) => {
   it('below md the links stay in the mobile menu', async () => {
     await changeLanguage(language);
     const { row } = await header();
-    const menu = within(row.children[2] as HTMLElement).getByRole('button', {
+    const menu = within(must(row.children[2])).getByRole('button', {
       name: t.nav.menu,
     });
     expect(menu.closest('.md\\:hidden')).not.toBeNull();
@@ -100,7 +106,7 @@ describe.each(['en', 'ar'] as const)('app shell header (%s)', (language) => {
     renderRoute('/projects', { ...auth('student'), verificationStatus: 'pending' });
     const banner = await screen.findByRole('banner');
     const nav = within(banner).getAllByRole('navigation', { name: t.shell.nav })[0];
-    const active = within(nav as HTMLElement).getByRole('link', { name: t.shell.explore });
+    const active = within(must(nav)).getByRole('link', { name: t.shell.explore });
     expect(active).toHaveAttribute('aria-current', 'page');
     expect(active).toHaveClass('bg-primary/10', 'text-primary', 'underline');
   });
