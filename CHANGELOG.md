@@ -196,6 +196,20 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   project. A branded default image (gradient, track icon, first letter) when none is uploaded;
   the dashboard shows it next to the title. The privacy policy lists project data.
 
+- Submit a project for review (SCRUM-18, page 8, migration `20261107104206_project_submission`):
+  `submit_project(id)` for the verified owner, from draft or changes requested, once title,
+  summary, a description of at least 100 characters, track, academic year and stage are set
+  (`ABR_PROJECT_INCOMPLETE: <fields>` otherwise); it sets `pending_review` and `submitted_at`.
+  `withdraw_submission(id)` takes a pending project back to a draft. Both lock the row, are
+  audited, and give other users the same not-found answer. Append-only `project_reviews`
+  (owner and admins read it, without `reviewer_id`; no client writes). pgTAP
+  `100_project_submission`.
+- The edit page ends with "Submit for review": a checklist of what is still missing (each item
+  focuses its field), then a confirmation; open changes are saved first. Status banners: under
+  review (read-only, "Withdraw submission"), changes requested (the latest notes, editable,
+  "Resubmit for review"), rejected (the reason), published and unpublished (read-only). The
+  dashboard's "What's next" has its own message and action for every status.
+
 ### Handoff to SCRUM-13 (sign-up UI)
 
 - The client must call `check_student_email(university_id, email)` before signing a student up.
@@ -402,6 +416,9 @@ Open points in the Terms and Conditions (`/terms`), shown only in development bu
 - Admin RPCs: manage universities and domains, read `reviewer_id`.
 - Unsubscribe link and mechanism required in every marketing email (SCRUM-37).
 - Organization and mentor onboarding (later) must also require a phone number.
+- Admin review RPC (next story): lock the project row and re-check `status = 'pending_review'`
+  before applying a decision, so a student's withdraw racing an admin decision can never publish
+  a draft; the admin gets a clear "no longer pending" error.
 - Clean up orphaned project files: an old file whose removal failed after a replace, and the
   folders of deleted accounts (scheduled job with the secret key; files are private and
   unreachable meanwhile).
