@@ -253,6 +253,14 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   gate; the explicit `status = published` and owner-verified filters keep owners' drafts and the
   admin's full view out of the directory. pgTAP `120_project_directory`. Both routes show "Coming
   soon" when `VITE_AUTH_ENABLED=false`. No migration.
+- Project images fill their frame (SCRUM-20; cards, project page, dashboard, admin, upload
+  preview): the same image, blurred, slightly enlarged and dimmed, covers the frame behind it
+  (decorative; left out with `prefers-contrast: more` or `prefers-reduced-transparency`), and the
+  image itself is contained with no padding, as large as the frame allows up to twice its natural
+  size, never cropped. Directory cards give the image at least 55% of the square from md up.
+- App shell header (SCRUM-20): from md a three-part grid (1fr auto 1fr): logo at the start, the
+  page links (Dashboard or Admin, Explore projects) centred, language switch and account menu at
+  the end; mirrored in Arabic. Below md the links stay in the mobile menu.
 - Account menu: an account with no name (provisioned admins) shows initials from its email
   instead of "?". `scripts/provision-admin.mjs --name "<full name>"` sets the admin's name.
 
