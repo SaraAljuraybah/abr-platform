@@ -7,8 +7,6 @@ import { isAuthEnabled } from '@/lib/features';
 import { ComingNextPage } from '@/pages/ComingNextPage';
 import { ComingSoonPage } from '@/pages/ComingSoonPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
-import { PlaceholderPage } from '@/pages/PlaceholderPage';
-import { AuthOnly } from './AuthOnly';
 import { RequireAuth } from './guards/RequireAuth';
 import { RequireAuthEnabled } from './guards/RequireAuthEnabled';
 import { RequireOnboarding } from './guards/RequireOnboarding';
@@ -24,9 +22,6 @@ import { RequireRole } from './guards/RequireRole';
  * With VITE_AUTH_ENABLED=false (phase 1 launch mode) RequireAuthEnabled sends all three to
  * /sign-in, which then shows the "Coming soon" page instead of the form.
  */
-// Placeholders inside the auth card drop the page padding.
-const inCard = 'p-0 sm:p-0';
-
 export const routes: RouteObject[] = [
   {
     element: <FormLayout />,
@@ -49,12 +44,22 @@ export const routes: RouteObject[] = [
         }),
       },
       {
+        // SCRUM-13 (page 4): request a reset link, then choose the new password.
         path: 'forgot-password',
-        element: (
-          <AuthOnly>
-            <PlaceholderPage page="forgotPassword" className={inCard} />
-          </AuthOnly>
-        ),
+        lazy: async () => ({
+          Component: isAuthEnabled()
+            ? (await import('@/features/auth/ForgotPasswordPage')).ForgotPasswordPage
+            : ComingSoonPage,
+        }),
+      },
+      {
+        // redirectTo of reset links. Allowed by additional_redirect_urls.
+        path: 'reset-password',
+        lazy: async () => ({
+          Component: isAuthEnabled()
+            ? (await import('@/features/auth/ResetPasswordPage')).ResetPasswordPage
+            : ComingSoonPage,
+        }),
       },
       // Forms system (SCRUM-34): /forms/<slug>, including request access (SCRUM-14).
       ...formRoutes,

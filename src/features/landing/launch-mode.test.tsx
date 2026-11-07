@@ -57,6 +57,7 @@ describe.each(['en', 'ar'] as const)('VITE_AUTH_ENABLED=false (%s)', (language) 
     '/sign-up',
     '/forms/request-access',
     '/forgot-password',
+    '/reset-password',
     '/check-email',
     '/auth/confirmed',
   ])('%s shows "Coming soon" with the interest form and home links', async (path) => {
@@ -176,7 +177,9 @@ describe.each(['en', 'ar'] as const)('VITE_AUTH_ENABLED=true (%s)', (language) =
   });
 
   it.each([
-    ['/forgot-password', () => t.placeholder.pages.forgotPassword],
+    ['/forgot-password', () => t.auth.forgot.title],
+    // Signed out, no link in the URL: the expired-link state.
+    ['/reset-password', () => t.auth.reset.failedTitle],
     ['/check-email', () => t.auth.checkEmail.title],
     // Signed out, no link in the URL: the expired-link state.
     ['/auth/confirmed', () => t.auth.confirmed.failed],

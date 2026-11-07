@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Callout } from '@/components/ui/callout';
 import { TextField } from '@/components/ui/text-field';
 import { validationMessage, z } from '@/lib/zod-i18n';
-import { useResendConfirmation } from '../api';
+import { useRequestPasswordReset, useResendConfirmation } from '../api';
 import { signInSchema } from '../schemas';
 import { formatCountdown, useCooldown } from '../use-cooldown';
 
@@ -18,11 +18,20 @@ type EmailValues = z.infer<typeof emailSchema>;
 /**
  * "Resend link" with a cooldown that starts on page load and again after every successful send.
  * With `email`, a single button sends to that address; without it, the user types the address.
+ * `purpose` picks the link: the sign-up confirmation (default) or a password reset (SCRUM-13, page 4).
  * Errors use the sign-in mapping (toAuthFailure); none of them says whether an account exists.
  */
-export function ResendLink({ email }: { email?: string }) {
+export function ResendLink({
+  email,
+  purpose = 'signup',
+}: {
+  email?: string;
+  purpose?: 'signup' | 'recovery';
+}) {
   const { t } = useTranslation();
-  const resend = useResendConfirmation();
+  const confirmation = useResendConfirmation();
+  const reset = useRequestPasswordReset();
+  const resend = purpose === 'recovery' ? reset : confirmation;
   const { secondsLeft, restart } = useCooldown(RESEND_COOLDOWN_SECONDS);
 
   const {

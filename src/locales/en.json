@@ -188,7 +188,6 @@
     "pages": {
       "signIn": "Sign in",
       "signUp": "Create an account",
-      "forgotPassword": "Reset your password",
       "requestAccess": "Request access"
     }
   },
@@ -212,7 +211,9 @@
       "network": "We couldn't reach the server. Check your connection and try again.",
       "unexpected": "Something went wrong. Please try again.",
       "weakPassword": "Choose a stronger password that meets every requirement under the password field.",
-      "signUpFailed": "We couldn't create your account. Check your details and try again."
+      "signUpFailed": "We couldn't create your account. Check your details and try again.",
+      "samePassword": "Choose a password that is different from your current one.",
+      "resetLinkInvalid": "This reset link is no longer valid. Request a new one."
     },
     "resend": {
       "action": "Resend link",
@@ -292,6 +293,29 @@
       "continue": "Continue",
       "failed": "This link has expired or was already used.",
       "signIn": "Sign in"
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "intro": "Enter the email you use for ABR. If it has an account, we'll send a link to choose a new password.",
+      "submit": "Send reset link",
+      "sentTitle": "Check your email",
+      "sentBody": "If an account exists for <email>{{email}}</email>, a link to choose a new password is on its way. It works once and expires after an hour.",
+      "backToSignIn": "Back to sign in"
+    },
+    "reset": {
+      "checking": "Checking your link…",
+      "title": "Choose a new password",
+      "password": "New password",
+      "confirm": "Confirm the new password",
+      "mismatch": "The passwords don't match.",
+      "submit": "Save new password",
+      "saving": "Saving…",
+      "requestNew": "Request a new reset link",
+      "doneTitle": "Your password was changed",
+      "doneBody": "Sign in with your new password.",
+      "signIn": "Sign in",
+      "failedTitle": "This reset link has expired or was already used",
+      "failedBody": "Enter your email to get a new link."
     }
   },
   "forms": {

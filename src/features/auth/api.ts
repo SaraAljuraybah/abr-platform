@@ -2,6 +2,7 @@ import {
   isAuthApiError,
   isAuthError,
   isAuthRetryableFetchError,
+  isAuthSessionMissingError,
   isAuthWeakPasswordError,
 } from '@supabase/supabase-js';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -18,6 +19,8 @@ export type AuthErrorKind =
   | 'weakPassword'
   | 'signUpFailed'
   | 'rateLimited'
+  | 'samePassword'
+  | 'resetLinkInvalid'
   | 'network'
   | 'unexpected';
 
@@ -59,6 +62,69 @@ export function toAuthFailure(error: unknown): AuthFailure {
 
 /** Where confirmation links (sign-up and resend) land. Must be in the Auth redirect allow-list. */
 export const confirmationRedirectUrl = () => `${window.location.origin}/auth/confirmed`;
+
+/** Where password reset links land (SCRUM-13, page 4). Must be in the Auth redirect allow-list. */
+export const passwordResetRedirectUrl = () => `${window.location.origin}/reset-password`;
+
+/**
+ * Sends a password reset link. Supabase Auth answers the same whether or not the email has an
+ * account, so the page can never tell (no enumeration); only rate limits and network errors show.
+ */
+export function useRequestPasswordReset() {
+  return useMutation<null, AuthFailure, { email: string }>({
+    mutationFn: async ({ email }) => {
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+          redirectTo: passwordResetRedirectUrl(),
+        });
+        if (error) throw error;
+        return null;
+      } catch (error) {
+        throw toAuthFailure(error);
+      }
+    },
+  });
+}
+
+/** Password-change errors on top of toAuthFailure, by code, never by message text. */
+export function toPasswordUpdateFailure(error: unknown): AuthFailure {
+  if (isAuthWeakPasswordError(error)) return new AuthFailure('weakPassword');
+  if (isAuthApiError(error) && error.code === 'same_password')
+    return new AuthFailure('samePassword');
+  if (
+    isAuthSessionMissingError(error) ||
+    (isAuthApiError(error) &&
+      (error.code === 'session_not_found' ||
+        error.code === 'reauthentication_needed' ||
+        error.code === 'otp_expired' ||
+        error.status === 401))
+  ) {
+    return new AuthFailure('resetLinkInvalid');
+  }
+  return toAuthFailure(error);
+}
+
+/**
+ * Sets the new password for the session the recovery link opened, then signs out on this device,
+ * so the student signs in again with the new password.
+ */
+export function useUpdatePassword() {
+  const queryClient = useQueryClient();
+  return useMutation<null, AuthFailure, { password: string }>({
+    mutationFn: async ({ password }) => {
+      try {
+        const { error } = await supabase.auth.updateUser({ password });
+        if (error) throw error;
+      } catch (error) {
+        throw toPasswordUpdateFailure(error);
+      }
+      const { error } = await supabase.auth.signOut({ scope: 'local' });
+      if (error) console.error('Sign-out after password change failed', { code: error.code });
+      queryClient.clear();
+      return null;
+    },
+  });
+}
 
 export function useSignIn() {
   return useMutation<null, AuthFailure, SignInValues>({
