@@ -165,10 +165,11 @@ export function ProjectCard({
         'md:aspect-square',
       )}
     >
-      <div className="aspect-[2/1] shrink-0 md:aspect-auto md:min-h-0 md:flex-1">
+      {/* md+: at least 55% of the square, more when the title fits on one line. */}
+      <div className="aspect-[2/1] shrink-0 md:aspect-auto md:min-h-[55%] md:flex-1">
         <ProjectImage project={card} size="card" signed={signed} decorative />
       </div>
-      <div className="flex shrink-0 flex-col gap-1 p-3">
+      <div className="flex shrink-0 flex-col gap-1 p-2.5">
         <h2 dir="auto" className="line-clamp-2 text-sm leading-snug font-bold text-brand">
           <Link
             to={`/projects/${card.id}`}
@@ -178,11 +179,17 @@ export function ProjectCard({
             {card.title}
           </Link>
         </h2>
-        <p dir="auto" className="truncate text-xs text-foreground">
-          {card.ownerName ?? t('explore.card.unknownOwner')}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          {t('explore.card.teamSize', { count: card.teamSize })}
+        {/* Owner and team size share one line; the name is cut first. */}
+        <p className="flex min-w-0 items-baseline gap-1.5 text-xs">
+          <span dir="auto" className="min-w-0 truncate text-foreground">
+            {card.ownerName ?? t('explore.card.unknownOwner')}
+          </span>
+          <span aria-hidden="true" className="text-muted-foreground">
+            ·
+          </span>
+          <span className="shrink-0 text-muted-foreground">
+            {t('explore.card.teamSize', { count: card.teamSize })}
+          </span>
         </p>
         {chips.length > 0 && <ChipRow chips={chips} label={t('explore.card.labels')} />}
       </div>
@@ -197,7 +204,7 @@ export function ProjectCardSkeleton() {
       aria-hidden="true"
       className="flex flex-col overflow-hidden rounded-lg border border-border bg-card md:aspect-square"
     >
-      <span className="block aspect-[2/1] bg-muted motion-safe:animate-pulse md:aspect-auto md:flex-1" />
+      <span className="block aspect-[2/1] bg-muted motion-safe:animate-pulse md:aspect-auto md:min-h-[55%] md:flex-1" />
       <span className="flex flex-col gap-2 p-3">
         <span className="block h-4 w-3/4 rounded bg-muted motion-safe:animate-pulse" />
         <span className="block h-3 w-1/2 rounded bg-muted motion-safe:animate-pulse" />

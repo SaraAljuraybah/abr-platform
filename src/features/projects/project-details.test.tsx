@@ -598,7 +598,7 @@ describe.each(['en', 'ar'] as const)('media (%s)', (language) => {
     ['tall (1:1.4)', 1143, 1600, true],
     ['square', 1080, 1080, false],
   ] as const)(
-    'a %s image is shown whole (contain, never cropped or scaled up)',
+    'a %s image fills the frame without being cropped (blurred backdrop, contained image)',
     async (_case, width, height, tip) => {
       const user = userEvent.setup();
       db.encoded = { width, height, bytes: 100 * 1024 };
@@ -609,14 +609,17 @@ describe.each(['en', 'ar'] as const)('media (%s)', (language) => {
       if (tip) expect(dialog.getByText(m.previewSquareTip)).toBeInTheDocument();
       else expect(dialog.queryByText(m.previewSquareTip)).toBeNull();
       for (const img of dialog.getAllByRole('img', { name: alt })) {
-        // Fitted inside the frame, never cropped or stretched past its own size.
-        expect(img).toHaveClass('object-contain', 'max-w-full', 'max-h-full');
-        expect(img).not.toHaveClass('object-cover', 'w-full', 'h-full');
+        // The image itself: whole (contain), as large as the frame, no padding, never cover.
+        expect(img).toHaveClass('object-contain', 'size-full');
+        expect(img).not.toHaveClass('object-cover');
         const frame = img.parentElement;
         expect(frame).toHaveAttribute('data-testid', 'project-image-frame');
-        // Centred with padding on the neutral surface (#F3EDFF).
-        expect(frame).toHaveClass('bg-muted', 'items-center', 'justify-center');
-        expect(frame?.className).toMatch(/\bp-(0\.5|2)\b/);
+        expect(frame?.className).not.toMatch(/(^|\s)p-\d/);
+        // Behind it: the same picture, cover, blurred and hidden from assistive technology.
+        const backdrop = within(frame as HTMLElement).getByTestId('project-image-backdrop');
+        expect(backdrop).toHaveAttribute('src', img.getAttribute('src'));
+        expect(backdrop).toHaveAttribute('aria-hidden', 'true');
+        expect(backdrop).toHaveClass('object-cover', 'blur-[24px]', 'scale-115');
       }
     },
   );

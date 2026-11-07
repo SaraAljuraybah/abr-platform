@@ -393,10 +393,10 @@ describe.each(['en', 'ar'] as const)('projects directory (%s)', (language) => {
     ]);
   });
 
-  it('images: one signed-URL batch per page, shown whole (object-contain, never cropped)', async () => {
+  it('images: one signed-URL batch per page, filling the frame but never cropped', async () => {
     await open('/projects');
     await waitFor(() => {
-      expect(document.querySelectorAll('[data-testid="project-image-frame"] img')).toHaveLength(2);
+      expect(document.querySelectorAll('[data-testid="project-image-foreground"]')).toHaveLength(2);
     });
     expect(db.signBatches).toEqual([
       [
@@ -404,9 +404,13 @@ describe.each(['en', 'ar'] as const)('projects directory (%s)', (language) => {
         `${pid(1)}/image-aaaaaaaa-0000-4000-8000-000000000001.webp`,
       ],
     ]);
-    for (const img of document.querySelectorAll('[data-testid="project-image-frame"] img')) {
-      expect(img).toHaveClass('object-contain');
+    for (const img of document.querySelectorAll('[data-testid="project-image-foreground"]')) {
+      expect(img).toHaveClass('object-contain', 'size-full');
       expect(img.className).not.toMatch(/object-cover/);
+      // The blurred cover copy behind it fills the frame and is hidden from assistive technology.
+      const backdrop = img.parentElement?.querySelector('[data-testid="project-image-backdrop"]');
+      expect(backdrop).toHaveClass('object-cover');
+      expect(backdrop).toHaveAttribute('aria-hidden', 'true');
       // Decorative: the title link already names the card.
       expect(img).toHaveAttribute('alt', '');
     }
