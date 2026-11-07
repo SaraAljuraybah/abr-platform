@@ -193,7 +193,8 @@ describe('AuthProvider + route guards (real profile)', () => {
     withSession(session);
     profileRow({ role: 'admin', verification_status: 'verified', onboarding_completed: true });
     const router = renderAt('/admin');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Admin' })).toBeInTheDocument();
+    // The admin overview (SCRUM-19) replaced the placeholder.
+    expect(await screen.findByRole('heading', { level: 1, name: 'Overview' })).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/admin');
   });
 
