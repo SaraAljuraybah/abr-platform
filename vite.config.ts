@@ -22,20 +22,13 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
-      rollupOptions: {
-        output: {
-          // Stable vendor chunks: better caching, and no single chunk over the 500 kB warning.
-          manualChunks(id) {
-            if (!id.includes('node_modules')) return undefined;
-            if (/[\\/]@supabase[\\/]/.test(id)) return 'vendor-supabase';
-            if (/[\\/](react|react-dom|react-router|scheduler)[\\/]/.test(id))
-              return 'vendor-react';
-            if (/[\\/](i18next|react-i18next)[\\/]/.test(id)) return 'vendor-i18n';
-            if (/[\\/]zod[\\/]/.test(id)) return 'vendor-zod';
-            return 'vendor';
-          },
-        },
-      },
+      // Read by scripts/check-chunk-cycles.mjs in `npm run ci`. No custom manualChunks: a hand-made
+      // vendor split once put React and React-dependent libraries in chunks that imported each
+      // other, and the built site crashed on load. Rollup's own splitting has no such cycles.
+      manifest: true,
+      // The entry chunk (React, router, i18n, zod, the shell) is about 610 kB (190 kB gzip). The
+      // limit sits just above it so the warning means real growth again.
+      chunkSizeWarningLimit: 650,
     },
     server: {
       host: '127.0.0.1',
