@@ -317,6 +317,41 @@ export type Database = {
           },
         ]
       }
+      project_reviews: {
+        Row: {
+          created_at: string
+          decision: Database["public"]["Enums"]["review_decision"]
+          id: string
+          notes: string | null
+          project_id: string
+          reviewer_id: string
+        }
+        Insert: {
+          created_at?: string
+          decision: Database["public"]["Enums"]["review_decision"]
+          id?: string
+          notes?: string | null
+          project_id: string
+          reviewer_id: string
+        }
+        Update: {
+          created_at?: string
+          decision?: Database["public"]["Enums"]["review_decision"]
+          id?: string
+          notes?: string | null
+          project_id?: string
+          reviewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_reviews_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           academic_year: string | null
@@ -651,6 +686,7 @@ export type Database = {
         Returns: string
       }
       submit_interest: { Args: { p_payload: Json }; Returns: undefined }
+      submit_project: { Args: { p_project_id: string }; Returns: undefined }
       update_my_contact: {
         Args: {
           p_linkedin_url: string
@@ -658,6 +694,10 @@ export type Database = {
           p_share_linkedin: boolean
           p_share_phone: boolean
         }
+        Returns: undefined
+      }
+      withdraw_submission: {
+        Args: { p_project_id: string }
         Returns: undefined
       }
     }
