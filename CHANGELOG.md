@@ -310,6 +310,19 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - `/privacy` is titled "Privacy Policy" / «سياسة الخصوصية» (heading, browser tab and footer link),
   matching the sign-up checkbox, and states the consent records and the students' mobile number.
   `PRIVACY_LAST_UPDATED` is `2026-11-06` (SCRUM-38).
+- Project image: picking a file (Upload or Replace) no longer uploads at once (SCRUM-27). The
+  checks and the browser re-encoding run first, then "Preview your project image" shows the
+  re-encoded result (exactly what will be stored) in the same `ProjectImage` as the project page
+  (large) and the dashboard (small), with its final dimensions and size, and a tip when the image
+  is much wider or taller than square (sides more than 4:3 apart). "Use this image" uploads with
+  the progress bar; "Choose another" opens the picker again; Cancel or Escape uploads nothing and
+  keeps the current image. Errors appear before any request. The document asks "Upload this
+  document?" with its name and size first.
+- Uploaded project images are never cropped: `ProjectImage` fits them whole (`object-contain`),
+  centred with padding on #F3EDFF, everywhere it is used (edit page, read-only view, dashboard,
+  admin queue and review page). Small images are not scaled up. The generated default still fills
+  the frame. The JPEG fallback encoder fills white first, so transparent areas stay white, not
+  black (WebP keeps the transparency).
 
 ### Fixed
 
