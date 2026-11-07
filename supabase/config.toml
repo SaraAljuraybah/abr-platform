@@ -168,6 +168,9 @@ additional_redirect_urls = [
   "http://localhost:5173",
   "http://127.0.0.1:5173/auth/confirmed",
   "http://localhost:5173/auth/confirmed",
+  # SCRUM-13 (page 4): password reset links (the app and scripts/provision-admin.mjs --redirect-to).
+  "http://127.0.0.1:5173/reset-password",
+  "http://localhost:5173/reset-password",
 ]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
