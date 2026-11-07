@@ -115,7 +115,7 @@ const SUMMARY_COLUMNS = 'id, title, status, track, image_path';
 const PROJECT_COLUMNS =
   'id, title, status, track, image_path, summary, description, sectors, academic_year, stage, team_size, looking_for_members, wanted_specializations, needs, document_path, video_url, repo_url, demo_url';
 
-function toProject(
+export function toProject(
   row: Omit<
     Row,
     'owner_id' | 'university_id' | 'submitted_at' | 'published_at' | 'created_at' | 'updated_at'
