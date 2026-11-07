@@ -210,6 +210,21 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   "Resubmit for review"), rejected (the reason), published and unpublished (read-only). The
   dashboard's "What's next" has its own message and action for every status.
 
+- Admin review of projects (SCRUM-19, migrations `20261107112729_project_review` and
+  `20261107115036_admin_reviewer_fallback`): `review_project(id, decision, notes)` for admins
+  only; notes required to request changes or reject. It locks the project and re-checks
+  `pending_review`, so a withdraw racing a decision can never publish a draft (`ABR_NOT_PENDING`).
+  Approving publishes (`published_at`); the review row and a `project.reviewed` audit event are
+  written in the same transaction. `admin_project_reviews(id)` gives admins the history with the
+  reviewer's name (or contact email); `admin_project_counts()` the projects per status. pgTAP
+  `110_project_review`.
+- Admin area at `/admin` (admins only; `/app` sends admins there, and the shell shows "Admin"):
+  Overview (projects per status, pending highlighted; total interest sign-ups), Project reviews
+  (the pending queue, oldest first, with image, student, university, track and date; a filter
+  for the other outcomes), the review page (everything the student entered, the review history,
+  and Approve and publish / Request changes / Reject behind confirmations), and Interest (the
+  interest-form counts per dimension as tables with bars; counts only).
+
 ### Handoff to SCRUM-13 (sign-up UI)
 
 - The client must call `check_student_email(university_id, email)` before signing a student up.
@@ -416,9 +431,8 @@ Open points in the Terms and Conditions (`/terms`), shown only in development bu
 - Admin RPCs: manage universities and domains, read `reviewer_id`.
 - Unsubscribe link and mechanism required in every marketing email (SCRUM-37).
 - Organization and mentor onboarding (later) must also require a phone number.
-- Admin review RPC (next story): lock the project row and re-check `status = 'pending_review'`
-  before applying a decision, so a student's withdraw racing an admin decision can never publish
-  a draft; the admin gets a clear "no longer pending" error.
+- Email the student when their project is approved, needs changes or is rejected (depends on
+  SCRUM-37 SMTP).
 - Clean up orphaned project files: an old file whose removal failed after a replace, and the
   folders of deleted accounts (scheduled job with the secret key; files are private and
   unreachable meanwhile).
