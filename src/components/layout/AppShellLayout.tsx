@@ -20,9 +20,10 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 /**
  * Shell for signed-in pages (/app, /app/*, /projects, /admin): logo to /app, the Dashboard and
- * Explore projects links (active state
- * by aria-current="page" and an underline, not colour alone), language switch and account menu.
- * Below sm the Dashboard link moves into the same disclosure menu the landing page uses.
+ * Explore projects links (active state by aria-current="page" and an underline, not colour alone),
+ * language switch and account menu.
+ * From md the links are centred in a 1fr auto 1fr grid; below md they move into the same disclosure
+ * menu the landing page uses.
  * Rendered inside the auth guards, so a session always exists here.
  */
 export function AppShellLayout() {
@@ -62,22 +63,32 @@ export function AppShellLayout() {
       </a>
 
       <header className="sticky top-0 z-40 border-b border-border bg-background">
-        <div className="relative container-page flex h-16 items-center justify-between gap-3">
-          <div className="flex items-center gap-6">
-            <Link to="/app" className="shrink-0 rounded-sm" aria-label={t('shell.homeLink')}>
-              <Logo />
-            </Link>
-            <nav aria-label={t('shell.nav')} className="hidden items-center gap-1 sm:flex">
-              {links()}
-            </nav>
-          </div>
-          <div className="flex items-center gap-1 sm:gap-2">
+        {/*
+          From md: a three-part grid (1fr auto 1fr), so the page links sit truly centred whatever
+          the widths of the two sides; the columns follow the reading direction (Arabic mirrors).
+          Below md: logo and actions, with the links in the mobile menu.
+        */}
+        <div className="relative container-page flex h-16 items-center justify-between gap-3 md:grid md:grid-cols-[1fr_auto_1fr]">
+          <Link
+            to="/app"
+            className="shrink-0 justify-self-start rounded-sm"
+            aria-label={t('shell.homeLink')}
+          >
+            <Logo />
+          </Link>
+          <nav
+            aria-label={t('shell.nav')}
+            className="hidden items-center gap-1 justify-self-center md:flex"
+          >
+            {links()}
+          </nav>
+          <div className="flex items-center gap-1 justify-self-end sm:gap-2">
             <LanguageSwitch />
             <AccountMenu
               name={profile.data?.fullName ?? null}
               email={session?.user.email ?? null}
             />
-            <MobileMenu className="sm:hidden">
+            <MobileMenu className="md:hidden">
               <nav aria-label={t('shell.nav')} className="flex flex-col gap-1">
                 {links('w-full text-base')}
               </nav>
