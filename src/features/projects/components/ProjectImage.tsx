@@ -31,6 +31,8 @@ const TRACK_ICONS: Record<string, LucideIcon> = {
 const SIZES = {
   sm: { box: 'size-12 rounded-md', pad: 'p-0.5', icon: 'size-4', letter: 'text-lg' },
   lg: { box: 'size-40 rounded-lg', pad: 'p-2', icon: 'size-6', letter: 'text-5xl' },
+  // The directory card (SCRUM-20): fills the card's image area, whatever its shape.
+  card: { box: 'size-full', pad: 'p-2', icon: 'size-6', letter: 'text-5xl' },
 } as const;
 
 interface ProjectImageProps {
@@ -39,6 +41,13 @@ interface ProjectImageProps {
   className?: string;
   /** A local image to show instead of the stored one: the re-encoded file in the upload preview. */
   src?: string;
+  /**
+   * The signed URL was fetched by the caller (the directory signs a whole page in one request):
+   * no request of its own. `url` undefined while pending or when signing failed.
+   */
+  signed?: { url: string | undefined; pending: boolean };
+  /** Next to a visible title (a card link): the image adds nothing for screen readers. */
+  decorative?: boolean;
 }
 
 /**
@@ -51,11 +60,29 @@ interface ProjectImageProps {
  * visible. Only max-width/max-height bound it, so a small image is centred at its own size, never
  * scaled up (no blur). The generated default still fills the frame.
  */
-export function ProjectImage({ project, size = 'sm', className, src }: ProjectImageProps) {
+export function ProjectImage({
+  project,
+  size = 'sm',
+  className,
+  src,
+  signed,
+  decorative = false,
+}: ProjectImageProps) {
   const { t } = useTranslation();
-  const url = useSignedUrl('image', src ? null : project.imagePath);
+  const url = useSignedUrl('image', src || signed ? null : project.imagePath);
   const s = SIZES[size];
-  const shown = src ?? (project.imagePath ? url.data : undefined);
+  const shown = src ?? (project.imagePath ? (signed ? signed.url : url.data) : undefined);
+
+  // The page's batch of URLs is still on its way: a quiet frame, not a flash of the default.
+  if (!shown && project.imagePath && signed?.pending) {
+    return (
+      <div
+        aria-hidden="true"
+        data-testid="project-image-pending"
+        className={cn(s.box, 'shrink-0 bg-muted motion-safe:animate-pulse', className)}
+      />
+    );
+  }
 
   if (shown) {
     return (
@@ -70,7 +97,7 @@ export function ProjectImage({ project, size = 'sm', className, src }: ProjectIm
       >
         <img
           src={shown}
-          alt={t('projects.media.imageAlt', { title: project.title })}
+          alt={decorative ? '' : t('projects.media.imageAlt', { title: project.title })}
           className="block max-h-full max-w-full object-contain"
         />
       </div>

@@ -92,6 +92,11 @@ describe.each(['en', 'ar'] as const)('VITE_AUTH_ENABLED=false (%s)', (language) 
     ['/app/projects/new', signedIn],
     ['/app/projects/p-1/edit', signedOut],
     ['/app/projects/p-1/edit', signedIn],
+    // SCRUM-20: the projects directory and a project page.
+    ['/projects', signedOut],
+    ['/projects', signedIn],
+    ['/projects/p-1', signedOut],
+    ['/projects/p-1', signedIn],
   ] as const)('%s redirects to the coming-soon page', async (path, auth) => {
     const { router } = await renderAt(path, language, auth);
     await waitFor(() => {
@@ -202,6 +207,13 @@ describe.each(['en', 'ar'] as const)('VITE_AUTH_ENABLED=true (%s)', (language) =
     const { router } = await renderAt('/app', language);
     await waitFor(() => {
       expect(router.state.location.search).toBe('?next=%2Fapp');
+    });
+  });
+
+  it('/projects signed out goes to sign-in with next=', async () => {
+    const { router } = await renderAt('/projects', language);
+    await waitFor(() => {
+      expect(router.state.location.search).toBe('?next=%2Fprojects');
     });
   });
 

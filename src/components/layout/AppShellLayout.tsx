@@ -19,7 +19,8 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   );
 
 /**
- * Shell for signed-in pages (/app, /app/*, /admin): logo to /app, the Dashboard link (active state
+ * Shell for signed-in pages (/app, /app/*, /projects, /admin): logo to /app, the Dashboard and
+ * Explore projects links (active state
  * by aria-current="page" and an underline, not colour alone), language switch and account menu.
  * Below sm the Dashboard link moves into the same disclosure menu the landing page uses.
  * Rendered inside the auth guards, so a session always exists here.
@@ -40,6 +41,16 @@ export function AppShellLayout() {
         {t('shell.dashboard')}
       </NavLink>
     );
+  // Every signed-in, onboarded user (SCRUM-20). Unverified users get the "verify first" message
+  // there, so pending organizations learn what verification unlocks.
+  const links = (className?: string) => (
+    <>
+      {dashboard(className)}
+      <NavLink to="/projects" className={(state) => cn(navLinkClass(state), className)}>
+        {t('shell.explore')}
+      </NavLink>
+    </>
+  );
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">
@@ -56,15 +67,20 @@ export function AppShellLayout() {
             <Link to="/app" className="shrink-0 rounded-sm" aria-label={t('shell.homeLink')}>
               <Logo />
             </Link>
-            <nav aria-label={t('shell.nav')} className="hidden sm:block">
-              {dashboard()}
+            <nav aria-label={t('shell.nav')} className="hidden items-center gap-1 sm:flex">
+              {links()}
             </nav>
           </div>
           <div className="flex items-center gap-1 sm:gap-2">
             <LanguageSwitch />
-            <AccountMenu name={profile.data?.fullName ?? null} />
+            <AccountMenu
+              name={profile.data?.fullName ?? null}
+              email={session?.user.email ?? null}
+            />
             <MobileMenu className="sm:hidden">
-              <nav aria-label={t('shell.nav')}>{dashboard('w-full text-base')}</nav>
+              <nav aria-label={t('shell.nav')} className="flex flex-col gap-1">
+                {links('w-full text-base')}
+              </nav>
             </MobileMenu>
           </div>
         </div>

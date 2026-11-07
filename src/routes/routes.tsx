@@ -15,7 +15,7 @@ import { RequireRole } from './guards/RequireRole';
 /**
  * Guard nesting (UX only; the database is the authority):
  *   /onboarding → RequireAuth (public AppLayout)
- *   /app, /app/profile → RequireAuth → RequireOnboarding (AppShellLayout)
+ *   /app, /app/profile, /projects, /projects/:id → RequireAuth → RequireOnboarding (AppShellLayout)
  *   /app/projects/new, /app/projects/:id/edit → … → RequireOnboarding → RequireRole(allow: 'student')
  *   /admin      → RequireAuth → RequireOnboarding → RequireRole(allow: 'admin') (AppShellLayout)
  * RequireOnboarding redirects to /onboarding and RequireRole to /app, so neither can loop.
@@ -144,6 +144,20 @@ export const routes: RouteObject[] = [
                     }),
                   },
                   { path: 'app/profile', element: <ComingNextPage page="profile" /> },
+                  {
+                    // Projects directory (SCRUM-20): every role. The pages show a "verify first"
+                    // message to anyone not verified; RLS (projects_select, D-15) is the gate.
+                    path: 'projects',
+                    lazy: async () => ({
+                      Component: (await import('@/features/explore/ExplorePage')).ExplorePage,
+                    }),
+                  },
+                  {
+                    path: 'projects/:id',
+                    lazy: async () => ({
+                      Component: (await import('@/features/explore/ProjectPage')).ProjectPage,
+                    }),
+                  },
                   {
                     // Projects (SCRUM-18): students only. RequireRole sends anyone else to /app.
                     element: <RequireRole allow="student" />,
