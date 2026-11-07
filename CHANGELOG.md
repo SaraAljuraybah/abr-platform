@@ -225,6 +225,17 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   and Approve and publish / Request changes / Reject behind confirmations), and Interest (the
   interest-form counts per dimension as tables with bars; counts only).
 
+- Forgot and reset password (SCRUM-13, page 4), English and Arabic: `/forgot-password` sends a
+  reset link (`resetPasswordForEmail`, redirect to `/reset-password`) with the same answer whether or
+  not the address has an account and the same 60-second "send again" cooldown as the
+  confirmation resend. `/reset-password` turns the link into a session, removes the tokens from the
+  address bar, asks for the new password with the sign-up strength checklist and a confirmation,
+  then signs out and offers sign-in. An expired or used link offers a new one. Both pages show
+  "Coming soon" when `VITE_AUTH_ENABLED=false`. Local redirect allow-list: `/reset-password`.
+- `scripts/provision-admin.mjs --redirect-to <url>`: the recovery link opens that site's
+  `/reset-password` (for example the dev preview for abr-dev); without it, the project's Site URL.
+  The script now prints the project URL it ran against and where the link opens.
+
 ### Handoff to SCRUM-13 (sign-up UI)
 
 - The client must call `check_student_email(university_id, email)` before signing a student up.
@@ -321,6 +332,9 @@ placeholder universities seeded (no users).
   TOTP MFA (on) and storage vector (off) keep their previous hosted values.
 - Done: default privileges (ADR-0011 note). Hosted grants ALL by default; the migrations' explicit
   revokes hold (client roles have `SELECT` only, `anon` executes only `check_student_email`).
+- Open: production redirect allow-list (SCRUM-13, page 4). Before account screens open on
+  tryabr.com, add `https://tryabr.com/reset-password` (and `/auth/confirmed`) to abr-prod's Auth
+  redirect URLs. abr-dev already allows the production and `dev` preview hosts with `/**`.
 - Open: second sign-up without enumeration (SCRUM-13). Settings are in place (email and SMS
   confirmations on, so no autoconfirm). Behaviour check: sign up twice with a confirmed email; the
   second answer must be HTTP 200 with no identities. Needs a real, confirmed account, so it is left
