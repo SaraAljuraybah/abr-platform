@@ -161,7 +161,43 @@ export const routes: RouteObject[] = [
                   },
                   {
                     element: <RequireRole allow="admin" />,
-                    children: [{ path: 'admin', element: <PlaceholderPage page="admin" /> }],
+                    children: [
+                      {
+                        // Admin area (SCRUM-19). Every query and RPC behind it checks is_admin().
+                        path: 'admin',
+                        lazy: async () => ({
+                          Component: (await import('@/features/admin/AdminLayout')).AdminLayout,
+                        }),
+                        children: [
+                          {
+                            index: true,
+                            lazy: async () => ({
+                              Component: (await import('@/features/admin/OverviewPage'))
+                                .OverviewPage,
+                            }),
+                          },
+                          {
+                            path: 'projects',
+                            lazy: async () => ({
+                              Component: (await import('@/features/admin/QueuePage')).QueuePage,
+                            }),
+                          },
+                          {
+                            path: 'projects/:id',
+                            lazy: async () => ({
+                              Component: (await import('@/features/admin/ReviewPage')).ReviewPage,
+                            }),
+                          },
+                          {
+                            path: 'interest',
+                            lazy: async () => ({
+                              Component: (await import('@/features/admin/InterestPage'))
+                                .InterestPage,
+                            }),
+                          },
+                        ],
+                      },
+                    ],
                   },
                 ],
               },

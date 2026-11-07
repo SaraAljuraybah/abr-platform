@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Navigate } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { Callout } from '@/components/ui/callout';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -6,7 +7,6 @@ import { StatusChip } from '@/components/ui/status-chip';
 import { useAuth } from '@/features/auth/auth-context';
 import { useOwnProjects } from '@/features/projects/api';
 import { useDirection } from '@/hooks/useDirection';
-import { PlaceholderPage } from '@/pages/PlaceholderPage';
 import { firstName, useStudentDashboard } from './api';
 import { Card, ProfileCard, ProjectsCard, ProjectsError, WhatsNextCard } from './components/cards';
 import { useNextStep } from './next-step';
@@ -21,7 +21,8 @@ export function DashboardPage() {
   const { t } = useTranslation();
   const { session, role, verificationStatus } = useAuth();
 
-  if (role === 'admin') return <PlaceholderPage page="app" />;
+  // Admins have their own home (SCRUM-19).
+  if (role === 'admin') return <Navigate to="/admin" replace />;
 
   if (role === 'student' && session) return <StudentDashboardView userId={session.user.id} />;
 

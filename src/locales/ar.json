@@ -188,8 +188,6 @@
     "pages": {
       "signIn": "تسجيل الدخول",
       "signUp": "إنشاء حساب",
-      "app": "لوحة التحكم",
-      "admin": "الإدارة",
       "forgotPassword": "إعادة تعيين كلمة المرور",
       "requestAccess": "طلب انضمام"
     }
@@ -796,7 +794,8 @@
     "dashboard": "لوحة التحكم",
     "accountMenu": "قائمة الحساب",
     "myProfile": "ملفي",
-    "signOut": "تسجيل الخروج"
+    "signOut": "تسجيل الخروج",
+    "admin": "الإدارة"
   },
   "dashboard": {
     "title": "لوحة التحكم",
@@ -1082,5 +1081,105 @@
   "numberStepper": {
     "decrease": "إنقاص {{label}}",
     "increase": "زيادة {{label}}"
+  },
+  "admin": {
+    "loading": "جارٍ التحميل…",
+    "loadError": "تعذّر التحميل. يُرجى المحاولة مجددًا.",
+    "nav": {
+      "label": "تنقل الإدارة",
+      "overview": "نظرة عامة",
+      "projects": "مراجعة المشاريع",
+      "interest": "المهتمون"
+    },
+    "overview": {
+      "title": "نظرة عامة",
+      "intro": "المشاريع حسب الحالة، والتسجيلات في نموذج الاهتمام.",
+      "projects": "المشاريع",
+      "reviewNow": "ابدأ المراجعة",
+      "view": "عرض",
+      "interestTitle": "تسجيلات الاهتمام",
+      "interestCta": "عرض الأرقام"
+    },
+    "queue": {
+      "title": "مراجعة المشاريع",
+      "filterLabel": "التصفية حسب الحالة",
+      "emptyPending": "لا توجد مشاريع بانتظار المراجعة.",
+      "empty": "لا توجد مشاريع بهذه الحالة.",
+      "submitted": "أُرسل في {{date}}",
+      "updated": "حُدّث في {{date}}",
+      "noTrack": "بلا مسار",
+      "unknownStudent": "طالب غير معروف"
+    },
+    "review": {
+      "title": "مراجعة المشروع",
+      "back": "العودة إلى مراجعة المشاريع",
+      "notFound": "هذا المشروع غير موجود.",
+      "student": "الطالب",
+      "university": "الجامعة",
+      "submitted": "تاريخ الإرسال",
+      "notPending": "لم يعد هذا المشروع بانتظار المراجعة.",
+      "historyTitle": "سجل المراجعات",
+      "historyEmpty": "لا توجد مراجعات بعد.",
+      "by": "بواسطة {{name}}",
+      "decisionTitle": "القرار",
+      "decisionIntro": "يرى الطالب قرارك وملاحظاتك.",
+      "approve": "اعتماد ونشر",
+      "requestChanges": "طلب تعديلات",
+      "reject": "رفض",
+      "notes": "ملاحظات للطالب",
+      "notesOptional": "ملاحظات للطالب (اختياري)",
+      "notesRequired": "اكتب ملاحظات ليعرف الطالب الخطوة التالية.",
+      "cancel": "إلغاء",
+      "saving": "جارٍ الحفظ…",
+      "decision": {
+        "approved": "معتمد",
+        "changes_requested": "مطلوب تعديلات",
+        "rejected": "مرفوض"
+      },
+      "dialog": {
+        "approved": {
+          "title": "اعتماد هذا المشروع ونشره؟",
+          "body": "سيتمكن الأعضاء الموثّقون في عَبْر من الاطلاع عليه.",
+          "confirm": "اعتماد ونشر"
+        },
+        "changes_requested": {
+          "title": "طلب تعديلات؟",
+          "body": "سيتمكن الطالب من تعديل المشروع وإعادة إرساله.",
+          "confirm": "طلب تعديلات"
+        },
+        "rejected": {
+          "title": "رفض هذا المشروع؟",
+          "body": "لا يمكن للطالب تعديل المشروع المرفوض أو إعادة إرساله.",
+          "confirm": "رفض"
+        }
+      },
+      "done": {
+        "approved": "تم اعتماد المشروع ونشره.",
+        "changes_requested": "تم طلب التعديلات.",
+        "rejected": "تم رفض المشروع."
+      }
+    },
+    "interest": {
+      "title": "المهتمون",
+      "intro": "أعداد من نموذج الاهتمام، دون أي بيانات شخصية.",
+      "total": "إجمالي التسجيلات",
+      "answer": "الإجابة",
+      "count": "العدد",
+      "share": "النسبة",
+      "empty": "لا توجد إجابات بعد.",
+      "dimension": {
+        "role": "الصفة",
+        "university": "الجامعة",
+        "field_of_study": "التخصص",
+        "graduation_year": "سنة التخرج",
+        "project_stage": "مرحلة المشروع",
+        "sector": "القطاع",
+        "looking_for": "ما يبحثون عنه",
+        "org_size": "حجم الجهة",
+        "expertise": "مجال الخبرة",
+        "experience": "الخبرة",
+        "heard_from": "كيف عرفوا عن عَبْر"
+      }
+    }
   }
 }

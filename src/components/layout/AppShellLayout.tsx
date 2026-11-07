@@ -26,14 +26,20 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
  */
 export function AppShellLayout() {
   const { t } = useTranslation();
-  const { session } = useAuth();
+  const { session, role } = useAuth();
   const profile = useOwnProfile(session?.user.id);
 
-  const dashboard = (className?: string) => (
-    <NavLink to="/app" end className={(state) => cn(navLinkClass(state), className)}>
-      {t('shell.dashboard')}
-    </NavLink>
-  );
+  // Admins work in /admin (SCRUM-19; /app sends them there); everyone else in /app.
+  const dashboard = (className?: string) =>
+    role === 'admin' ? (
+      <NavLink to="/admin" className={(state) => cn(navLinkClass(state), className)}>
+        {t('shell.admin')}
+      </NavLink>
+    ) : (
+      <NavLink to="/app" end className={(state) => cn(navLinkClass(state), className)}>
+        {t('shell.dashboard')}
+      </NavLink>
+    );
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">

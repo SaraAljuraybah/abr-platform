@@ -455,12 +455,26 @@ describe.each(['en', 'ar'] as const)('other roles on /app (%s)', (language) => {
     expect(screen.queryByRole('region', { name: t.dashboard.profile.title })).toBeNull();
   });
 
-  it('an admin keeps the placeholder', async () => {
+  it('an admin is sent to the admin overview (SCRUM-19)', async () => {
     seed({ role: 'admin', verification_status: 'verified' });
-    await load();
-    expect(
-      await screen.findByRole('heading', { level: 1, name: t.placeholder.pages.app }),
-    ).toBeInTheDocument();
+    const router = createMemoryRouter(routes, { initialEntries: ['/app'] });
+    render(
+      <QueryClientProvider
+        client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+      >
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </QueryClientProvider>,
+    );
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/admin');
+    });
+    // The shell's main link is "Admin" for admins.
+    expect((await screen.findAllByRole('link', { name: t.shell.admin }))[0]).toHaveAttribute(
+      'href',
+      '/admin',
+    );
   });
 
   it(

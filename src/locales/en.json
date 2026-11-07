@@ -188,8 +188,6 @@
     "pages": {
       "signIn": "Sign in",
       "signUp": "Create an account",
-      "app": "Dashboard",
-      "admin": "Admin",
       "forgotPassword": "Reset your password",
       "requestAccess": "Request access"
     }
@@ -796,7 +794,8 @@
     "dashboard": "Dashboard",
     "accountMenu": "Account menu",
     "myProfile": "My profile",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "admin": "Admin"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -1082,5 +1081,105 @@
   "numberStepper": {
     "decrease": "Decrease {{label}}",
     "increase": "Increase {{label}}"
+  },
+  "admin": {
+    "loading": "Loading…",
+    "loadError": "We couldn't load this. Please try again.",
+    "nav": {
+      "label": "Admin navigation",
+      "overview": "Overview",
+      "projects": "Project reviews",
+      "interest": "Interest"
+    },
+    "overview": {
+      "title": "Overview",
+      "intro": "Projects by status, and sign-ups from the interest form.",
+      "projects": "Projects",
+      "reviewNow": "Review now",
+      "view": "View",
+      "interestTitle": "Interest sign-ups",
+      "interestCta": "See the numbers"
+    },
+    "queue": {
+      "title": "Project reviews",
+      "filterLabel": "Filter by status",
+      "emptyPending": "No projects are waiting for review.",
+      "empty": "No projects have this status.",
+      "submitted": "Submitted {{date}}",
+      "updated": "Updated {{date}}",
+      "noTrack": "No track",
+      "unknownStudent": "Unknown student"
+    },
+    "review": {
+      "title": "Project review",
+      "back": "Back to project reviews",
+      "notFound": "This project doesn't exist.",
+      "student": "Student",
+      "university": "University",
+      "submitted": "Submitted",
+      "notPending": "This project is no longer awaiting review.",
+      "historyTitle": "Review history",
+      "historyEmpty": "No reviews yet.",
+      "by": "by {{name}}",
+      "decisionTitle": "Decision",
+      "decisionIntro": "The student sees your decision and your notes.",
+      "approve": "Approve and publish",
+      "requestChanges": "Request changes",
+      "reject": "Reject",
+      "notes": "Notes for the student",
+      "notesOptional": "Notes for the student (optional)",
+      "notesRequired": "Write notes so the student knows what to do next.",
+      "cancel": "Cancel",
+      "saving": "Saving…",
+      "decision": {
+        "approved": "Approved",
+        "changes_requested": "Changes requested",
+        "rejected": "Rejected"
+      },
+      "dialog": {
+        "approved": {
+          "title": "Approve and publish this project?",
+          "body": "Verified members of ABR will be able to see it.",
+          "confirm": "Approve and publish"
+        },
+        "changes_requested": {
+          "title": "Request changes?",
+          "body": "The student can edit the project and resubmit it.",
+          "confirm": "Request changes"
+        },
+        "rejected": {
+          "title": "Reject this project?",
+          "body": "The student can't edit or resubmit a rejected project.",
+          "confirm": "Reject"
+        }
+      },
+      "done": {
+        "approved": "Project approved and published.",
+        "changes_requested": "Changes requested.",
+        "rejected": "Project rejected."
+      }
+    },
+    "interest": {
+      "title": "Interest",
+      "intro": "Counts from the interest form. No personal data.",
+      "total": "Total sign-ups",
+      "answer": "Answer",
+      "count": "Count",
+      "share": "Share",
+      "empty": "No answers yet.",
+      "dimension": {
+        "role": "Role",
+        "university": "University",
+        "field_of_study": "Field of study",
+        "graduation_year": "Graduation year",
+        "project_stage": "Project stage",
+        "sector": "Sector",
+        "looking_for": "What they are looking for",
+        "org_size": "Organization size",
+        "expertise": "Expertise",
+        "experience": "Experience",
+        "heard_from": "How they heard about ABR"
+      }
+    }
   }
 }

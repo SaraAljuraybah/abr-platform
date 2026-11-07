@@ -2,6 +2,7 @@ import type { Session } from '@supabase/supabase-js';
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { type AuthState } from '@/features/auth/auth-context';
+import en from '@/locales/en.json';
 import { renderRoute } from '@/test/render-route';
 
 const session = { user: { id: '00000000-0000-0000-0000-000000000001' } } as unknown as Session;
@@ -76,13 +77,19 @@ describe('route guards (UX only)', () => {
     expect(router.state.location.pathname).toBe('/onboarding');
   });
 
-  it.each([
-    ['student', onboardedStudent],
-    ['admin', onboardedAdmin],
-  ])('sends an onboarded %s from /onboarding to /app', async (_role, auth) => {
-    const router = renderAt('/onboarding', auth);
+  it('sends an onboarded student from /onboarding to /app', async () => {
+    const router = renderAt('/onboarding', onboardedStudent);
     expect(await screen.findByRole('heading', { level: 1, name: 'Dashboard' })).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/app');
+    expect(router.state.historyAction).toBe('REPLACE');
+  });
+
+  it('sends an onboarded admin from /onboarding via /app to the admin overview', async () => {
+    const router = renderAt('/onboarding', onboardedAdmin);
+    expect(
+      await screen.findByRole('heading', { level: 1, name: en.admin.overview.title }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/admin');
     expect(router.state.historyAction).toBe('REPLACE');
   });
 
@@ -100,7 +107,9 @@ describe('route guards (UX only)', () => {
 
   it('lets an onboarded admin into /admin', async () => {
     const router = renderAt('/admin', onboardedAdmin);
-    expect(await screen.findByRole('heading', { level: 1, name: 'Admin' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: en.admin.overview.title }),
+    ).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/admin');
   });
 
