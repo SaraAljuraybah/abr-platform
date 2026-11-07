@@ -38,6 +38,11 @@ const db = vi.hoisted(() => ({
   /** An upload error kind, or 'hold' to keep the upload pending until release(). */
   upload: null as null | 'hold' | 'network' | 'tooLarge',
   release: null as null | (() => void),
+  /** What the fake re-encoder produces for the next image: dimensions and byte count. */
+  encoded: { width: 1080, height: 1080, bytes: 240 * 1024 },
+  /** Object URLs handed out for previews, and the ones revoked. */
+  objectUrls: [] as string[],
+  revoked: [] as string[],
 }));
 
 vi.mock('@/lib/supabase', () => {
@@ -140,11 +145,23 @@ vi.mock('@/features/projects/storage', async (importOriginal) => {
         return Promise.reject(new actual.UploadFailure('wrongType'));
       }
       if (file.size > rules.maxBytes) return Promise.reject(new actual.UploadFailure('tooLarge'));
+      if (kind === 'document') {
+        return Promise.resolve({
+          blob: file,
+          contentType: file.type,
+          extension: 'pdf',
+          originalName: file.name,
+        });
+      }
+      // The re-encoded image: a new blob with its own size and dimensions, never the original.
+      const { width, height, bytes } = db.encoded;
       return Promise.resolve({
-        blob: file,
-        contentType: kind === 'image' ? 'image/webp' : file.type,
-        extension: kind === 'image' ? 'webp' : 'pdf',
+        blob: new Blob([new Uint8Array(bytes)], { type: 'image/webp' }),
+        contentType: 'image/webp',
+        extension: 'webp',
         originalName: file.name,
+        width,
+        height,
       });
     },
     uploadObject: async (
@@ -206,6 +223,9 @@ function seed(row: Row = {}) {
   db.failRpc = false;
   db.upload = null;
   db.release = null;
+  db.encoded = { width: 1080, height: 1080, bytes: 240 * 1024 };
+  db.objectUrls = [];
+  db.revoked = [];
   db.profiles.set(USER_ID, {
     role: 'student',
     verification_status: 'verified',
@@ -268,6 +288,17 @@ beforeAll(() => {
     hasPointerCapture: () => false,
     releasePointerCapture: () => undefined,
     scrollIntoView: () => undefined,
+  });
+  // jsdom has no object URLs; the preview shows the re-encoded blob through one.
+  Object.assign(URL, {
+    createObjectURL: () => {
+      const url = `blob:preview-${String(db.objectUrls.length + 1)}`;
+      db.objectUrls.push(url);
+      return url;
+    },
+    revokeObjectURL: (url: string) => {
+      db.revoked.push(url);
+    },
   });
 });
 
@@ -440,6 +471,13 @@ describe.each(['en', 'ar'] as const)('edit page sections (%s)', (language) => {
 describe.each(['en', 'ar'] as const)('media (%s)', (language) => {
   const t = copy[language];
   const m = t.projects.media;
+  const alt = m.imageAlt.replace('{{title}}', 'Campus Navigator');
+  const previewDialog = () => screen.findByRole('dialog', { name: m.previewTitle });
+  const sizeLine = (width: number, height: number, kb: number) =>
+    m.previewSize
+      .replace('{{width}}', String(width))
+      .replace('{{height}}', String(height))
+      .replace('{{size}}', m.sizeKb.replace('{{value}}', String(kb)));
 
   beforeEach(async () => {
     await changeLanguage(language);
@@ -456,25 +494,139 @@ describe.each(['en', 'ar'] as const)('media (%s)', (language) => {
     expect(within(media).queryByRole('button', { name: m.removeImage })).toBeNull();
   });
 
-  it('upload shows progress, then the preview; saved at once, not with Save', async () => {
+  it('picking an image opens the preview of the re-encoded result; nothing is sent yet', async () => {
+    const user = userEvent.setup();
+    await load();
+    await user.upload(fileInput(m.image), pngFile());
+    const dialog = within(await previewDialog());
+    expect(dialog.getByText(m.previewBody)).toBeInTheDocument();
+    // The same ProjectImage, large and small, showing the re-encoded blob (not the original).
+    const images = dialog.getAllByRole('img', { name: alt });
+    expect(images).toHaveLength(2);
+    for (const img of images) expect(img).toHaveAttribute('src', 'blob:preview-1');
+    expect(dialog.getByText(m.previewLarge)).toBeInTheDocument();
+    expect(dialog.getByText(m.previewSmall)).toBeInTheDocument();
+    expect(dialog.getByTestId('preview-size')).toHaveTextContent(sizeLine(1080, 1080, 240));
+    expect(dialog.queryByText(m.previewSquareTip)).toBeNull();
+    expect(db.calls).toEqual([]);
+    expect(db.projects.get(PROJECT_ID)?.image_path).toBeNull();
+  });
+
+  it('"Use this image" uploads with progress; saved at once, not with Save', async () => {
     const user = userEvent.setup();
     db.upload = 'hold';
     await load();
     await user.upload(fileInput(m.image), pngFile());
+    const dialog = await previewDialog();
+    await user.click(within(dialog).getByRole('button', { name: m.useImage }));
     const bar = await screen.findByRole('progressbar', { name: m.uploadingImage });
     expect(bar).toHaveAttribute('aria-valuenow', '40');
     expect(screen.getByText(m.uploading.replace('{{percent}}', '40'))).toBeInTheDocument();
+    // An upload in progress cannot be dismissed.
+    await user.keyboard('{Escape}');
+    expect(screen.getByRole('dialog', { name: m.previewTitle })).toBeInTheDocument();
     db.release?.();
 
     expect(await screen.findByText(m.imageUploaded)).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).toBeNull();
     const path = db.projects.get(PROJECT_ID)?.image_path as string;
     expect(path).toMatch(new RegExp(`^${PROJECT_ID}/image-[0-9a-f-]{36}\\.webp$`));
     expect(db.calls).toEqual(['upload:image', 'update:image_path']);
-    const img = await screen.findByRole('img', {
-      name: m.imageAlt.replace('{{title}}', 'Campus Navigator'),
-    });
+    const img = await screen.findByRole('img', { name: alt });
     expect(img).toHaveAttribute('src', `https://signed.test/project-images/${path}`);
     expect(screen.queryByRole('progressbar')).toBeNull();
+    expect(db.revoked).toEqual(['blob:preview-1']);
+  });
+
+  it.each(['cancel', 'escape'] as const)(
+    '%s uploads nothing, keeps the current image and returns focus to Replace',
+    async (how) => {
+      const user = userEvent.setup();
+      seed({ image_path: IMAGE });
+      await load();
+      const replace = screen.getByRole('button', { name: m.replaceImage });
+      await user.upload(fileInput(m.image), pngFile());
+      const dialog = await previewDialog();
+      if (how === 'cancel') {
+        await user.click(within(dialog).getByRole('button', { name: m.cancel }));
+      } else {
+        await user.keyboard('{Escape}');
+      }
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).toBeNull();
+      });
+      expect(db.calls).toEqual([]);
+      expect(db.projects.get(PROJECT_ID)?.image_path).toBe(IMAGE);
+      expect(screen.getByRole('img', { name: alt })).toHaveAttribute(
+        'src',
+        `https://signed.test/project-images/${IMAGE}`,
+      );
+      await waitFor(() => {
+        expect(replace).toHaveFocus();
+      });
+      expect(db.revoked).toEqual(['blob:preview-1']);
+    },
+  );
+
+  it('"Choose another" replaces the pending file; only the last one is uploaded', async () => {
+    const user = userEvent.setup();
+    await load();
+    await user.upload(fileInput(m.image), pngFile());
+    let dialog = within(await previewDialog());
+    expect(dialog.getByTestId('preview-size')).toHaveTextContent(sizeLine(1080, 1080, 240));
+
+    db.encoded = { width: 1600, height: 900, bytes: 180 * 1024 };
+    await user.click(dialog.getByRole('button', { name: m.chooseAnother }));
+    await user.upload(fileInput(m.chooseAnother), pngFile());
+    dialog = within(screen.getByRole('dialog', { name: m.previewTitle }));
+    await waitFor(() => {
+      expect(dialog.getByTestId('preview-size')).toHaveTextContent(sizeLine(1600, 900, 180));
+    });
+    for (const img of dialog.getAllByRole('img', { name: alt })) {
+      expect(img).toHaveAttribute('src', 'blob:preview-2');
+    }
+    expect(db.revoked).toEqual(['blob:preview-1']);
+    expect(db.calls).toEqual([]);
+
+    await user.click(dialog.getByRole('button', { name: m.useImage }));
+    expect(await screen.findByText(m.imageUploaded)).toBeInTheDocument();
+    expect(db.calls).toEqual(['upload:image', 'update:image_path']);
+  });
+
+  it.each([
+    ['wide (2.3:1)', 1600, 696, true],
+    ['tall (1:1.4)', 1143, 1600, true],
+    ['square', 1080, 1080, false],
+  ] as const)(
+    'a %s image is shown whole (contain, never cropped or scaled up)',
+    async (_case, width, height, tip) => {
+      const user = userEvent.setup();
+      db.encoded = { width, height, bytes: 100 * 1024 };
+      await load();
+      await user.upload(fileInput(m.image), pngFile());
+      const dialog = within(await previewDialog());
+      expect(dialog.getByTestId('preview-size')).toHaveTextContent(sizeLine(width, height, 100));
+      if (tip) expect(dialog.getByText(m.previewSquareTip)).toBeInTheDocument();
+      else expect(dialog.queryByText(m.previewSquareTip)).toBeNull();
+      for (const img of dialog.getAllByRole('img', { name: alt })) {
+        // Fitted inside the frame, never cropped or stretched past its own size.
+        expect(img).toHaveClass('object-contain', 'max-w-full', 'max-h-full');
+        expect(img).not.toHaveClass('object-cover', 'w-full', 'h-full');
+        const frame = img.parentElement;
+        expect(frame).toHaveAttribute('data-testid', 'project-image-frame');
+        // Centred with padding on the neutral surface (#F3EDFF).
+        expect(frame).toHaveClass('bg-muted', 'items-center', 'justify-center');
+        expect(frame?.className).toMatch(/\bp-(0\.5|2)\b/);
+      }
+    },
+  );
+
+  it('the stored image is shown whole too (edit page)', async () => {
+    seed({ image_path: IMAGE });
+    await load();
+    const img = await screen.findByRole('img', { name: alt });
+    expect(img).toHaveClass('object-contain');
+    expect(img).not.toHaveClass('object-cover');
   });
 
   it('replace removes the old image; remove clears the path first, then the object', async () => {
@@ -482,6 +634,7 @@ describe.each(['en', 'ar'] as const)('media (%s)', (language) => {
     seed({ image_path: IMAGE });
     await load();
     await user.upload(fileInput(m.image), pngFile());
+    await user.click(within(await previewDialog()).getByRole('button', { name: m.useImage }));
     await screen.findByText(m.imageUploaded);
     expect(db.calls).toEqual(['upload:image', 'update:image_path', 'remove:project-images:1']);
     expect(db.objects.has(`project-images:${IMAGE}`)).toBe(false);
@@ -513,20 +666,39 @@ describe.each(['en', 'ar'] as const)('media (%s)', (language) => {
       () => new File([new Uint8Array(11 * 1024 * 1024)], 'big.pdf', { type: 'application/pdf' }),
       'tooLargeDocument',
     ],
-  ] as const)('%s is refused before any upload', async (_case, kind, make, error) => {
+  ] as const)(
+    '%s is refused before any upload, without a dialog',
+    async (_case, kind, make, error) => {
+      const user = userEvent.setup({ applyAccept: false });
+      await load();
+      await user.upload(fileInput(kind === 'image' ? m.image : m.document), make());
+      expect(await screen.findByRole('alert')).toHaveTextContent(m.errors[error]);
+      expect(screen.queryByRole('dialog')).toBeNull();
+      expect(db.calls).toEqual([]);
+    },
+  );
+
+  it('a wrong file chosen through "Choose another" is explained in the dialog', async () => {
     const user = userEvent.setup({ applyAccept: false });
     await load();
-    await user.upload(fileInput(kind === 'image' ? m.image : m.document), make());
-    expect(await screen.findByRole('alert')).toHaveTextContent(m.errors[error]);
+    await user.upload(fileInput(m.image), pngFile());
+    const dialog = within(await previewDialog());
+    await user.upload(
+      fileInput(m.chooseAnother),
+      new File(['gif'], 'a.gif', { type: 'image/gif' }),
+    );
+    expect(await dialog.findByRole('alert')).toHaveTextContent(m.errors.wrongTypeImage);
     expect(db.calls).toEqual([]);
   });
 
-  it('a network failure says so and saves nothing', async () => {
+  it('a network failure says so in the dialog and saves nothing', async () => {
     const user = userEvent.setup();
     db.upload = 'network';
     await load();
     await user.upload(fileInput(m.image), pngFile());
-    expect(await screen.findByRole('alert')).toHaveTextContent(m.errors.network);
+    const dialog = within(await previewDialog());
+    await user.click(dialog.getByRole('button', { name: m.useImage }));
+    expect(await dialog.findByRole('alert')).toHaveTextContent(m.errors.network);
     expect(db.projects.get(PROJECT_ID)?.image_path).toBeNull();
   });
 
@@ -536,15 +708,37 @@ describe.each(['en', 'ar'] as const)('media (%s)', (language) => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     await load();
     await user.upload(fileInput(m.image), pngFile());
+    await user.click(within(await previewDialog()).getByRole('button', { name: m.useImage }));
     expect(await screen.findByRole('alert')).toHaveTextContent(t.projects.errors.notEditable);
     expect(db.calls).toEqual(['upload:image', 'update:image_path', 'remove:project-images:1']);
     expect([...db.objects]).toEqual([]);
   });
 
-  it('document: name and size, and "Open" through a signed URL in a new tab', async () => {
+  it('document: "Upload this document?" with name and size; Cancel uploads nothing', async () => {
     const user = userEvent.setup();
     await load();
     await user.upload(fileInput(m.document), pdfFile());
+    const dialog = within(await screen.findByRole('dialog', { name: m.confirmDocumentTitle }));
+    expect(dialog.getByText('Pitch deck.pdf')).toBeInTheDocument();
+    expect(dialog.getByText(m.sizeKb.replace('{{value}}', '1'))).toBeInTheDocument();
+    expect(dialog.queryByRole('img')).toBeNull();
+    await user.click(dialog.getByRole('button', { name: m.cancel }));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
+    expect(db.calls).toEqual([]);
+    expect(db.projects.get(PROJECT_ID)?.document_path).toBeNull();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: m.uploadDocument })).toHaveFocus();
+    });
+  });
+
+  it('document: Upload, then name and size, and "Open" through a signed URL', async () => {
+    const user = userEvent.setup();
+    await load();
+    await user.upload(fileInput(m.document), pdfFile());
+    const dialog = within(await screen.findByRole('dialog', { name: m.confirmDocumentTitle }));
+    await user.click(dialog.getByRole('button', { name: m.confirmDocumentUpload }));
     expect(await screen.findByText(m.documentUploaded)).toBeInTheDocument();
     const media = within(region(t, 'media'));
     expect(await media.findByText('Pitch deck.pdf')).toBeInTheDocument();
@@ -562,9 +756,34 @@ describe.each(['en', 'ar'] as const)('media (%s)', (language) => {
       const user = userEvent.setup({ applyAccept: false });
       seed({ image_path: IMAGE, document_path: DOCUMENT });
       await load();
-      await screen.findByRole('img', { name: m.imageAlt.replace('{{title}}', 'Campus Navigator') });
+      await screen.findByRole('img', { name: alt });
       await user.upload(fileInput(m.image), new File(['gif'], 'a.gif', { type: 'image/gif' }));
       await screen.findByRole('alert');
+      expect(await axeViolations()).toEqual([]);
+    },
+    AXE_TIMEOUT,
+  );
+
+  it(
+    'axe: the image preview dialog (with the tip) has no violations',
+    async () => {
+      const user = userEvent.setup();
+      db.encoded = { width: 1600, height: 696, bytes: 100 * 1024 };
+      await load();
+      await user.upload(fileInput(m.image), pngFile());
+      await previewDialog();
+      expect(await axeViolations()).toEqual([]);
+    },
+    AXE_TIMEOUT,
+  );
+
+  it(
+    'axe: the document confirm dialog has no violations',
+    async () => {
+      const user = userEvent.setup();
+      await load();
+      await user.upload(fileInput(m.document), pdfFile());
+      await screen.findByRole('dialog', { name: m.confirmDocumentTitle });
       expect(await axeViolations()).toEqual([]);
     },
     AXE_TIMEOUT,

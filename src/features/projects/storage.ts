@@ -105,6 +105,24 @@ export interface ImageEncoder {
   ) => Promise<Blob | null>;
 }
 
+/**
+ * Draws the image for the target type. JPEG has no alpha channel: transparent pixels would turn
+ * black, so the canvas is filled white first. WebP keeps the transparency.
+ */
+export function drawForType(
+  context: Pick<CanvasRenderingContext2D, 'fillStyle' | 'fillRect' | 'drawImage'>,
+  source: CanvasImageSource,
+  width: number,
+  height: number,
+  type: string,
+) {
+  if (type === 'image/jpeg') {
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, width, height);
+  }
+  context.drawImage(source, 0, 0, width, height);
+}
+
 export const browserEncoder: ImageEncoder = {
   // createImageBitmap applies the EXIF orientation, so a rotated phone photo stays upright.
   decode: async (file) => {
@@ -117,7 +135,7 @@ export const browserEncoder: ImageEncoder = {
     canvas.height = height;
     const context = canvas.getContext('2d');
     if (!context) return Promise.resolve(null);
-    context.drawImage(source, 0, 0, width, height);
+    drawForType(context, source, width, height, type);
     return new Promise((resolve) => {
       canvas.toBlob(resolve, type, 0.85);
     });
@@ -130,14 +148,21 @@ export function fitWithin(width: number, height: number, maxSide: number) {
   return { width: Math.round(width * scale), height: Math.round(height * scale) };
 }
 
+export interface EncodedImage {
+  blob: Blob;
+  width: number;
+  height: number;
+}
+
 /**
  * The image as uploaded: pixels only (no metadata), at most maxSide on its longest side, as WebP,
- * or JPEG where the browser cannot encode WebP.
+ * or JPEG (on white) where the browser cannot encode WebP. Returns the final dimensions too, for
+ * the preview.
  */
 export async function reencodeImage(
   file: Blob,
   encoder: ImageEncoder = browserEncoder,
-): Promise<Blob> {
+): Promise<EncodedImage> {
   let decoded;
   try {
     decoded = await encoder.decode(file);
@@ -154,7 +179,7 @@ export async function reencodeImage(
     throw new UploadFailure('unexpected');
   }
   if (hasExif(await readBytes(blob))) throw new UploadFailure('unexpected');
-  return blob;
+  return { blob, width, height };
 }
 
 // Preparing a file ---------------------------------------------------------------------------------
@@ -165,6 +190,9 @@ export interface PreparedFile {
   extension: string;
   /** The original file name, kept as object metadata so the document can be shown by name. */
   originalName: string;
+  /** Images only: the re-encoded dimensions, shown in the preview. */
+  width?: number;
+  height?: number;
 }
 
 /** Checks type and size and, for images, re-encodes. Throws UploadFailure before any request. */
@@ -178,9 +206,12 @@ export async function prepareFile(
     throw new UploadFailure('wrongType');
   }
   let blob: Blob = file;
+  let size: { width: number; height: number } | undefined;
   if (kind === 'image') {
     if (file.size > MAX_ORIGINAL_IMAGE_BYTES) throw new UploadFailure('tooLarge');
-    blob = await reencodeImage(file, encoder);
+    const encoded = await reencodeImage(file, encoder);
+    blob = encoded.blob;
+    size = { width: encoded.width, height: encoded.height };
   } else if (!ascii(await readBytes(file, 5), 0, '%PDF-')) {
     // Declared as a PDF but is not one.
     throw new UploadFailure('wrongType');
@@ -191,6 +222,7 @@ export async function prepareFile(
     contentType: blob.type,
     extension: EXTENSIONS[blob.type] ?? 'bin',
     originalName: file.name.slice(0, 150),
+    ...size,
   };
 }
 

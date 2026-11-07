@@ -13,6 +13,7 @@ import {
   listProjectObjects,
   objectInfo,
   objectName,
+  type PreparedFile,
   prepareFile,
   removeObjects,
   signedUrl,
@@ -321,7 +322,8 @@ export class FileFailure extends Error {
 }
 
 /**
- * Upload, replace and remove one project file. Files save immediately (not with the form's Save):
+ * Prepare (check and re-encode, nothing sent), upload, replace and remove one project file. Files
+ * save immediately once confirmed (not with the form's Save):
  *   upload the new object → save its path on the project → remove the old object.
  * If saving the path fails, the new object is removed again, so nothing points to a missing file
  * and no new orphan is left. A failed removal of the OLD object is only logged: it is private and
@@ -348,11 +350,22 @@ export function useProjectFile(project: Project, kind: ProjectFileKind, userId: 
     }
   };
 
-  const upload = useMutation<string, FileFailure, File>({
+  // Checks and (for images) re-encodes in the browser. Nothing is sent: the result is shown for
+  // confirmation first, and only upload() below sends it.
+  const prepare = useMutation<PreparedFile, FileFailure, File>({
     mutationFn: async (file) => {
+      try {
+        return await prepareFile(kind, file);
+      } catch (error) {
+        throw toFileFailure(error);
+      }
+    },
+  });
+
+  const upload = useMutation<string, FileFailure, PreparedFile>({
+    mutationFn: async (prepared) => {
       setProgress(0);
       try {
-        const prepared = await prepareFile(kind, file);
         const name = objectName(project.id, kind, prepared.extension);
         await uploadObject(kind, name, prepared, setProgress);
         try {
@@ -390,7 +403,7 @@ export function useProjectFile(project: Project, kind: ProjectFileKind, userId: 
     },
   });
 
-  return { upload, remove, progress };
+  return { prepare, upload, remove, progress };
 }
 
 function toFileFailure(error: unknown): FileFailure {

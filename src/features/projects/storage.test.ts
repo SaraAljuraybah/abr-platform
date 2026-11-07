@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  drawForType,
   fitWithin,
   hasExif,
   type ImageEncoder,
@@ -151,16 +152,36 @@ describe('image re-encoding', () => {
     expect(prepared.contentType).toBe('image/webp');
     expect(prepared.extension).toBe('webp');
     expect(calls[0]).toEqual({ width: 1600, height: 1200, type: 'image/webp' });
+    expect(prepared).toMatchObject({ width: 1600, height: 1200 });
     // The original bytes are never what gets uploaded.
     expect(out).not.toEqual(jpegWithGps());
   });
 
   it('falls back to JPEG where the browser cannot encode WebP', async () => {
     const { encoder, calls } = fakeEncoder({ webp: false });
-    const blob = await reencodeImage(file(jpegWithGps(), 'a.jpg', 'image/jpeg'), encoder);
+    const { blob } = await reencodeImage(file(jpegWithGps(), 'a.jpg', 'image/jpeg'), encoder);
     expect(blob.type).toBe('image/jpeg');
     expect(calls.map((call) => call.type)).toEqual(['image/webp', 'image/jpeg']);
     expect(hasExif(new Uint8Array(await blob.arrayBuffer()))).toBe(false);
+  });
+
+  it('JPEG fallback fills white first, so transparent areas do not turn black; WebP keeps alpha', () => {
+    const record = (type: string) => {
+      const steps: string[] = [];
+      const context = {
+        fillStyle: '',
+        fillRect: (x: number, y: number, w: number, h: number) => {
+          steps.push(`fill:${context.fillStyle}:${String([x, y, w, h])}`);
+        },
+        drawImage: () => {
+          steps.push('draw');
+        },
+      };
+      drawForType(context, {} as CanvasImageSource, 300, 200, type);
+      return steps;
+    };
+    expect(record('image/jpeg')).toEqual(['fill:#ffffff:0,0,300,200', 'draw']);
+    expect(record('image/webp')).toEqual(['draw']);
   });
 
   it('refuses to upload if the encoded bytes still carry EXIF (second layer)', async () => {
