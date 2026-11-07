@@ -635,6 +635,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_project_counts: {
+        Args: never
+        Returns: {
+          count: number
+          status: Database["public"]["Enums"]["project_status"]
+        }[]
+      }
+      admin_project_reviews: {
+        Args: { p_project_id: string }
+        Returns: {
+          created_at: string
+          decision: Database["public"]["Enums"]["review_decision"]
+          id: string
+          notes: string
+          reviewer_name: string
+        }[]
+      }
       check_student_email: {
         Args: { p_email: string; p_university_id: string }
         Returns: boolean
@@ -677,6 +694,14 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       is_verified: { Args: never; Returns: boolean }
       resubmit_verification: { Args: never; Returns: undefined }
+      review_project: {
+        Args: {
+          p_decision: Database["public"]["Enums"]["review_decision"]
+          p_notes?: string
+          p_project_id: string
+        }
+        Returns: string
+      }
       review_verification: {
         Args: {
           p_decision: Database["public"]["Enums"]["review_decision"]
