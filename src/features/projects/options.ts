@@ -72,6 +72,52 @@ export const PROJECT_LIMITS = {
   url: { max: 500 },
 } as const;
 
+/**
+ * What submit_project() requires, as database column names in form order (its error lists the
+ * missing ones in this order). options.test.ts compares the list and the length with the migration.
+ */
+export const REQUIRED_FOR_SUBMIT = [
+  'title',
+  'summary',
+  'description',
+  'track',
+  'academic_year',
+  'stage',
+] as const;
+export type RequiredField = (typeof REQUIRED_FOR_SUBMIT)[number];
+export const DESCRIPTION_MIN = 100;
+
+/** The form field of each required column (for focusing it from the checklist). */
+export const REQUIRED_FORM_FIELD = {
+  title: 'title',
+  summary: 'summary',
+  description: 'description',
+  track: 'track',
+  academic_year: 'academicYear',
+  stage: 'stage',
+} as const satisfies Record<RequiredField, string>;
+
+/** The same rule as submit_project(), on the form's current values. */
+export function missingForSubmit(values: {
+  title: string;
+  summary: string;
+  description: string;
+  track: string;
+  academicYear: string;
+  stage: string;
+}): RequiredField[] {
+  return REQUIRED_FOR_SUBMIT.filter((field) => {
+    switch (field) {
+      case 'description':
+        return values.description.trim().length < DESCRIPTION_MIN;
+      case 'academic_year':
+        return values.academicYear === '';
+      default:
+        return values[field].trim() === '';
+    }
+  });
+}
+
 /** The two private buckets (migration 20261106090424_project_details_and_media). */
 export const PROJECT_FILES = {
   image: {

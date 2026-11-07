@@ -5,7 +5,10 @@ import ar from '@/locales/ar.json';
 import en from '@/locales/en.json';
 import {
   ACADEMIC_YEARS,
+  DESCRIPTION_MIN,
+  missingForSubmit,
   NEEDS,
+  REQUIRED_FOR_SUBMIT,
   PROJECT_FILES,
   PROJECT_LIMITS,
   PROJECT_STATUSES,
@@ -103,6 +106,40 @@ describe('project option lists and limits match the database', () => {
     expect(migrations).toContain(
       `('${document.bucket}', '${document.bucket}', false, ${String(document.maxBytes)}, array['${document.types[0]}'])`,
     );
+  });
+});
+
+describe('the submit rule matches submit_project() (page 8)', () => {
+  it('the required fields, in the order the error lists them', () => {
+    const body = migrations.slice(migrations.lastIndexOf('create function public.submit_project'));
+    const appended = [...body.matchAll(/array_append\(v_missing, '([a-z_]+)'\)/g)].map((m) => m[1]);
+    expect(appended).toEqual([...REQUIRED_FOR_SUBMIT]);
+    expect(body).toContain(
+      `char_length(pg_catalog.btrim(coalesce(v_project.description, ''))) < ${String(DESCRIPTION_MIN)}`,
+    );
+  });
+
+  const complete = {
+    title: 'Campus Navigator',
+    summary: 'Indoor maps.',
+    description: 'x'.repeat(DESCRIPTION_MIN),
+    track: 'mobile',
+    academicYear: '2026',
+    stage: 'mvp',
+  };
+
+  it('a complete project misses nothing; each gap is named', () => {
+    expect(missingForSubmit(complete)).toEqual([]);
+    expect(missingForSubmit({ ...complete, summary: '  ' })).toEqual(['summary']);
+    expect(missingForSubmit({ ...complete, description: 'x'.repeat(DESCRIPTION_MIN - 1) })).toEqual(
+      ['description'],
+    );
+    expect(missingForSubmit({ ...complete, description: ` ${'x'.repeat(99)} ` })).toEqual([
+      'description',
+    ]);
+    expect(
+      missingForSubmit({ ...complete, summary: '', track: '', academicYear: '', stage: '' }),
+    ).toEqual(['summary', 'track', 'academic_year', 'stage']);
   });
 });
 

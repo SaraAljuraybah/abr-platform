@@ -2,7 +2,12 @@ import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/r
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { Database } from '@/types/database';
-import { type ProjectFileKind, type ProjectStatus } from './options';
+import {
+  type ProjectFileKind,
+  type ProjectStatus,
+  REQUIRED_FOR_SUBMIT,
+  type RequiredField,
+} from './options';
 import type { ProjectValues } from './schemas';
 import {
   listProjectObjects,
@@ -51,9 +56,21 @@ export const projectKey = (id: string) => ['projects', 'detail', id] as const;
  * goes to the console, never to the screen.
  */
 export type ProjectErrorKind =
-  'network' | 'limit' | 'notAllowed' | 'notEditable' | 'notFound' | 'unexpected';
+  | 'network'
+  | 'limit'
+  | 'notAllowed'
+  | 'notEditable'
+  | 'notFound'
+  | 'incomplete'
+  | 'notSubmittable'
+  | 'notPending'
+  | 'unexpected';
 export class ProjectFailure extends Error {
-  constructor(readonly kind: ProjectErrorKind) {
+  constructor(
+    readonly kind: ProjectErrorKind,
+    /** For 'incomplete': the fields submit_project() reported missing, in form order. */
+    readonly missing: RequiredField[] = [],
+  ) {
     super(kind);
     this.name = 'ProjectFailure';
   }
@@ -66,13 +83,28 @@ const CODES: Record<string, ProjectErrorKind> = {
   ABR_ONBOARDING_INCOMPLETE: 'notAllowed',
   ABR_NOT_DRAFT: 'notEditable',
   ABR_PROJECT_NOT_FOUND: 'notFound',
+  ABR_NOT_SUBMITTABLE: 'notSubmittable',
+  ABR_NOT_PENDING: 'notPending',
 };
+
+const INCOMPLETE = 'ABR_PROJECT_INCOMPLETE:';
 
 function toFailure(error: unknown): ProjectFailure {
   if (error instanceof ProjectFailure) return error;
   if (error instanceof TypeError) return new ProjectFailure('network');
   const message =
     typeof error === 'object' && error !== null && 'message' in error ? error.message : null;
+  // "ABR_PROJECT_INCOMPLETE: summary,stage": the codes the UI can name, in form order.
+  if (typeof message === 'string' && message.startsWith(INCOMPLETE)) {
+    const reported = message
+      .slice(INCOMPLETE.length)
+      .split(',')
+      .map((code) => code.trim());
+    return new ProjectFailure(
+      'incomplete',
+      REQUIRED_FOR_SUBMIT.filter((field) => reported.includes(field)),
+    );
+  }
   const kind = typeof message === 'string' ? CODES[message] : undefined;
   if (kind) return new ProjectFailure(kind);
   console.error('Project request failed', error);
@@ -424,6 +456,74 @@ export function useDeleteProject(userId: string) {
       // null, not removed: removing a query the page still observes would refetch it.
       queryClient.setQueryData(projectKey(project.id), null);
       void queryClient.invalidateQueries({ queryKey: ownProjectsKey(userId) });
+    },
+  });
+}
+
+// Submitting for review -------------------------------------------------------------------------
+
+/** The server decides (submit_project); afterwards the project is reloaded and shows its new status. */
+export function useSubmitProject(projectId: string, userId: string) {
+  const queryClient = useQueryClient();
+  return useMutation<null, ProjectFailure>({
+    mutationFn: async () => {
+      try {
+        const { error } = await supabase.rpc('submit_project', { p_project_id: projectId });
+        if (error) throw error;
+        return null;
+      } catch (error) {
+        throw toFailure(error);
+      }
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: projectKey(projectId) });
+      void queryClient.invalidateQueries({ queryKey: ownProjectsKey(userId) });
+    },
+  });
+}
+
+export function useWithdrawSubmission(projectId: string, userId: string) {
+  const queryClient = useQueryClient();
+  return useMutation<null, ProjectFailure>({
+    mutationFn: async () => {
+      try {
+        const { error } = await supabase.rpc('withdraw_submission', { p_project_id: projectId });
+        if (error) throw error;
+        return null;
+      } catch (error) {
+        throw toFailure(error);
+      }
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: projectKey(projectId) });
+      void queryClient.invalidateQueries({ queryKey: ownProjectsKey(userId) });
+    },
+  });
+}
+
+export interface ProjectReview {
+  decision: Database['public']['Enums']['review_decision'];
+  notes: string | null;
+  createdAt: string;
+}
+
+/** The newest review of the project (owner or admin only; RLS). null when there is none. */
+export function useLatestReview(projectId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ['projects', 'latest-review', projectId],
+    enabled,
+    queryFn: async (): Promise<ProjectReview | null> => {
+      const { data, error } = await supabase
+        .from('project_reviews')
+        .select('decision, notes, created_at')
+        .eq('project_id', projectId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data
+        ? { decision: data.decision, notes: data.notes, createdAt: data.created_at }
+        : null;
     },
   });
 }
