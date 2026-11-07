@@ -235,6 +235,26 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 - `scripts/provision-admin.mjs --redirect-to <url>`: the recovery link opens that site's
   `/reset-password` (for example the dev preview for abr-dev); without it, the project's Site URL.
   The script now prints the project URL it ran against and where the link opens.
+- Projects directory (SCRUM-20), English and Arabic, at `/projects` ("Explore projects" in the app
+  shell for every signed-in, onboarded user). Verified students, organizations, mentors and admins
+  see the published projects of verified students in square cards (4 columns on desktop, 3 on
+  tablets, 2 on phones, 1 below 360 px; on phones the text part grows): the image, never cropped,
+  with one signed-URL request per page of cards, or the generated default; the title (two lines
+  at most), the student, the team size and the labels in one row (track, stage, up to 2 sectors
+  "+N", "Looking for members"; what does not fit folds into "+M" and stays readable to screen
+  readers). Debounced search on title or summary (`%`, `_` and `*` are literal or single
+  characters, never wildcards; the text is quoted for PostgREST), filters (track, stage, sectors
+  and needs "any of", university, looking for members) in a panel or, on small screens, a dialog,
+  sort (newest, title A–Z), a polite "Results: N", 24 per page with "Load more". Search, filters
+  and sort live in the URL. `/projects/:id` shows the project, its student (name, university,
+  field of study) and a placeholder for requests to connect; a missing, unpublished or hidden
+  project gets the same "not found". Users who are not verified see "Projects are available once
+  your account is verified." and no query is sent. RLS (`projects_select`, D-15) stays the only
+  gate; the explicit `status = published` and owner-verified filters keep owners' drafts and the
+  admin's full view out of the directory. pgTAP `120_project_directory`. Both routes show "Coming
+  soon" when `VITE_AUTH_ENABLED=false`. No migration.
+- Account menu: an account with no name (provisioned admins) shows initials from its email
+  instead of "?". `scripts/provision-admin.mjs --name "<full name>"` sets the admin's name.
 
 ### Handoff to SCRUM-13 (sign-up UI)
 
@@ -456,6 +476,10 @@ Open points in the Terms and Conditions (`/terms`), shown only in development bu
 - SHA-pinned GitHub Actions (pre-pilot hardening).
 - ESLint 10 upgrade (ESLint 9 is now end-of-life upstream).
 - Review robots/indexing at public launch.
+- Projects directory indexes (SCRUM-20): revisit at a few thousand published projects. Candidates:
+  a partial index on `published_at desc, id desc` where `status = 'published'`, GIN on `sectors`
+  and `needs` (the `&&` filters), and `pg_trgm` for the title/summary search (`ilike '%…%'` uses
+  no btree or array index). Not needed at V1 volume, where Postgres scans the table anyway.
 - Scroll to the hash after the first render when the page is opened directly at `/#section` (native
   anchors already work for in-page links).
 - Mobile Lighthouse Performance ≥ 90 (currently about 71 on the production build): prerender the
