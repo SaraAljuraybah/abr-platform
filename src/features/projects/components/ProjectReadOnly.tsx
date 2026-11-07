@@ -1,7 +1,6 @@
 import { ExternalLink } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Callout } from '@/components/ui/callout';
 import { linkClass } from '@/features/forms/styles';
 import { cn } from '@/lib/utils';
 import type { Project } from '../api';
@@ -10,6 +9,7 @@ import { useOptionLabels } from './labels';
 import { DocumentSummary } from './MediaSection';
 import { ProjectImage } from './ProjectImage';
 import { ProjectStatusChip } from './ProjectStatusChip';
+import { StatusBanner } from './StatusBanner';
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -53,7 +53,7 @@ function ExternalUrl({ href }: { href: string }) {
 }
 
 /** Any status the owner cannot edit in: what was submitted, with a note on why it is locked. */
-export function ProjectReadOnly({ project }: { project: Project }) {
+export function ProjectReadOnly({ project, userId }: { project: Project; userId: string }) {
   const { t } = useTranslation();
   const labels = useOptionLabels();
   const none = <span className="text-muted-foreground">{t('projects.notSet')}</span>;
@@ -66,9 +66,7 @@ export function ProjectReadOnly({ project }: { project: Project }) {
         <h1 className="auth-title text-brand">{t('projects.readOnly.title')}</h1>
         <ProjectStatusChip status={project.status} />
       </div>
-      <Callout className="mt-6 max-w-3xl">
-        <p>{t('projects.readOnly.notice')}</p>
-      </Callout>
+      <StatusBanner project={project} userId={userId} />
       <div className={cn(panel, 'mt-6 flex max-w-3xl flex-col gap-6')}>
         <ProjectImage project={project} size="lg" />
         <dl className="flex flex-col gap-4">

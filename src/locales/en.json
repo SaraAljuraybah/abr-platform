@@ -819,8 +819,29 @@
         "body": "Add a summary, a description and your track, then save. You can come back any time.",
         "cta": "Continue your draft"
       },
-      "project": {
-        "title": "Your project",
+      "pending_review": {
+        "title": "Your project is under review",
+        "body": "Our team is reviewing it. You can withdraw the submission to make changes.",
+        "cta": "View your project"
+      },
+      "changes_requested": {
+        "title": "Our team asked for changes",
+        "body": "Make the changes, then resubmit your project.",
+        "cta": "Make the changes"
+      },
+      "rejected": {
+        "title": "Your project wasn't accepted",
+        "body": "The reason is on your project page.",
+        "cta": "See the reason"
+      },
+      "published": {
+        "title": "Your project is published",
+        "body": "Verified members of ABR can now find it.",
+        "cta": "View your project"
+      },
+      "unpublished": {
+        "title": "Your project is no longer published",
+        "body": "Other members can no longer see it.",
         "cta": "Open your project"
       }
     },
@@ -926,7 +947,10 @@
       "notAllowed": "Only verified students who have finished setting up their profile can create a project.",
       "notEditable": "This project can't be changed any more.",
       "notFound": "This project no longer exists.",
-      "unexpected": "Something went wrong. Please try again."
+      "unexpected": "Something went wrong. Please try again.",
+      "incomplete": "Some required information is missing.",
+      "notSubmittable": "This project can't be submitted in its current status.",
+      "notPending": "This submission is no longer under review."
     },
     "options": {
       "track": {
@@ -1008,7 +1032,52 @@
       }
     },
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "submit": {
+      "title": "Submit for review",
+      "resubmitTitle": "Resubmit for review",
+      "intro": "Our team reviews every project before it is published.",
+      "button": "Submit for review",
+      "resubmit": "Resubmit for review",
+      "checklist": "Before you submit, add:",
+      "missing": "Missing:",
+      "descriptionItem": "Description (at least {{min}} characters)",
+      "completeFirst": "Complete the list above to submit.",
+      "ready": "Everything needed is filled in.",
+      "dialogTitle": "Submit your project for review?",
+      "dialogBody": "After you submit, you can't edit until our team reviews your project.",
+      "submitting": "Submitting…",
+      "done": "Your project was submitted for review."
+    },
+    "status": {
+      "pending_review": {
+        "title": "Under review",
+        "body": "Our team is reviewing your project. Withdraw the submission if you need to make changes."
+      },
+      "changes_requested": {
+        "title": "Our team asked for changes",
+        "body": "Read the notes, update your project, then resubmit it."
+      },
+      "rejected": {
+        "title": "Your project wasn't accepted",
+        "body": "Our team reviewed your project and did not accept it."
+      },
+      "published": {
+        "title": "Your project is published",
+        "body": "Verified members of ABR can now see it."
+      },
+      "unpublished": {
+        "title": "Your project is no longer published",
+        "body": "Other members can no longer see it."
+      },
+      "notes": "Notes from our team",
+      "reason": "Reason",
+      "withdraw": "Withdraw submission",
+      "withdrawTitle": "Withdraw your submission?",
+      "withdrawBody": "Your project goes back to a draft, and you will need to submit it again.",
+      "withdrawing": "Withdrawing…",
+      "withdrawn": "Submission withdrawn. You can edit your project again."
+    }
   },
   "numberStepper": {
     "decrease": "Decrease {{label}}",

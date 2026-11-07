@@ -18,7 +18,13 @@ import {
 import { toastStore } from '@/components/ui/toast-store';
 import { useAuth } from '@/features/auth/auth-context';
 import { cn } from '@/lib/utils';
-import { type Project, useDeleteProject, useProject, useUpdateProject } from './api';
+import {
+  type Project,
+  useDeleteProject,
+  useProject,
+  useSubmitProject,
+  useUpdateProject,
+} from './api';
 import {
   BasicsSection,
   EditorSection,
@@ -29,6 +35,8 @@ import {
 import { DocumentField, ImageField } from './components/MediaSection';
 import { ProjectReadOnly } from './components/ProjectReadOnly';
 import { ProjectStatusChip } from './components/ProjectStatusChip';
+import { StatusBanner } from './components/StatusBanner';
+import { SubmitSection } from './components/SubmitSection';
 import { ProjectLoadError, ProjectNotFound, ProjectSkeleton } from './components/states';
 import { isEditable } from './options';
 import { projectSchema, type ProjectValues } from './schemas';
@@ -60,7 +68,9 @@ export function EditProjectPage() {
     );
   }
   if (!query.data) return <ProjectNotFound />;
-  if (!isEditable(query.data.status)) return <ProjectReadOnly project={query.data} />;
+  if (!isEditable(query.data.status)) {
+    return <ProjectReadOnly project={query.data} userId={session.user.id} />;
+  }
   // Keyed by id so another project never inherits this one's form state.
   return <ProjectEditor key={query.data.id} project={query.data} userId={session.user.id} />;
 }
@@ -89,6 +99,7 @@ function ProjectEditor({ project, userId }: { project: Project; userId: string }
   const navigate = useNavigate();
   const save = useUpdateProject(project, userId);
   const remove = useDeleteProject(userId);
+  const submit = useSubmitProject(project.id, userId);
   const [saved, setSaved] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
@@ -132,6 +143,32 @@ function ProjectEditor({ project, userId }: { project: Project; userId: string }
     });
   });
 
+  /**
+   * Submit for review: open changes are saved first (so the server checks what the student sees),
+   * then submit_project(). On success the project reloads and the page shows it as pending.
+   */
+  const submitForReview = () =>
+    new Promise<void>((resolve, reject) => {
+      void form.handleSubmit(
+        async (values) => {
+          try {
+            if (form.formState.isDirty) {
+              const savedProject = await save.mutateAsync(values);
+              form.reset(toValues(savedProject));
+            }
+            await submit.mutateAsync();
+            toastStore.show(t('projects.submit.done'));
+            resolve();
+          } catch (error) {
+            reject(error instanceof Error ? error : new Error('submit failed'));
+          }
+        },
+        () => {
+          reject(new Error('invalid form'));
+        },
+      )();
+    });
+
   const onDelete = () => {
     remove.mutate(project, {
       onSuccess: () => {
@@ -149,6 +186,7 @@ function ProjectEditor({ project, userId }: { project: Project; userId: string }
         <ProjectStatusChip status={project.status} />
       </div>
       <p className="mt-2 max-w-3xl text-muted-foreground">{t('projects.edit.intro')}</p>
+      <StatusBanner project={project} userId={userId} />
 
       <form
         noValidate
@@ -173,6 +211,16 @@ function ProjectEditor({ project, userId }: { project: Project; userId: string }
           <DocumentField project={project} userId={userId} />
         </EditorSection>
         <LinksSection form={form} />
+        <SubmitSection
+          form={form}
+          resubmit={project.status === 'changes_requested'}
+          onSubmit={submitForReview}
+          pending={submit.isPending || save.isPending}
+          error={submit.error}
+          onOpen={() => {
+            submit.reset();
+          }}
+        />
 
         <div
           className={cn(

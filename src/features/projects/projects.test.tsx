@@ -529,7 +529,8 @@ describe.each(['en', 'ar'] as const)('read-only and not found (%s)', (language) 
       expect(
         screen.getByRole('heading', { level: 1, name: t.projects.readOnly.title }),
       ).toBeInTheDocument();
-      expect(screen.getByText(t.projectStatus[status])).toBeInTheDocument();
+      // The chip (and, in Arabic, the pending banner's title, which uses the same words).
+      expect(screen.getAllByText(t.projectStatus[status]).length).toBeGreaterThan(0);
       expect(screen.getByText(t.projects.readOnly.notice)).toBeInTheDocument();
       expect(screen.getByText('Campus Navigator')).toBeInTheDocument();
       expect(screen.getByText(t.projects.options.track.mobile)).toBeInTheDocument();

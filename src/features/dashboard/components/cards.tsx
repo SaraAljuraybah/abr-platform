@@ -80,7 +80,7 @@ export function WhatsNextCard({ step }: { step: NextStep }) {
         </div>
       );
       break;
-    // Page 8 (submission and review) gives these states their own copy.
+    // Page 8: every later state has its own message and next action.
     case 'pending_review':
     case 'changes_requested':
     case 'published':
@@ -89,11 +89,12 @@ export function WhatsNextCard({ step }: { step: NextStep }) {
       body = (
         <div className="flex flex-col items-start gap-3">
           <div className="flex flex-wrap items-center gap-3">
-            <h3 className="font-bold text-foreground">{t('dashboard.next.project.title')}</h3>
+            <h3 className="font-bold text-foreground">{t(`dashboard.next.${step.kind}.title`)}</h3>
             <ProjectStatusChip status={step.kind} />
           </div>
-          <Button asChild variant="outline">
-            <Link to={projectEditPath(step.projectId)}>{t('dashboard.next.project.cta')}</Link>
+          <p className="text-muted-foreground">{t(`dashboard.next.${step.kind}.body`)}</p>
+          <Button asChild variant={step.kind === 'changes_requested' ? 'default' : 'outline'}>
+            <Link to={projectEditPath(step.projectId)}>{t(`dashboard.next.${step.kind}.cta`)}</Link>
           </Button>
         </div>
       );

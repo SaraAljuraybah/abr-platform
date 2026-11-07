@@ -288,7 +288,7 @@ describe.each(['en', 'ar'] as const)('edit page sections (%s)', (language) => {
     await changeLanguage(language);
   });
 
-  it('five sections, one Save', async () => {
+  it('six sections (the last one submits), one Save', async () => {
     await load();
     expect(
       screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent),
@@ -298,6 +298,7 @@ describe.each(['en', 'ar'] as const)('edit page sections (%s)', (language) => {
       p.sections.needs,
       p.sections.media,
       p.sections.links,
+      p.submit.title,
     ]);
     expect(screen.getAllByRole('button', { name: p.save.button })).toHaveLength(1);
   });

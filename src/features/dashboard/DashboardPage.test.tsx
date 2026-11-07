@@ -362,16 +362,22 @@ describe.each(['en', 'ar'] as const)('student dashboard (%s)', (language) => {
     expect(within(card).queryByRole('link', { name: t.dashboard.createProject })).toBeNull();
   });
 
-  it('any later status gets the generic "Open your project" link with the chip', async () => {
-    fake.projects = [{ id: 'p-1', title: 'Campus Navigator', status: 'pending_review' }];
-    await load();
-    const next = await screen.findByRole('region', { name: t.dashboard.next.title });
-    expect(within(next).getByText(t.projectStatus.pending_review)).toBeInTheDocument();
-    expect(within(next).getByRole('link', { name: t.dashboard.next.project.cta })).toHaveAttribute(
-      'href',
-      '/app/projects/p-1/edit',
-    );
-  });
+  it.each(['pending_review', 'changes_requested', 'rejected', 'published', 'unpublished'] as const)(
+    '"What\'s next" for %s: its own message, the status chip and the next action',
+    async (status) => {
+      fake.projects = [{ id: 'p-1', title: 'Campus Navigator', status }];
+      await load();
+      const next = await screen.findByRole('region', { name: t.dashboard.next.title });
+      const copyFor = t.dashboard.next[status];
+      expect(within(next).getByRole('heading', { name: copyFor.title })).toBeInTheDocument();
+      expect(within(next).getByText(copyFor.body)).toBeInTheDocument();
+      expect(within(next).getByText(t.projectStatus[status])).toBeInTheDocument();
+      expect(within(next).getByRole('link', { name: copyFor.cta })).toHaveAttribute(
+        'href',
+        '/app/projects/p-1/edit',
+      );
+    },
+  );
 
   it('projects that fail to load show an error with a retry', async () => {
     const user = userEvent.setup();
