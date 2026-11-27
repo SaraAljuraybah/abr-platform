@@ -495,7 +495,10 @@
     "saudiMobile": "Enter a Saudi mobile number, for example 05XXXXXXXX.",
     "videoUrl": "Enter a YouTube, Vimeo or Loom link starting with https://.",
     "repoUrl": "Enter a GitHub or GitLab link starting with https://.",
-    "demoUrl": "Enter a link starting with https://."
+    "demoUrl": "Enter a link starting with https://.",
+    "chooseOne": "Choose at least one option.",
+    "yearsOfExperience": "Enter a number from 0 to 60.",
+    "linkedinUrl": "Enter a LinkedIn profile or company link, like https://www.linkedin.com/in/username."
   },
   "passwordField": {
     "show": "Show password",
@@ -799,6 +802,50 @@
         "gaming": "Gaming",
         "other": "Other"
       }
+    },
+    "partner": {
+      "optional": "Optional",
+      "chooseAll": "Choose all that apply.",
+      "contactTitle": "Contact details",
+      "contactIntro": "Private by default. Shared only with people you connect with on ABR, and only what you choose.",
+      "phoneHint": "Required. Never shown publicly.",
+      "sharePhone": "Share my mobile number with people I connect with.",
+      "linkedin": "LinkedIn (optional)",
+      "linkedinHint": "Your profile or company page, like https://www.linkedin.com/in/username.",
+      "shareLinkedin": "Share my LinkedIn with people I connect with.",
+      "reviewNote": "Our team reviews every account before it can browse projects and send requests.",
+      "submit": "Submit for verification",
+      "save": "Save changes",
+      "submitted": "Thanks. Your account is now waiting for review.",
+      "saved": "Your profile is saved.",
+      "organization": {
+        "intro": "Tell us about your organization so our team can verify it.",
+        "aboutTitle": "About your organization",
+        "fullName": "Your full name (contact person)",
+        "organizationName": "Organization name",
+        "sector": "Sector",
+        "orgSize": "Number of employees",
+        "website": "Website (optional)",
+        "websiteHint": "Starting with https://",
+        "offerTitle": "What you are looking for",
+        "chips": "Looking for",
+        "description": "About the organization",
+        "descriptionHint": "What you do and which projects interest you. At least 30 characters."
+      },
+      "mentor": {
+        "intro": "Tell us about your experience so our team can verify your account.",
+        "aboutTitle": "About you",
+        "fullName": "Full name",
+        "jobTitle": "Job title",
+        "company": "Company or organization",
+        "years": "Years of experience",
+        "offerTitle": "Your expertise",
+        "chips": "Fields of expertise",
+        "description": "Professional summary",
+        "descriptionHint": "Your experience and how you can help students. At least 30 characters."
+      },
+      "editTitle": "Edit your profile",
+      "editIntro": "Changes are saved to the profile our team reviews."
     }
   },
   "status": {
@@ -889,6 +936,35 @@
     "other": {
       "title": "Your dashboard",
       "body": "Your dashboard is coming next. We'll let you know when your account is reviewed."
+    },
+    "partner": {
+      "pending": {
+        "title": "Your account is under review",
+        "body": "Our team reviews every organization and mentor. We will let you know when it is done. You can still edit your profile meanwhile."
+      },
+      "verified": {
+        "title": "Your account is verified",
+        "body": "You can now explore published graduation projects."
+      },
+      "rejected": {
+        "title": "Our team asked for changes",
+        "body": "Update your profile, then send it for review again."
+      },
+      "suspended": {
+        "title": "Your account is suspended",
+        "body": "Contact us at try0abr@gmail.com if you think this is a mistake."
+      },
+      "unverified": {
+        "title": "Confirm your email",
+        "body": "Open the link we sent you to confirm your email address."
+      },
+      "reasonLabel": "Note from our team",
+      "explore": "Explore projects",
+      "editProfile": "Edit profile",
+      "resubmit": "Send for review again",
+      "resubmitting": "Sending…",
+      "resubmitted": "Sent. Your account is under review again.",
+      "resubmitError": "We could not send it. Check your connection and try again."
     }
   },
   "comingNext": {
@@ -1183,7 +1259,9 @@
       "label": "Admin navigation",
       "overview": "Overview",
       "projects": "Project reviews",
-      "interest": "Interest"
+      "interest": "Interest",
+      "verifications": "Verifications",
+      "universities": "Universities"
     },
     "overview": {
       "title": "Overview",
@@ -1273,6 +1351,62 @@
         "expertise": "Expertise",
         "experience": "Experience",
         "heard_from": "How they heard about ABR"
+      }
+    },
+    "verifications": {
+      "title": "Account verification",
+      "intro": "Organizations and mentors who finished their profile, oldest first. Check the email domain and the website before approving.",
+      "filterLabel": "Filter by status",
+      "emptyPending": "No accounts are waiting for review.",
+      "empty": "No accounts with this status.",
+      "role": {
+        "organization": "Organization",
+        "mentor": "Mentor"
+      },
+      "contact": "Contact person",
+      "email": "Sign-up email",
+      "approve": "Approve",
+      "reject": "Reject",
+      "dialog": {
+        "approved": {
+          "title": "Approve {{name}}?",
+          "body": "The account becomes verified and can explore published projects.",
+          "confirm": "Approve"
+        },
+        "rejected": {
+          "title": "Reject {{name}}?",
+          "body": "They will see your reason, can update their profile and send it again.",
+          "confirm": "Reject"
+        }
+      },
+      "reason": "Reason (shown to them)",
+      "reasonRequired": "Write a reason before rejecting.",
+      "error": "Something went wrong. The list may have changed; refresh and try again.",
+      "cancel": "Cancel",
+      "sending": "Sending…",
+      "done": {
+        "approved": "Account approved.",
+        "rejected": "Account rejected."
+      }
+    },
+    "universities": {
+      "title": "Universities and email domains",
+      "intro": "Students verify with an email at one of these domains. Matching is exact, so each student subdomain is listed on its own.",
+      "addTitle": "Add a student email domain",
+      "university": "University",
+      "domain": "Domain",
+      "domainHint": "Only what comes after @, like students.example.edu.sa.",
+      "add": "Add domain",
+      "added": "Domain added.",
+      "listLabel": "Universities",
+      "disable": "Turn off",
+      "enable": "Turn on",
+      "disableLabel": "Turn off {{domain}}",
+      "enableLabel": "Turn on {{domain}}",
+      "errors": {
+        "taken": "This domain is already listed.",
+        "invalid": "Enter a valid domain, like students.example.edu.sa.",
+        "unexpected": "Something went wrong. Try again."
       }
     }
   }

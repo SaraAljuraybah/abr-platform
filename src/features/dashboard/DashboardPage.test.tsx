@@ -29,6 +29,9 @@ const fake = vi.hoisted(() => {
     /** Reads of student_profiles fail this many times, or never resolve with 'hang'. */
     studentFailures,
     signOut: vi.fn(),
+    /** The latest verification decisions about the user (own rows, newest first). */
+    reviews: [] as Row[],
+    rpcs: [] as string[],
   };
 });
 
@@ -52,9 +55,24 @@ vi.mock('@/lib/supabase', () => {
           return Promise.resolve({ error: null });
         },
       },
-      from: (name: 'profiles' | 'student_profiles' | 'projects') => ({
+      rpc: (name: string) => {
+        fake.rpcs.push(name);
+        if (name === 'resubmit_verification') {
+          const profile = fake.profiles.get('00000000-0000-0000-0000-00000000000a');
+          if (profile) profile.verification_status = 'pending';
+        }
+        return Promise.resolve({ data: null, error: null });
+      },
+      from: (name: 'profiles' | 'student_profiles' | 'projects' | 'verification_reviews') => ({
         select: () => ({
           eq: (_column: string, id: string) => {
+            if (name === 'verification_reviews') {
+              return {
+                order: () => ({
+                  limit: () => Promise.resolve({ data: fake.reviews, error: null }),
+                }),
+              };
+            }
             if (name === 'projects') {
               return {
                 order: () => {
@@ -78,7 +96,8 @@ vi.mock('@/lib/supabase', () => {
                 fake.studentFailures.value = failures - 1;
                 return Promise.resolve({ data: null, error: { code: 'PGRST000', message: 'x' } });
               }
-              return Promise.resolve({ data: fake[name].get(id) ?? null, error: null });
+              const table = name === 'profiles' ? fake.profiles : fake.student_profiles;
+              return Promise.resolve({ data: table.get(id) ?? null, error: null });
             };
             return { single: read, maybeSingle: read };
           },
@@ -93,6 +112,8 @@ function seed(profile: Row = {}, student: Row = {}) {
   fake.studentFailures.value = 0;
   fake.projects = [];
   fake.projectsFail = 0;
+  fake.reviews = [];
+  fake.rpcs = [];
   fake.signOut.mockReset();
   fake.profiles.set(USER_ID, {
     role: 'student',
@@ -443,16 +464,50 @@ describe.each(['en', 'ar'] as const)('other roles on /app (%s)', (language) => {
     await changeLanguage(language);
   });
 
-  it.each([
-    ['organization', 'pending'],
-    ['mentor', 'rejected'],
-  ] as const)('a %s (%s) sees the coming-next card with their status', async (role, status) => {
-    seed({ role, verification_status: status });
+  it('a pending organization sees that its account is under review, and can edit', async () => {
+    seed({ role: 'organization', verification_status: 'pending', full_name: 'Huda Contact' });
     await load();
-    const card = await screen.findByRole('region', { name: t.dashboard.other.title });
-    expect(within(card).getByText(t.dashboard.other.body)).toBeInTheDocument();
-    expect(within(card).getByText(t.status[status])).toBeInTheDocument();
+    const card = await screen.findByRole('region', { name: t.dashboard.partner.pending.title });
+    expect(within(card).getByText(t.dashboard.partner.pending.body)).toBeInTheDocument();
+    expect(
+      within(card).getByRole('link', { name: t.dashboard.partner.editProfile }),
+    ).toHaveAttribute('href', '/app/profile');
+    expect(within(card).queryByRole('link', { name: t.dashboard.partner.explore })).toBeNull();
+    expect(screen.getByText(t.status.pending)).toBeInTheDocument();
     expect(screen.queryByRole('region', { name: t.dashboard.profile.title })).toBeNull();
+  });
+
+  it('a verified mentor is sent on to Explore projects', async () => {
+    seed({ role: 'mentor', verification_status: 'verified' });
+    await load();
+    const card = await screen.findByRole('region', { name: t.dashboard.partner.verified.title });
+    expect(within(card).getByRole('link', { name: t.dashboard.partner.explore })).toHaveAttribute(
+      'href',
+      '/projects',
+    );
+  });
+
+  it('a rejected mentor sees the reason as text and can send for review again', async () => {
+    seed({ role: 'mentor', verification_status: 'rejected' });
+    fake.reviews = [
+      {
+        decision: 'rejected',
+        reason: '<b>Add</b> your company website.',
+        created_at: '2026-11-20',
+      },
+    ];
+    const user = userEvent.setup();
+    await load();
+    const card = await screen.findByRole('region', { name: t.dashboard.partner.rejected.title });
+    expect(await within(card).findByText('<b>Add</b> your company website.')).toBeInTheDocument();
+    expect(card.querySelector('b')).toBeNull();
+    await user.click(within(card).getByRole('button', { name: t.dashboard.partner.resubmit }));
+    await waitFor(() => {
+      expect(fake.rpcs).toContain('resubmit_verification');
+    });
+    expect(
+      await screen.findByRole('region', { name: t.dashboard.partner.pending.title }),
+    ).toBeInTheDocument();
   });
 
   it('an admin is sent to the admin overview (SCRUM-19)', async () => {
@@ -478,11 +533,12 @@ describe.each(['en', 'ar'] as const)('other roles on /app (%s)', (language) => {
   });
 
   it(
-    'axe: the coming-next card has no violations',
+    'axe: the partner dashboard has no violations',
     async () => {
-      seed({ role: 'organization', verification_status: 'pending' });
+      seed({ role: 'organization', verification_status: 'rejected' });
+      fake.reviews = [{ decision: 'rejected', reason: 'Add a website.', created_at: '2026-11-20' }];
       await load();
-      await screen.findByRole('region', { name: t.dashboard.other.title });
+      await screen.findByText('Add a website.');
       expect(await axeViolations()).toEqual([]);
     },
     AXE_TIMEOUT,

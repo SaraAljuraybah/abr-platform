@@ -484,12 +484,7 @@ describe('resume, Back and failures', () => {
     expect(screen.getByLabelText(en.onboarding.about.phone)).toHaveValue('');
   });
 
-  it.each(['organization', 'mentor'])('a %s sees that their setup comes next', async (role) => {
-    seed({ role, verification_status: 'pending' });
-    await load();
-    expect(screen.getByText(en.onboarding.comingNext)).toBeInTheDocument();
-    expect(screen.queryByRole('navigation', { name: en.onboarding.stepperLabel })).toBeNull();
-  });
+  // Organizations and mentors: see PartnerOnboarding.test.tsx (SCRUM-17).
 
   it('an onboarded student visiting /onboarding goes to /app', async () => {
     seed({ onboarding_completed: true, onboarding_step: 4 });

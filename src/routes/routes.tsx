@@ -4,7 +4,6 @@ import { FormLayout } from '@/components/layout/FormLayout';
 import { formRoutes, legacyFormRedirects } from '@/features/forms/registry';
 import { LandingPage } from '@/features/landing';
 import { isAuthEnabled } from '@/lib/features';
-import { ComingNextPage } from '@/pages/ComingNextPage';
 import { ComingSoonPage } from '@/pages/ComingSoonPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { RequireAuth } from './guards/RequireAuth';
@@ -143,7 +142,13 @@ export const routes: RouteObject[] = [
                       Component: (await import('@/features/dashboard/DashboardPage')).DashboardPage,
                     }),
                   },
-                  { path: 'app/profile', element: <ComingNextPage page="profile" /> },
+                  {
+                    // SCRUM-17: organizations and mentors edit their profile; students later.
+                    path: 'app/profile',
+                    lazy: async () => ({
+                      Component: (await import('@/features/onboarding/ProfilePage')).ProfilePage,
+                    }),
+                  },
                   {
                     // Projects directory (SCRUM-20): every role. The pages show a "verify first"
                     // message to anyone not verified; RLS (projects_select, D-15) is the gate.
@@ -205,6 +210,20 @@ export const routes: RouteObject[] = [
                             path: 'projects/:id',
                             lazy: async () => ({
                               Component: (await import('@/features/admin/ReviewPage')).ReviewPage,
+                            }),
+                          },
+                          {
+                            path: 'verifications',
+                            lazy: async () => ({
+                              Component: (await import('@/features/admin/VerificationsPage'))
+                                .VerificationsPage,
+                            }),
+                          },
+                          {
+                            path: 'universities',
+                            lazy: async () => ({
+                              Component: (await import('@/features/admin/UniversitiesPage'))
+                                .UniversitiesPage,
                             }),
                           },
                           {

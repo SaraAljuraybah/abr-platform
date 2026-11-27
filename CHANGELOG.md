@@ -17,6 +17,17 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
   `student.kfu.edu.sa`, and `aou.edu.sa` for Arab Open University students. Matching stays exact (D-05).
 - Admin RPCs `admin_add_university_domain` and `admin_set_university_domain_active` (audited), so a
   missing student subdomain is added without a migration.
+- Organization and mentor onboarding (SCRUM-17): one form in three numbered sections (about, what
+  they offer, private contact) at `/onboarding`, also used to edit at `/app/profile`. Migration
+  `20261127100000_partner_onboarding` adds `organization_profiles.sector` and `org_size`, CHECKs the
+  support types and mentor expertise against the interest form's codes, and extends the onboarding
+  completion trigger to both roles (required fields and a phone), so `review_verification()` only ever
+  sees complete profiles.
+- Partner dashboard: verification status and next step (under review, verified → Explore projects,
+  changes needed with the admin's reason as plain text and "Send for review again", suspended).
+- Admin: `/admin/verifications` (approve, or reject with a reason; shows the sign-up email through the
+  admin-only `admin_verification_queue()`), and `/admin/universities` (add or turn off student email
+  domains).
 
 ## [Unreleased] — Sprint 1, checkpoint 24 Oct 2026
 
@@ -513,7 +524,6 @@ Open points in the Terms and Conditions (`/terms`), shown only in development bu
 - Block or re-validate a student's auth email change to a domain that is not allowlisted.
 - Admin RPCs: manage universities (add, deactivate), read `reviewer_id`. Domains are done (27 Nov).
 - Unsubscribe link and mechanism required in every marketing email (SCRUM-37).
-- Organization and mentor onboarding (later) must also require a phone number.
 - Email the student when their project is approved, needs changes or is rejected (depends on
   SCRUM-37 SMTP).
 - Clean up orphaned project files: an old file whose removal failed after a replace, and the

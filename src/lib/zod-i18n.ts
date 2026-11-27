@@ -15,6 +15,9 @@ const VALIDATION_KEYS: readonly ValidationKey[] = [
   'validation.videoUrl',
   'validation.repoUrl',
   'validation.demoUrl',
+  'validation.chooseOne',
+  'validation.yearsOfExperience',
+  'validation.linkedinUrl',
 ];
 
 export function isValidationKey(value: unknown): value is ValidationKey {

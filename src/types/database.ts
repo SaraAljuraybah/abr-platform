@@ -194,7 +194,9 @@ export type Database = {
           created_at: string
           description: string | null
           logo_path: string | null
+          org_size: string | null
           organization_name: string | null
+          sector: string | null
           support_types: string[]
           updated_at: string
           user_id: string
@@ -204,7 +206,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           logo_path?: string | null
+          org_size?: string | null
           organization_name?: string | null
+          sector?: string | null
           support_types?: string[]
           updated_at?: string
           user_id: string
@@ -214,7 +218,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           logo_path?: string | null
+          org_size?: string | null
           organization_name?: string | null
+          sector?: string | null
           support_types?: string[]
           updated_at?: string
           user_id?: string
@@ -665,6 +671,29 @@ export type Database = {
       admin_set_university_domain_active: {
         Args: { p_active: boolean; p_domain_id: string }
         Returns: undefined
+      }
+      admin_verification_queue: {
+        Args: { p_status?: Database["public"]["Enums"]["verification_status"] }
+        Returns: {
+          company: string
+          description: string
+          email: string
+          expertise: string[]
+          full_name: string
+          id: string
+          job_title: string
+          onboarding_completed: boolean
+          org_size: string
+          organization_name: string
+          professional_summary: string
+          role: Database["public"]["Enums"]["user_role"]
+          sector: string
+          support_types: string[]
+          updated_at: string
+          verification_status: Database["public"]["Enums"]["verification_status"]
+          website: string
+          years_of_experience: number
+        }[]
       }
       check_student_email: {
         Args: { p_email: string; p_university_id: string }

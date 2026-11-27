@@ -6,12 +6,14 @@ import { useAuth } from '@/features/auth/auth-context';
 import { useDirection } from '@/hooks/useDirection';
 import { LoadingScreen } from '@/routes/guards/LoadingScreen';
 import { useOnboardingData } from './api';
+import { PartnerOnboarding } from './components/PartnerOnboarding';
 import { StudentOnboarding } from './components/StudentOnboarding';
+import { type PartnerRole, usePartnerData } from './partner';
 
 /**
  * /onboarding (inside RequireAuth). UX only: column grants, RLS and the completion trigger are the
  * authority. An onboarded user goes to /app; students get the four steps; organizations and
- * mentors see that their setup comes next.
+ * mentors get one form, then wait for verification.
  */
 export function OnboardingPage() {
   const { t } = useTranslation();
@@ -26,6 +28,11 @@ export function OnboardingPage() {
         <>
           <p className="mt-2 mb-8 text-muted-foreground">{t('onboarding.intro')}</p>
           <StudentData userId={session.user.id} />
+        </>
+      ) : (role === 'organization' || role === 'mentor') && session ? (
+        <>
+          <p className="mt-2 mb-8 text-muted-foreground">{t(`onboarding.partner.${role}.intro`)}</p>
+          <PartnerData userId={session.user.id} role={role} />
         </>
       ) : (
         <p className="mt-4 text-muted-foreground">{t('onboarding.comingNext')}</p>
@@ -57,4 +64,28 @@ function StudentData({ userId }: { userId: string }) {
     );
   }
   return <StudentOnboarding userId={userId} data={query.data} />;
+}
+
+function PartnerData({ userId, role }: { userId: string; role: PartnerRole }) {
+  const { t } = useTranslation();
+  const query = usePartnerData(userId, role);
+
+  if (query.isPending) return <LoadingScreen />;
+  if (query.isError) {
+    return (
+      <Callout variant="error" live>
+        <p>{t('onboarding.errors.load')}</p>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="mt-3"
+          onClick={() => void query.refetch()}
+        >
+          {t('onboarding.retry')}
+        </Button>
+      </Callout>
+    );
+  }
+  return <PartnerOnboarding userId={userId} role={role} values={query.data} mode="onboarding" />;
 }

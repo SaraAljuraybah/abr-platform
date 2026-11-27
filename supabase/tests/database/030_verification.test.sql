@@ -62,6 +62,22 @@ select pg_temp.new_user('dddddddd-0000-4000-8000-000000000004', 's@uni-one.test'
   '{"role": "student", "university_id": "aaaaaaaa-0000-4000-8000-000000000001"}');
 select pg_temp.new_user('dddddddd-0000-4000-8000-000000000005', 'x@abr.test', '{}', '{"abr_role": "admin"}');
 
+-- SCRUM-17: organizations and mentors complete onboarding only with their required fields.
+update public.organization_profiles
+  set organization_name = coalesce(organization_name, 'Test Organization'), sector = 'technology',
+      description = 'A test organization that supports student graduation projects.',
+      support_types = array['hire_talent']
+  where support_types = '{}';
+update public.mentor_profiles
+  set job_title = 'Engineer', company = 'Test Co', years_of_experience = 5,
+      expertise = array['software_data'],
+      professional_summary = 'An experienced mentor who helps students with their projects.'
+  where expertise = '{}';
+update public.profiles set full_name = coalesce(full_name, 'Test Partner')
+  where role in ('organization', 'mentor');
+update private.contact_details c set phone = '+966500000001'
+  from public.profiles p
+  where p.id = c.user_id and p.role in ('organization', 'mentor') and c.phone is null;
 update public.profiles set onboarding_completed = true
 where id in ('dddddddd-0000-4000-8000-000000000001', 'dddddddd-0000-4000-8000-000000000002');
 update public.organization_profiles set organization_name = 'Clinic Co', website = 'https://clinic.test'

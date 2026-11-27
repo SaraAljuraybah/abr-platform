@@ -10,12 +10,13 @@ import { useDirection } from '@/hooks/useDirection';
 import { firstName, useStudentDashboard } from './api';
 import { Card, ProfileCard, ProjectsCard, ProjectsError, WhatsNextCard } from './components/cards';
 import { useNextStep } from './next-step';
+import { PartnerDashboard } from './PartnerDashboard';
 
 const page = 'mx-auto w-full max-w-[1120px] px-4 py-10 sm:px-6 sm:py-12';
 
 /**
  * /app (inside RequireAuth and RequireOnboarding). Students get their dashboard; organizations and
- * mentors a "coming next" card with their status; admins keep a placeholder. UX only.
+ * mentors their verification status and next step; admins go to /admin. UX only.
  */
 export function DashboardPage() {
   const { t } = useTranslation();
@@ -25,6 +26,9 @@ export function DashboardPage() {
   if (role === 'admin') return <Navigate to="/admin" replace />;
 
   if (role === 'student' && session) return <StudentDashboardView userId={session.user.id} />;
+  if ((role === 'organization' || role === 'mentor') && session) {
+    return <PartnerDashboard userId={session.user.id} />;
+  }
 
   return (
     <div className={page}>

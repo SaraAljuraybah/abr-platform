@@ -274,6 +274,8 @@ describe.each(['en', 'ar'] as const)('admin area (%s)', (language) => {
     expect(nav.getAllByRole('link').map((link) => link.textContent)).toEqual([
       a.nav.overview,
       a.nav.projects,
+      a.nav.verifications,
+      a.nav.universities,
       a.nav.interest,
     ]);
     expect(nav.getByRole('link', { name: a.nav.overview })).toHaveAttribute('aria-current', 'page');
