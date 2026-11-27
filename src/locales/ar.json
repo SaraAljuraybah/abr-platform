@@ -273,7 +273,11 @@
       "signIn": "سجّل الدخول",
       "acceptTerms": "أوافق على <termsLink>الشروط والأحكام</termsLink>.",
       "acceptPrivacy": "أوافق على <privacyLink>سياسة الخصوصية</privacyLink>.",
-      "consentRequired": "يُرجى الموافقة للمتابعة."
+      "consentRequired": "يُرجى الموافقة للمتابعة.",
+      "universityGroups": {
+        "public": "الجامعات الحكومية",
+        "private": "الجامعات الأهلية"
+      }
     },
     "checkEmail": {
       "title": "تحقّق من بريدك الإلكتروني",

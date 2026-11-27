@@ -3,6 +3,21 @@
 All notable changes to the ABR platform. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Entries are grouped per checkpoint (Plan v2.0 §17).
 
+## [Unreleased] — Build-out, 27 Nov 2026
+
+### Added
+
+- All Saudi universities in sign-up (CTO decision): 29 public and 14 private universities, by migration
+  `20261127090000_universities_ksa`, with stable codes (the interest form's codes) and a `kind`
+  (public/private). Sign-up and the directory filter group them under «الجامعات الحكومية» and
+  «الجامعات الأهلية». Existing rows (the abr-dev placeholders) are matched by English name and keep
+  their ids. `seed.sql` no longer inserts universities.
+- Student email domains: each university's official domain, plus the student subdomains a published
+  university source confirmed: `stu.kau.edu.sa`, `st.uqu.edu.sa`, `student.ksu.edu.sa`,
+  `student.kfu.edu.sa`, and `aou.edu.sa` for Arab Open University students. Matching stays exact (D-05).
+- Admin RPCs `admin_add_university_domain` and `admin_set_university_domain_active` (audited), so a
+  missing student subdomain is added without a migration.
+
 ## [Unreleased] — Sprint 1, checkpoint 24 Oct 2026
 
 ### Added
@@ -496,7 +511,7 @@ Open points in the Terms and Conditions (`/terms`), shown only in development bu
   `verification_reviews` keep plain user ids without foreign keys, so deleting an account does not
   delete or block on its history.
 - Block or re-validate a student's auth email change to a domain that is not allowlisted.
-- Admin RPCs: manage universities and domains, read `reviewer_id`.
+- Admin RPCs: manage universities (add, deactivate), read `reviewer_id`. Domains are done (27 Nov).
 - Unsubscribe link and mechanism required in every marketing email (SCRUM-37).
 - Organization and mentor onboarding (later) must also require a phone number.
 - Email the student when their project is approved, needs changes or is rejected (depends on

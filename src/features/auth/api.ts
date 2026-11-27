@@ -225,9 +225,17 @@ export function useSignUp() {
   });
 }
 
+export type UniversityKind = 'public' | 'private';
+
 export interface University {
   id: string;
   name: string;
+  /** Public or private, for grouping; null for a university created without one. */
+  kind: UniversityKind | null;
+}
+
+function toUniversityKind(kind: string | null): UniversityKind | null {
+  return kind === 'public' || kind === 'private' ? kind : null;
 }
 
 /** Active universities, named and sorted in the current language. RLS shows anon active rows only. */
@@ -237,7 +245,7 @@ export function useUniversities(language: Language) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('universities')
-        .select('id, name_ar, name_en')
+        .select('id, name_ar, name_en, kind')
         .eq('active', true);
       if (error) throw error;
       return data;
@@ -246,7 +254,11 @@ export function useUniversities(language: Language) {
     select: (rows): University[] => {
       const collator = new Intl.Collator(language);
       return rows
-        .map((row) => ({ id: row.id, name: language === 'ar' ? row.name_ar : row.name_en }))
+        .map((row) => ({
+          id: row.id,
+          name: language === 'ar' ? row.name_ar : row.name_en,
+          kind: toUniversityKind(row.kind),
+        }))
         .sort((a, b) => collator.compare(a.name, b.name));
     },
   });

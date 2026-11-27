@@ -508,24 +508,30 @@ export type Database = {
       universities: {
         Row: {
           active: boolean
+          code: string | null
           created_at: string
           id: string
+          kind: string | null
           name_ar: string
           name_en: string
           updated_at: string
         }
         Insert: {
           active?: boolean
+          code?: string | null
           created_at?: string
           id?: string
+          kind?: string | null
           name_ar: string
           name_en: string
           updated_at?: string
         }
         Update: {
           active?: boolean
+          code?: string | null
           created_at?: string
           id?: string
+          kind?: string | null
           name_ar?: string
           name_en?: string
           updated_at?: string
@@ -635,6 +641,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_add_university_domain: {
+        Args: { p_domain: string; p_university_id: string }
+        Returns: string
+      }
       admin_project_counts: {
         Args: never
         Returns: {
@@ -651,6 +661,10 @@ export type Database = {
           notes: string
           reviewer_name: string
         }[]
+      }
+      admin_set_university_domain_active: {
+        Args: { p_active: boolean; p_domain_id: string }
+        Returns: undefined
       }
       check_student_email: {
         Args: { p_email: string; p_university_id: string }

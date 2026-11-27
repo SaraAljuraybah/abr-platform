@@ -94,6 +94,13 @@ export function SignUpForm() {
   const fields = ROLE_FIELDS[role];
   const failure = preCheckFailure ?? signUp.error;
 
+  // Public, then private (each already sorted by name), then any university without a kind.
+  const universityGroups = (['public', 'private', null] as const)
+    .map((kind) => ({
+      kind,
+      items: (universities.data ?? []).filter((university) => university.kind === kind),
+    }))
+    .filter((group) => group.items.length > 0);
   const universityName = (id: string) =>
     universities.data?.find((university) => university.id === id)?.name ?? '';
 
@@ -224,11 +231,26 @@ export function SignUpForm() {
                   ? t('auth.signUp.universitiesLoading')
                   : t('auth.signUp.universityPlaceholder')}
               </option>
-              {universities.data?.map((university) => (
-                <option key={university.id} value={university.id}>
-                  {university.name}
-                </option>
-              ))}
+              {universityGroups.map((group) =>
+                group.kind ? (
+                  <optgroup
+                    key={group.kind}
+                    label={t(`auth.signUp.universityGroups.${group.kind}`)}
+                  >
+                    {group.items.map((university) => (
+                      <option key={university.id} value={university.id}>
+                        {university.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                ) : (
+                  group.items.map((university) => (
+                    <option key={university.id} value={university.id}>
+                      {university.name}
+                    </option>
+                  ))
+                ),
+              )}
             </SelectField>
             {universities.isError && (
               <Callout live variant="error">

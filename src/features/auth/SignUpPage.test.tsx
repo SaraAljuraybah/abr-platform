@@ -319,6 +319,32 @@ describe.each(['en', 'ar'] as const)('sign-up page (%s)', (language) => {
     expect(supabase.from).toHaveBeenCalledWith('universities');
   });
 
+  it('groups universities into public then private, each sorted by name', async () => {
+    mockUniversities({
+      data: [
+        { ...UNIVERSITIES[2], kind: 'private' },
+        { ...UNIVERSITIES[0], kind: 'public' },
+        { ...UNIVERSITIES[1], kind: 'public' },
+      ],
+      error: null,
+    });
+    await renderSignUp();
+    await waitForUniversities();
+    const groups = Array.from(document.querySelectorAll('optgroup'));
+    expect(groups.map((group) => group.label)).toEqual([
+      s.universityGroups.public,
+      s.universityGroups.private,
+    ]);
+    const names = (group: HTMLOptGroupElement | undefined) =>
+      Array.from(group?.querySelectorAll('option') ?? []).map((option) => option.textContent);
+    expect(names(groups[0])).toEqual(
+      language === 'ar'
+        ? ['جامعة الملك سعود', 'جامعة الملك فهد للبترول والمعادن']
+        : ['King Fahd University', 'King Saud University'],
+    );
+    expect(names(groups[1])).toEqual([language === 'ar' ? 'جامعة الفيصل' : 'Alfaisal University']);
+  });
+
   it('shows a retry when the universities fail to load', async () => {
     mockUniversities({ data: null, error: { message: 'boom' } });
     const user = setupUser();

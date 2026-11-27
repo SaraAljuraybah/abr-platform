@@ -273,7 +273,11 @@
       "signIn": "Sign in",
       "acceptTerms": "I agree to the <termsLink>Terms and Conditions</termsLink>.",
       "acceptPrivacy": "I agree to the <privacyLink>Privacy Policy</privacyLink>.",
-      "consentRequired": "Please accept to continue."
+      "consentRequired": "Please accept to continue.",
+      "universityGroups": {
+        "public": "Public universities",
+        "private": "Private universities"
+      }
     },
     "checkEmail": {
       "title": "Check your email",
