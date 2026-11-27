@@ -4,6 +4,7 @@ import { LanguageSwitch } from '@/components/LanguageSwitch';
 import { Toaster } from '@/components/ui/toaster';
 import { useAuth } from '@/features/auth/auth-context';
 import { useOwnProfile } from '@/features/auth/profile-api';
+import { NotificationBell } from '@/features/connections/components/NotificationBell';
 import { cn } from '@/lib/utils';
 import { AccountMenu } from './AccountMenu';
 import { Logo } from './Logo';
@@ -50,6 +51,17 @@ export function AppShellLayout() {
       <NavLink to="/projects" className={(state) => cn(navLinkClass(state), className)}>
         {t('shell.explore')}
       </NavLink>
+      {/* SCRUM-21: organization → project requests; mentors' request types come later. */}
+      {(role === 'student' || role === 'organization') && (
+        <>
+          <NavLink to="/app/requests" className={(state) => cn(navLinkClass(state), className)}>
+            {t('shell.requests')}
+          </NavLink>
+          <NavLink to="/app/connections" className={(state) => cn(navLinkClass(state), className)}>
+            {t('shell.connections')}
+          </NavLink>
+        </>
+      )}
     </>
   );
 
@@ -84,6 +96,7 @@ export function AppShellLayout() {
           </nav>
           <div className="flex items-center gap-1 justify-self-end sm:gap-2">
             <LanguageSwitch />
+            {role !== 'admin' && <NotificationBell userId={session?.user.id} />}
             <AccountMenu
               name={profile.data?.fullName ?? null}
               email={session?.user.email ?? null}

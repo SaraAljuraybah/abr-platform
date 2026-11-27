@@ -871,7 +871,9 @@
     "accountMenu": "Account menu",
     "myProfile": "My profile",
     "signOut": "Sign out",
-    "admin": "Admin"
+    "admin": "Admin",
+    "requests": "Requests",
+    "connections": "Connections"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -1018,9 +1020,7 @@
       "ownerTitle": "About the student",
       "ownerName": "Name",
       "university": "University",
-      "fieldOfStudy": "Field of study",
-      "connectTitle": "Request to connect",
-      "connectBody": "Requests to connect are coming soon."
+      "fieldOfStudy": "Field of study"
     }
   },
   "projects": {
@@ -1407,6 +1407,129 @@
         "taken": "This domain is already listed.",
         "invalid": "Enter a valid domain, like students.example.edu.sa.",
         "unexpected": "Something went wrong. Try again."
+      }
+    }
+  },
+  "connections": {
+    "loading": "Loading…",
+    "loadError": "We couldn't load this. Check your connection and try again.",
+    "retry": "Try again",
+    "retrying": "Trying again…",
+    "status": {
+      "pending": "Waiting for an answer",
+      "accepted": "Accepted",
+      "declined": "Declined",
+      "withdrawn": "Withdrawn",
+      "cancelled": "Closed",
+      "expired": "Expired"
+    },
+    "errors": {
+      "network": "We couldn't reach ABR. Check your connection and try again.",
+      "pending": "You already have a request waiting for this project.",
+      "connected": "You're already connected with this student about this project.",
+      "cooldown": "The student declined recently. You can ask again 30 days after their answer.",
+      "rateLimited": "You've sent 20 requests today. You can send more tomorrow.",
+      "notFound": "This request or project is no longer available.",
+      "notAllowed": "Your account needs to be verified before you can do this.",
+      "notPending": "This request has already been answered or closed.",
+      "expired": "This request has expired, so it can no longer be answered.",
+      "unexpected": "Something went wrong. Please try again."
+    },
+    "panel": {
+      "title": "Request to connect",
+      "intro": "Tell the student who you are and how you'd like to support the project. Contact details are shared only if they accept: yours with them, and theirs with you.",
+      "messageLabel": "Your message",
+      "messageHint": "Between 10 and 1,000 characters.",
+      "messageTooShort": "Write at least 10 characters.",
+      "send": "Send request",
+      "sending": "Sending…",
+      "sent": "Request sent. We'll let you know when the student answers.",
+      "pendingBody": "You sent a request on {{date}}. The student has until {{expires}} to answer.",
+      "withdraw": "Withdraw request",
+      "withdrawing": "Withdrawing…",
+      "withdrawn": "Request withdrawn.",
+      "connectedBody": "You're connected with this student.",
+      "viewConnections": "See contact details",
+      "declinedBody": "The student declined your request. You can send a new one from {{date}}.",
+      "declineReason": "Their note",
+      "ownerBody": "Organizations interested in your project can send you a request to connect. You'll find them under Requests.",
+      "ownerLink": "Go to requests",
+      "studentBody": "For now, only organizations can send requests to connect.",
+      "mentorBody": "Requests from mentors are coming soon."
+    },
+    "requests": {
+      "metaTitle": "Requests · ABR",
+      "title": "Requests",
+      "receivedIntro": "Organizations that want to connect about your projects. If you accept, they see your contact email, and your phone and LinkedIn if you chose to share them. You see theirs.",
+      "sentIntro": "Requests you sent to students about their projects. A student has 30 days to answer.",
+      "mentorBody": "Requests for mentors are coming soon.",
+      "verifyFirst": "Requests open once your account is verified.",
+      "receivedLabel": "Requests you received",
+      "sentLabel": "Requests you sent",
+      "emptyReceived": "No requests yet. Once your project is published, organizations can ask to connect.",
+      "emptySent": "You haven't sent any requests yet. Open a project to send one.",
+      "explore": "Explore projects",
+      "sentOn": "Sent {{date}}",
+      "expiresOn": "Answer by {{date}}",
+      "project": "Project",
+      "projectGone": "A project that is no longer published",
+      "unknownSender": "An organization",
+      "unknownRecipient": "A student",
+      "about": "About them",
+      "website": "Website",
+      "message": "Message",
+      "reason": "Note from the student",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptDialog": {
+        "title": "Connect with {{name}}?",
+        "body": "They will see your contact email, and your phone and LinkedIn if you chose to share them. You will see theirs. You talk outside ABR.",
+        "confirm": "Accept and connect"
+      },
+      "declineDialog": {
+        "title": "Decline the request from {{name}}?",
+        "body": "They won't see any of your contact details. You can add a short note for them.",
+        "reasonLabel": "Note (optional)",
+        "confirm": "Decline request"
+      },
+      "cancel": "Cancel",
+      "working": "Saving…",
+      "accepted": "You're connected. Their contact details are in Connections.",
+      "declined": "Request declined.",
+      "goToConnections": "Open connections"
+    },
+    "list": {
+      "metaTitle": "Connections · ABR",
+      "title": "Connections",
+      "intro": "People you're connected with. You talk outside ABR. For everyone's safety, each time contact details are opened, it is recorded.",
+      "empty": "No connections yet. A connection starts when a request is accepted.",
+      "since": "Connected {{date}}",
+      "show": "Show contact details",
+      "contactLabel": "Contact details for {{name}}",
+      "email": "Email",
+      "phone": "Phone",
+      "linkedin": "LinkedIn",
+      "notShared": "Not shared",
+      "unavailable": "Contact details aren't available right now.",
+      "contactError": "We couldn't load the contact details. Please try again later.",
+      "unknown": "A connection"
+    },
+    "notifications": {
+      "metaTitle": "Notifications · ABR",
+      "title": "Notifications",
+      "markAll": "Mark all as read",
+      "marking": "Marking…",
+      "empty": "You're all caught up.",
+      "unread": "New",
+      "bell": "Notifications",
+      "bellUnread": "Notifications ({{count}} unread)",
+      "fallbackName": "Someone",
+      "fallbackProject": "a project",
+      "types": {
+        "request_received": "{{name}} sent a request to connect about “{{project}}”.",
+        "request_accepted": "{{name}} accepted your request about “{{project}}”.",
+        "request_declined": "{{name}} declined your request about “{{project}}”.",
+        "request_cancelled": "Your request about “{{project}}” was closed because the project is no longer available."
       }
     }
   }

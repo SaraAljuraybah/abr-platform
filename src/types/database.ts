@@ -64,6 +64,74 @@ export type Database = {
         }
         Relationships: []
       }
+      connections: {
+        Row: {
+          connection_type: string
+          created_at: string
+          id: string
+          project_id: string | null
+          request_id: string
+          revoked_at: string | null
+          revoked_by: string | null
+          status: string
+          user_a: string
+          user_b: string
+        }
+        Insert: {
+          connection_type: string
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          request_id: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: string
+          user_a: string
+          user_b: string
+        }
+        Update: {
+          connection_type?: string
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          request_id?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: string
+          user_a?: string
+          user_b?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connections_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "connections_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: true
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "connections_user_a_fkey"
+            columns: ["user_a"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "connections_user_b_fkey"
+            columns: ["user_b"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       interest_signups: {
         Row: {
           consent_at: string
@@ -185,6 +253,51 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: true
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          payload: Json
+          read_at: string | null
+          recipient_id: string
+          request_id: string | null
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          read_at?: string | null
+          recipient_id: string
+          request_id?: string | null
+          type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          read_at?: string | null
+          recipient_id?: string
+          request_id?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
             referencedColumns: ["id"]
           },
         ]
@@ -454,6 +567,70 @@ export type Database = {
           },
         ]
       }
+      requests: {
+        Row: {
+          created_at: string
+          decline_reason: string | null
+          expires_at: string
+          id: string
+          message: string
+          project_id: string | null
+          recipient_id: string
+          responded_at: string | null
+          sender_id: string
+          status: Database["public"]["Enums"]["request_status"]
+          type: Database["public"]["Enums"]["request_type"]
+        }
+        Insert: {
+          created_at?: string
+          decline_reason?: string | null
+          expires_at?: string
+          id?: string
+          message: string
+          project_id?: string | null
+          recipient_id: string
+          responded_at?: string | null
+          sender_id: string
+          status?: Database["public"]["Enums"]["request_status"]
+          type: Database["public"]["Enums"]["request_type"]
+        }
+        Update: {
+          created_at?: string
+          decline_reason?: string | null
+          expires_at?: string
+          id?: string
+          message?: string
+          project_id?: string | null
+          recipient_id?: string
+          responded_at?: string | null
+          sender_id?: string
+          status?: Database["public"]["Enums"]["request_status"]
+          type?: Database["public"]["Enums"]["request_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "requests_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "requests_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "requests_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_profiles: {
         Row: {
           academic_level: string | null
@@ -714,6 +891,16 @@ export type Database = {
         Returns: Database["public"]["Enums"]["user_role"]
       }
       delete_project: { Args: { p_project_id: string }; Returns: undefined }
+      get_connection_contact: {
+        Args: { p_connection_id: string }
+        Returns: {
+          contact_email: string
+          display_name: string
+          linkedin_url: string
+          phone: string
+          user_id: string
+        }[]
+      }
       get_interest_stats: {
         Args: never
         Returns: {
@@ -736,6 +923,11 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_verified: { Args: never; Returns: boolean }
+      mark_notifications_read: { Args: { p_ids?: string[] }; Returns: number }
+      respond_to_request: {
+        Args: { p_accept: boolean; p_reason?: string; p_request_id: string }
+        Returns: string
+      }
       resubmit_verification: { Args: never; Returns: undefined }
       review_project: {
         Args: {
@@ -753,6 +945,10 @@ export type Database = {
         }
         Returns: string
       }
+      send_org_project_request: {
+        Args: { p_message: string; p_project_id: string }
+        Returns: string
+      }
       submit_interest: { Args: { p_payload: Json }; Returns: undefined }
       submit_project: { Args: { p_project_id: string }; Returns: undefined }
       update_my_contact: {
@@ -764,6 +960,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      withdraw_request: { Args: { p_request_id: string }; Returns: undefined }
       withdraw_submission: {
         Args: { p_project_id: string }
         Returns: undefined

@@ -5,6 +5,23 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 
 ## [Unreleased] — Build-out, 27 Nov 2026
 
+### Requests to connect, connections and notifications (SCRUM-21)
+
+- New tables `requests`, `connections`, `notifications` (RLS, select-only grants; all writes through
+  RPCs). Request type 4 (organization → project owner) only, per the V1 scope.
+- `send_org_project_request`, `respond_to_request`, `withdraw_request`, `get_connection_contact`,
+  `mark_notifications_read`. Pending requests close as `cancelled` when the project leaves
+  `published` or a party is suspended; 30-day expiry applied lazily; 20 requests a day per
+  organization; 30-day cool-down after a decline (proposed, Plan §11; confirm with D-07).
+- Contact unlock (D-16 proposed default): contact email always; phone and LinkedIn only when the
+  owner opted to share them. Every read and every refusal is audited.
+- UI: "Request to connect" panel on `/projects/:id`; `/app/requests` (students accept or decline,
+  organizations follow and withdraw); `/app/connections` (contact details on demand);
+  `/app/notifications` and a header bell with the unread count; Requests and Connections in the nav
+  for students and organizations.
+- Not yet: mentor request types (5, 6), team and position types, email notifications (D-08),
+  connection revocation.
+
 ### Added
 
 - All Saudi universities in sign-up (CTO decision): 29 public and 14 private universities, by migration

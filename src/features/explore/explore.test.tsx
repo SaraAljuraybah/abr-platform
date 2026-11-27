@@ -630,7 +630,7 @@ describe.each(['en', 'ar'] as const)('projects directory (%s)', (language) => {
   );
 
   describe('project page', () => {
-    it('shows the project, the owner card and the connect placeholder', async () => {
+    it('shows the project, the owner card and the connect panel', async () => {
       await open(`/projects/${pid(2)}`);
       expect(
         await screen.findByRole('heading', { level: 1, name: 'منصة تعليمية' }),
@@ -643,8 +643,9 @@ describe.each(['en', 'ar'] as const)('projects directory (%s)', (language) => {
         ),
       ).toBeInTheDocument();
       expect(within(owner).getByText('Bioinformatics')).toBeInTheDocument();
-      expect(screen.getByRole('region', { name: e.project.connectTitle })).toHaveTextContent(
-        e.project.connectBody,
+      // A student who is not the owner: only organizations send requests (SCRUM-21).
+      expect(screen.getByRole('region', { name: t.connections.panel.title })).toHaveTextContent(
+        t.connections.panel.studentBody,
       );
       expect(screen.getByRole('link', { name: e.project.back })).toHaveAttribute(
         'href',

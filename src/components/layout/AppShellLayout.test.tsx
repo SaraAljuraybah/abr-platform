@@ -72,8 +72,12 @@ describe.each(['en', 'ar'] as const)('app shell header (%s)', (language) => {
       within(must(middle))
         .getAllByRole('link')
         .map((link) => link.textContent),
-    ).toEqual([t.shell.dashboard, t.shell.explore]);
+    ).toEqual([t.shell.dashboard, t.shell.explore, t.shell.requests, t.shell.connections]);
     expect(end).toHaveClass('justify-self-end');
+    // The notifications bell (SCRUM-21), named by its count, never by colour alone.
+    expect(
+      within(must(end)).getByRole('link', { name: t.connections.notifications.bell }),
+    ).toHaveAttribute('href', '/app/notifications');
     expect(
       within(must(end)).getByRole('button', { name: t.shell.accountMenu }),
     ).toBeInTheDocument();
@@ -90,6 +94,9 @@ describe.each(['en', 'ar'] as const)('app shell header (%s)', (language) => {
         .getAllByRole('link')
         .map((link) => link.textContent),
     ).toEqual([t.shell.admin, t.shell.explore]);
+    expect(
+      screen.queryByRole('link', { name: t.connections.notifications.bell }),
+    ).not.toBeInTheDocument();
   });
 
   it('below md the links stay in the mobile menu', async () => {

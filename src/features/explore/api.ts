@@ -120,6 +120,7 @@ export function usePageImageUrls(paths: string[]) {
 }
 
 export interface DirectoryProject extends Project {
+  ownerId: string;
   ownerName: string | null;
   universityName: string | null;
   /** A field-of-study code, or null; `majorOther` holds the text when the code is "other". */
@@ -141,7 +142,7 @@ export function useDirectoryProject(id: string, language: Language, enabled: boo
       const { data, error } = await supabase
         .from('projects')
         .select(
-          'id, title, status, track, image_path, summary, description, sectors, academic_year, stage, team_size, looking_for_members, wanted_specializations, needs, document_path, video_url, repo_url, demo_url, owner:profiles!projects_owner_id_fkey!inner(full_name, verification_status, student:student_profiles(major, major_other)), university:universities(name_en, name_ar)',
+          'id, owner_id, title, status, track, image_path, summary, description, sectors, academic_year, stage, team_size, looking_for_members, wanted_specializations, needs, document_path, video_url, repo_url, demo_url, owner:profiles!projects_owner_id_fkey!inner(full_name, verification_status, student:student_profiles(major, major_other)), university:universities(name_en, name_ar)',
         )
         .eq('id', id)
         .eq('status', 'published')
@@ -152,12 +153,13 @@ export function useDirectoryProject(id: string, language: Language, enabled: boo
     },
     select: (row): DirectoryProject | null => {
       if (!row) return null;
-      const { owner, university, ...project } = row;
+      const { owner, owner_id: ownerId, university, ...project } = row;
       const person = one(owner);
       const student = one(person?.student ?? null);
       const uni = one(university);
       return {
         ...toProject(project),
+        ownerId,
         ownerName: person?.full_name ?? null,
         universityName: uni ? (language === 'ar' ? uni.name_ar : uni.name_en) : null,
         major: student?.major ?? null,

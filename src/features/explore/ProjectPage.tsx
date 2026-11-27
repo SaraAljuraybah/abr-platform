@@ -1,10 +1,11 @@
-import { ArrowLeft, ArrowRight, SearchX, UserRound } from 'lucide-react';
+import { ArrowLeft, ArrowRight, SearchX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useParams } from 'react-router';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { useAuth } from '@/features/auth/auth-context';
+import { ConnectPanel } from '@/features/connections/components/ConnectPanel';
 import { ProjectDetails } from '@/features/projects/components/ProjectDetails';
 import { ProjectLoadError, ProjectSkeleton } from '@/features/projects/components/states';
 import { page, panel } from '@/features/projects/styles';
@@ -78,23 +79,6 @@ function OwnerCard({ project }: { project: DirectoryProject }) {
   );
 }
 
-/** Where "Request to connect" arrives in the next story. */
-function ConnectPlaceholder() {
-  const { t } = useTranslation();
-  return (
-    <section
-      aria-labelledby="connect-title"
-      className="flex flex-col gap-2 rounded-lg border border-dashed border-border p-6"
-    >
-      <h2 id="connect-title" className="flex items-center gap-2 text-lg font-bold text-brand">
-        <UserRound aria-hidden="true" strokeWidth={1.75} className="size-5" />
-        {t('explore.project.connectTitle')}
-      </h2>
-      <p className="text-sm text-muted-foreground">{t('explore.project.connectBody')}</p>
-    </section>
-  );
-}
-
 /** The same answer for a missing, unpublished or hidden project: nothing leaks. */
 function NotFound() {
   const { t } = useTranslation();
@@ -154,7 +138,7 @@ export function ProjectPage() {
         <ProjectDetails project={p} className="max-w-none" />
         <div className="flex flex-col gap-6">
           <OwnerCard project={p} />
-          <ConnectPlaceholder />
+          <ConnectPanel projectId={p.id} ownerId={p.ownerId} />
         </div>
       </div>
     </div>

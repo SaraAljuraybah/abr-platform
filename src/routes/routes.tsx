@@ -150,6 +150,28 @@ export const routes: RouteObject[] = [
                     }),
                   },
                   {
+                    // SCRUM-21: requests, connections and notifications. RLS and the RPCs decide
+                    // what each user sees; the pages explain what other roles get.
+                    path: 'app/requests',
+                    lazy: async () => ({
+                      Component: (await import('@/features/connections/RequestsPage')).RequestsPage,
+                    }),
+                  },
+                  {
+                    path: 'app/connections',
+                    lazy: async () => ({
+                      Component: (await import('@/features/connections/ConnectionsPage'))
+                        .ConnectionsPage,
+                    }),
+                  },
+                  {
+                    path: 'app/notifications',
+                    lazy: async () => ({
+                      Component: (await import('@/features/connections/NotificationsPage'))
+                        .NotificationsPage,
+                    }),
+                  },
+                  {
                     // Projects directory (SCRUM-20): every role. The pages show a "verify first"
                     // message to anyone not verified; RLS (projects_select, D-15) is the gate.
                     path: 'projects',
