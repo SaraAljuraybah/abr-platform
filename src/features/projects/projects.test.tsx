@@ -346,7 +346,7 @@ describe.each(['en', 'ar'] as const)('edit a draft (%s)', (language) => {
       screen.getByLabelText(t.projects.fields.academicYear),
       '2027_or_later',
     );
-    await user.click(screen.getByRole('button', { name: t.projects.save.button }));
+    await user.click(screen.getByRole('button', { name: t.projects.save.draft }));
 
     expect(await screen.findByText(t.projects.save.saved)).toBeInTheDocument();
     expect(db.updates).toEqual([
@@ -388,7 +388,7 @@ describe.each(['en', 'ar'] as const)('edit a draft (%s)', (language) => {
     const user = userEvent.setup();
     await load('/app/projects/p-1/edit');
     await user.clear(screen.getByLabelText(t.projects.fields.title));
-    await user.click(screen.getByRole('button', { name: t.projects.save.button }));
+    await user.click(screen.getByRole('button', { name: t.projects.save.draft }));
     expect(await screen.findByText(t.validation.required)).toBeInTheDocument();
     expect(db.updates).toEqual([]);
   });
@@ -438,7 +438,7 @@ describe.each(['en', 'ar'] as const)('edit a draft (%s)', (language) => {
     const user = userEvent.setup();
     const router = await load('/app/projects/p-1/edit');
     await user.type(screen.getByLabelText(t.projects.fields.summary), ' More.');
-    await user.click(screen.getByRole('button', { name: t.projects.save.button }));
+    await user.click(screen.getByRole('button', { name: t.projects.save.draft }));
     await screen.findByText(t.projects.save.saved);
     await user.click(dashboardLink(t) ?? document.body);
     await waitFor(() => {
@@ -494,7 +494,7 @@ describe.each(['en', 'ar'] as const)('edit a draft (%s)', (language) => {
     // Submitted for review in another tab: the update now matches no rows.
     db.projects.set('p-1', project({ status: 'pending_review' }));
     await user.type(screen.getByLabelText(t.projects.fields.summary), ' More.');
-    await user.click(screen.getByRole('button', { name: t.projects.save.button }));
+    await user.click(screen.getByRole('button', { name: t.projects.save.draft }));
     // The page reloads the project and shows it read-only.
     expect(await screen.findByText(t.projects.readOnly.notice, {}, SLOW)).toBeInTheDocument();
     expect(screen.queryByText(t.projects.save.saved)).toBeNull();
@@ -535,7 +535,7 @@ describe.each(['en', 'ar'] as const)('read-only and not found (%s)', (language) 
       expect(screen.getByText('Campus Navigator')).toBeInTheDocument();
       expect(screen.getByText(t.projects.options.track.mobile)).toBeInTheDocument();
       expect(screen.queryByRole('textbox')).toBeNull();
-      expect(screen.queryByRole('button', { name: t.projects.save.button })).toBeNull();
+      expect(screen.queryByRole('button', { name: t.projects.save.draft })).toBeNull();
       expect(screen.queryByRole('button', { name: t.projects.delete.button })).toBeNull();
     },
   );

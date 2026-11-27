@@ -1077,9 +1077,10 @@
       "demoUrlHint": "Any link starting with https://"
     },
     "save": {
-      "button": "Save",
       "saving": "Saving…",
-      "saved": "Saved"
+      "saved": "Saved",
+      "draft": "Save draft",
+      "changes": "Save changes"
     },
     "unsaved": {
       "title": "Leave without saving?",
@@ -1216,7 +1217,8 @@
       "dialogTitle": "Submit your project for review?",
       "dialogBody": "After you submit, you can't edit until our team reviews your project.",
       "submitting": "Submitting…",
-      "done": "Your project was submitted for review."
+      "done": "Your project was submitted for review.",
+      "private": "Your project stays private until our team approves it."
     },
     "status": {
       "pending_review": {

@@ -25,11 +25,12 @@ type Row = Record<string, unknown>;
  * their embedded shape. Top-level eq filters run here. RLS and every rule are the database's job
  * (supabase/tests/database/150_connection_requests.test.sql).
  */
-const db = vi.hoisted(() => ({
-  tables: {} as Record<string, Row[]>,
-  rpcs: [] as { name: string; args: Row }[],
-  rpcResult: {} as Record<string, { data?: unknown; error?: { message: string } | null }>,
-}));
+interface FakeDb {
+  tables: Record<string, Row[]>;
+  rpcs: { name: string; args: Row }[];
+  rpcResult: Record<string, { data?: unknown; error?: { message: string } | null }>;
+}
+const db = vi.hoisted((): FakeDb => ({ tables: {}, rpcs: [], rpcResult: {} }));
 
 vi.mock('@/lib/supabase', () => {
   function select(table: string, options?: { head?: boolean }) {

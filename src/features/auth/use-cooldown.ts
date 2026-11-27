@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 
 /**
- * A countdown that starts on mount. Measured against the clock, not by counting ticks, so a
- * throttled background tab still ends on time. restart() starts it again from the full length.
+ * A countdown that starts on mount (unless `startNow` is false). Measured against the clock, not by
+ * counting ticks, so a throttled background tab still ends on time. restart() starts it again from
+ * the full length.
  */
-export function useCooldown(seconds: number) {
-  const [endsAt, setEndsAt] = useState(() => Date.now() + seconds * 1000);
+export function useCooldown(seconds: number, startNow = true) {
+  const [endsAt, setEndsAt] = useState(() => (startNow ? Date.now() + seconds * 1000 : 0));
   const [now, setNow] = useState(() => Date.now());
   const running = now < endsAt;
 

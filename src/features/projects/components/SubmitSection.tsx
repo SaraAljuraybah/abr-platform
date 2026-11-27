@@ -72,7 +72,7 @@ export function SubmitSection({
     <EditorSection
       id="section-submit"
       title={resubmit ? t('projects.submit.resubmitTitle') : t('projects.submit.title')}
-      intro={t('projects.submit.intro')}
+      intro={`${t('projects.submit.intro')} ${t('projects.submit.private')}`}
     >
       {shown.length > 0 ? (
         <div className="flex flex-col gap-2">

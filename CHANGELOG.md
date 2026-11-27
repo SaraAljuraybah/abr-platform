@@ -5,6 +5,14 @@ Entries are grouped per checkpoint (Plan v2.0 §17).
 
 ## [Unreleased] — Build-out, 27 Nov 2026
 
+### Polish
+
+- Project editor: the save button reads "Save draft" (or "Save changes" when changes were
+  requested), the save bar sticks to the bottom of the screen, and the submit section says the
+  project stays private until our team approves it.
+- Expired or used email links: "Resend link" works at once (the 60-second wait starts only after
+  a send).
+
 ### Requests to connect, connections and notifications (SCRUM-21)
 
 - New tables `requests`, `connections`, `notifications` (RLS, select-only grants; all writes through

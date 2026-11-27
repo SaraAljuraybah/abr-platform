@@ -222,10 +222,11 @@ function ProjectEditor({ project, userId }: { project: Project; userId: string }
           }}
         />
 
+        {/* Sticky, so Save stays in reach on a long form (SCRUM-27 polish). */}
         <div
           className={cn(
             panel,
-            'flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between',
+            'sticky bottom-0 z-10 flex flex-col-reverse gap-4 shadow-md sm:flex-row sm:items-center sm:justify-between sm:p-5',
           )}
         >
           {project.status === 'draft' ? (
@@ -283,7 +284,9 @@ function ProjectEditor({ project, userId }: { project: Project; userId: string }
               )}
             </p>
             <Button type="submit" loading={save.isPending} loadingText={t('projects.save.saving')}>
-              {t('projects.save.button')}
+              {project.status === 'changes_requested'
+                ? t('projects.save.changes')
+                : t('projects.save.draft')}
             </Button>
           </div>
         </div>

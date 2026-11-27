@@ -152,7 +152,8 @@ describe.each(['en', 'ar'] as const)('auth/confirmed page (%s)', (language) => {
       });
       expect(heading).toHaveFocus();
       expect(screen.getByLabelText(t.auth.signIn.email)).toHaveAttribute('type', 'email');
-      expect(screen.getByRole('button', { name: cooldown('1:00') })).toBeDisabled();
+      // Nothing was sent from this page yet, so the button works at once (no initial cooldown).
+      expect(screen.getByRole('button', { name: t.auth.resend.action })).toBeEnabled();
       expect(screen.getByRole('link', { name: t.auth.confirmed.signIn })).toHaveAttribute(
         'href',
         '/sign-in',
@@ -191,7 +192,7 @@ describe.each(['en', 'ar'] as const)('auth/confirmed page (%s)', (language) => {
     ).toBeInTheDocument();
   });
 
-  it('the error state validates the email and resends after the cooldown', async () => {
+  it('the error state validates the email, resends at once, then waits the cooldown', async () => {
     vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
     const user = userEvent.setup();
     linkFailed();
@@ -199,9 +200,6 @@ describe.each(['en', 'ar'] as const)('auth/confirmed page (%s)', (language) => {
     renderWithAuthStore(`/auth/confirmed${EXPIRED_HASH}`);
     await screen.findByRole('heading', { level: 1, name: t.auth.confirmed.failed });
 
-    act(() => {
-      vi.advanceTimersByTime(60_000);
-    });
     const email = screen.getByLabelText(t.auth.signIn.email);
     await user.type(email, 'not-an-email');
     await user.click(screen.getByRole('button', { name: t.auth.resend.action }));

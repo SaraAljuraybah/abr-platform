@@ -16,7 +16,9 @@ const emailSchema = z.object({ email: signInSchema.shape.email });
 type EmailValues = z.infer<typeof emailSchema>;
 
 /**
- * "Resend link" with a cooldown that starts on page load and again after every successful send.
+ * "Resend link" with a cooldown after every successful send. With `email` (a link was just sent)
+ * the cooldown also starts on page load; on the expired-link pages (no `email`) nothing was sent
+ * from this page yet, so the button works at once.
  * With `email`, a single button sends to that address; without it, the user types the address.
  * `purpose` picks the link: the sign-up confirmation (default) or a password reset (SCRUM-13, page 4).
  * Errors use the sign-in mapping (toAuthFailure); none of them says whether an account exists.
@@ -32,7 +34,7 @@ export function ResendLink({
   const confirmation = useResendConfirmation();
   const reset = useRequestPasswordReset();
   const resend = purpose === 'recovery' ? reset : confirmation;
-  const { secondsLeft, restart } = useCooldown(RESEND_COOLDOWN_SECONDS);
+  const { secondsLeft, restart } = useCooldown(RESEND_COOLDOWN_SECONDS, email !== undefined);
 
   const {
     register,

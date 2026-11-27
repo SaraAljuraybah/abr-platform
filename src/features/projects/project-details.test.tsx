@@ -331,7 +331,7 @@ describe.each(['en', 'ar'] as const)('edit page sections (%s)', (language) => {
       p.sections.links,
       p.submit.title,
     ]);
-    expect(screen.getAllByRole('button', { name: p.save.button })).toHaveLength(1);
+    expect(screen.getAllByRole('button', { name: p.save.draft })).toHaveLength(1);
   });
 
   it('stage & team: stage, team size, and specializations only while looking for members', async () => {
@@ -378,7 +378,7 @@ describe.each(['en', 'ar'] as const)('edit page sections (%s)', (language) => {
       ),
     );
 
-    await user.click(screen.getByRole('button', { name: p.save.button }));
+    await user.click(screen.getByRole('button', { name: p.save.draft }));
     expect(await screen.findByText(p.save.saved)).toBeInTheDocument();
     expect(db.updates.at(-1)).toMatchObject({
       stage: 'mvp',
@@ -409,7 +409,7 @@ describe.each(['en', 'ar'] as const)('edit page sections (%s)', (language) => {
     expect(section.getByText(p.fields.needsHint)).toBeInTheDocument();
     await user.click(section.getByRole('button', { name: p.options.need.tech_partner }));
     await user.click(section.getByRole('button', { name: p.options.need.funding }));
-    await user.click(screen.getByRole('button', { name: p.save.button }));
+    await user.click(screen.getByRole('button', { name: p.save.draft }));
     await screen.findByText(p.save.saved);
     expect(db.updates.at(-1)?.needs).toEqual(['funding', 'tech_partner']);
   });
@@ -427,7 +427,7 @@ describe.each(['en', 'ar'] as const)('edit page sections (%s)', (language) => {
     await user.type(video, 'https://evil.example/watch');
     await user.type(repo, 'https://bitbucket.org/team/p');
     await user.type(demo, 'http://demo.example.com');
-    await user.click(screen.getByRole('button', { name: p.save.button }));
+    await user.click(screen.getByRole('button', { name: p.save.draft }));
     await waitFor(() => {
       expect(video).toHaveAccessibleDescription(expect.stringContaining(t.validation.videoUrl));
     });
@@ -441,7 +441,7 @@ describe.each(['en', 'ar'] as const)('edit page sections (%s)', (language) => {
     await user.type(repo, 'https://github.com/team/project');
     await user.clear(demo);
     await user.type(demo, 'https://demo.example.com');
-    await user.click(screen.getByRole('button', { name: p.save.button }));
+    await user.click(screen.getByRole('button', { name: p.save.draft }));
     await screen.findByText(p.save.saved);
     expect(db.updates.at(-1)).toMatchObject({
       video_url: 'https://youtu.be/abc',
@@ -460,7 +460,7 @@ describe.each(['en', 'ar'] as const)('edit page sections (%s)', (language) => {
         within(region(t, 'stageTeam')).getByRole('checkbox', { name: p.fields.lookingForMembers }),
       );
       await user.type(within(region(t, 'links')).getByLabelText(p.fields.repoUrl), 'x');
-      await user.click(screen.getByRole('button', { name: p.save.button }));
+      await user.click(screen.getByRole('button', { name: p.save.draft }));
       await screen.findByText(t.validation.repoUrl);
       expect(await axeViolations()).toEqual([]);
     },
